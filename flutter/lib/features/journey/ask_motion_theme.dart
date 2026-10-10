@@ -270,10 +270,7 @@ AskMotionTheme classifyAskMotionTheme(String question) {
     return _theme('route', AskMotionKind.map, [_sprite('town-map')]);
   }
   if (species.isNotEmpty || has(r'宝可梦|精灵|图鉴|pokemon|pokémon')) {
-    return _theme('capture', AskMotionKind.ball, [
-      _sprite('poke-ball'),
-      'assets/icons/Dex.png',
-    ]);
+    return _theme('capture', AskMotionKind.ball, [_sprite('poke-ball')]);
   }
   return _theme('general', AskMotionKind.book, [_book]);
 }

@@ -5,45 +5,32 @@ keeps three HGSS hints available offline. The reviewed online corpus also
 covers selected blockers in DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP,
 Legends: Arceus, and Scarlet/Violet.
 
-The request path is deliberately fail-safe:
+The current source candidate simplifies online research. It has not yet replaced
+the recorded production version below.
 
-1. Exact game + local aliases + verified save location are scored first.
-2. On a miss, the Worker may read the current versioned TitoDex Dex bundle
-   through the read-only `DEX_CONTENT` R2 binding. Exact species encounter,
-   held-item, versioned learnset, evolution, profile, item, ability, catalog
-   and reverse move/ability intersection questions are
-   validated and answered without a model. Open-ended questions receive only a
-   bounded entity evidence object. Cultivation, strategy, route, and
-   recommendation questions try a bounded Chinese 52Poké result pool first;
-   if it cannot support the answer, they retrieve fixed sources plus bounded
-   English and Chinese fallback pools over the remaining domains, then use bundle fields to
-   cross-check entities, versions, and numbers before Qwen composition and a
-   second verification pass. Strict mode requires two independent evidence
-   groups whenever available; the explicit v0.8.16 trial may return one
-   allowlisted evidence group at low confidence. Evolution conditions and
-   standalone move values retain the existing exact-version source path.
-3. Only a remaining local miss or tie may use the optional AI Search binding.
-4. AI Search returns candidate `hintId` values; its chunk text is never used as
-   an answer.
-5. Workers AI is the public default and may classify an allowed candidate and
-   reorder deterministic answer sections. It cannot add, remove, or rewrite
-   facts. A unique local match makes zero model calls.
-6. If the audited corpus still has no match and `CURATED_WEB_ENABLED=true`, a
-   strict Pokémon-game scope classifier may query only PokéAPI, StrategyWiki,
-   and Wikidata. Qwen composes a labelled, cited, unreviewed answer solely from
-   the bounded results.
-7. For Chinese questions, enabled retrieval providers first search within a boundary whose request
-   and accepted-result boundary is only `wiki.52poke.com`. If that evidence is
-   empty or fails Qwen support verification, broad advice opens independent
-   English/Chinese searches over the remaining server-owned allowlist; narrow
-   questions open one mixed fallback search. Snippets still pass through Qwen
-   composition and verification, and final answers remain Simplified Chinese.
-8. DeepSeek V4 Flash native search runs concurrently with that curated route.
-   TitoDex requires linked search-result blocks, revalidates every URL against
-   the same allowlist, and uses citation text for a Qwen support pass when the
-   provider supplies it. In explicit trial mode a linked, allowlisted result
-   without citation text can be returned at low confidence with a warning.
-   Any provider, quota, shape, or scope failure preserves deterministic fallback.
+1. Exact-game local hints and executed Dex-bundle queries answer first. A unique
+   local match makes zero model calls. Structured facts retain ownership of
+   their entity, version, value and condition fields.
+2. Optional AI Search narrows reviewed hint IDs; retrieved chunks cannot supply
+   answer facts. The routing model also prepares bilingual search terms.
+3. On a remaining miss, the normal Exa path reuses complete Chinese/English
+   terms from routing or the name dictionary. Only missing or mixed-language
+   terms need one query-preparation call.
+4. Exa performs one Chinese and one English `/search` request concurrently,
+   with at most six results each. It uses `auto` and retrieved highlights,
+   with no domain restriction or generated Exa answer. The normal Exa path
+   does not make fixed PokéAPI, StrategyWiki or Wikidata requests.
+5. URL deduplication, website diversity and topic/work checks produce at most
+   six web excerpts. These join bounded local evidence for composition and
+   support verification. Contradictions, wrong versions and invented facts
+   retain their existing guards. Citations keep original source URLs.
+6. Qwen is the default text model for terms, composition and verification.
+   A request-local text fallback can use the existing DeepSeek Gateway/BYOK
+   identity after model failure, without search tools or continuations.
+   `modelProviders` records successful text-model participation.
+7. Tavily and DeepSeek native web search are disabled by default. They require
+   explicit opt-in. The key-free fixed-source path remains available when Exa
+   is not configured; an active Exa failure preserves deterministic fallback.
 
 Before semantic blocks leave the Worker, `enforceFinalFacts` restores executed
 structured query results and keeps their evidence/entity IDs aligned. An
@@ -52,11 +39,83 @@ See [structured query coverage and limitations](../../docs/ASK_STRUCTURED_DATA.m
 The App no longer advertises the optional Journey pack downloader; compatible
 pack loading and reviewed hint delivery remain implemented.
 
+### Conversation and version scope
+
+The App stores at most 20 local conversations, with explicit deletion at capacity.
+Creating a conversation is part of the conversation switch sheet.
+It sends only the active conversation's newest six Q&A pairs. A page-level
+version picker is no longer part of the flow; the global edition supplies the
+default scope. A server-owned resolver runs after strict request validation and
+before hints, bundle facts, search or model work. It resolves explicit titles
+and user follow-ups, keeps same-version save context, and removes save context
+when changing to another version or researching several versions.
+
+Unsupported and combined default editions may send the optional plain
+`context.referenceGameTitle`. Only canonical game aliases become research
+scope; caller text cannot create an exact-game key or supply server scope
+metadata. Explicit question titles take precedence. Deploy this compatible
+Worker before the new App: the preceding Worker rejects this extra context key.
+The canonical wire schema is `data/journey/assistant_api.schema.json`.
+
+### Conversation candidate verification (2026-10-08)
+
+Worker: 496 tests passed / 10 existing skipped; structured configuration:
+27 passed / 10 existing skipped; strict schema: 7 passed. Types and dry-run
+passed. App: 864 tests passed / 2 existing skipped, full analysis clean,
+Android arm64 debug build passed. Real widget screenshots cover the page,
+conversation drawer and small-screen/large-text status layouts. Production
+rollout, signed release and physical-device acceptance remain pending.
+
+### General basics candidate (2026-10-09)
+
+Unscoped general mechanics questions first answer the useful supported basics,
+without requiring a game choice. Empty introductions and version prompts cannot
+count as an answer. Capture/obtain questions retain their location intent and may
+show up to two sourced examples explicitly labelled with the game. Optional
+`outlineMode: basic_web_outline` identifies this presentation while preserving
+the existing answer-mode contract. Basic verification uses fixed claim keys and
+numeric source references, mapped by the server to original IDs; each retained
+claim still needs an exact source quote. Original bundle fields continue to guard
+web claims, and contradictions cannot be revived by fallback.
+
+Web rejection can fall back to readable local evolution, type or weakness
+projections with upstream links and explicit cached-evidence labels. These links
+do not claim a live API read. A conservative capture projection accepts explicit
+edition/location rows, retains stated conditions and original source URLs, and
+keeps unknown boundaries or qualifiers out of the answer. It does not infer
+location fields from flattened cards or add missing capture steps.
+
+App: 864 passed / 2 existing skipped; full analysis clean and Android arm64 debug
+build passed. Real-response widget captures passed 14 tests. Worker: 566 passed /
+10 existing skipped; structured configuration: 27 passed / 10 existing skipped;
+typecheck and dry-run passed. Real 0%-traffic candidate requests answered general
+Eevee/Riolu evolution and Pikachu weakness questions. Two consecutive normal
+Riolu capture requests returned version-labelled answers and public citations.
+A normal request on the final candidate also returned a deterministic projection
+of explicit edition/location rows with its original public source link.
+These responses establish API behavior, not a blanket independent fact audit.
+A simulated failure of the entire composition path still returns no_match when
+location cards have no safely parseable edition/location boundaries. Temporary
+format and failure hooks were removed. Ordinary production traffic was restored
+to the recorded baseline; no App release or production rollout occurred.
+
+### Candidate verification (2026-10-08)
+
+- Worker: 410 tests passed / 10 existing skipped; independent structured
+  configuration: 27 passed / 10 existing skipped.
+- Typecheck and Worker dry-run passed.
+- App: 87 relevant tests passed, targeted analysis clean and Android arm64
+  debug build passed. Sources use theme-coloured Custom Tabs, with external
+  browser fallback; history preserves model participation and original URLs.
+- This earlier local snapshot had no real-provider acceptance evidence. See the
+  latest general-basics candidate checks above. Signed release and physical-device
+  browser acceptance remain pending.
+
 ## Key-free curated source fallback
 
 This fallback needs no new binding, account resource, or API key. The App still
 calls only `/v1/ask`; all source requests originate in the Worker. The existing
-per-device 20 requests/minute limiter remains the public abuse/cost guard, with
+edge-derived identity limiter and global question budget remain the public abuse/cost guards, with
 no daily five-request cap.
 
 - PokéAPI REST v2 is queried only for a validated resource kind and slug. The
@@ -82,49 +141,33 @@ Every live-source answer is visibly labelled `未经 TitoDex 人工审核`. A so
 failure, invalid model result, quota exhaustion, or scope rejection returns the
 original deterministic `no_match` response. Live answers never write to R2.
 
-## Optional Exa primary / Tavily fallback search
+## Bilingual Exa search and optional fallback
 
-Exa is the default retrieval provider. Tavily is disabled by default; it only
-participates as a backup after an explicit `TAVILY_WEB_ENABLED=true` setting.
-With Tavily disabled, Exa failure continues through the existing fixed-source,
-DeepSeek and deterministic fallback paths.
+The normal source configuration uses `EXA_WEB_ENABLED=true`,
+`WEB_SEARCH_PRIMARY=exa`, `TAVILY_WEB_ENABLED=false`,
+`DEEPSEEK_NATIVE_SEARCH_ENABLED=false` and
+`DEEPSEEK_TEXT_FALLBACK_ENABLED=true`.
 
-Both services retrieve evidence; the existing composer and verifier decide
-whether it supports an answer. Neither is called when a local audited hint or
-exact Dex-bundle fact already answers the question.
-
-- `WEB_SEARCH_PRIMARY=exa` selects Exa first. `tavily` explicitly reverses the
-  order. A missing/disabled provider is skipped. Exa is enabled in the validated candidate after its Worker secret and live
-  retrieval passed. Production uses the validated Exa version after the approved rollout.
-- Store `EXA_API_KEY` and `TAVILY_API_KEY` only as Worker secrets. Each also
-  needs its corresponding `EXA_WEB_ENABLED` / `TAVILY_WEB_ENABLED` flag and
-  `CURATED_WEB_ENABLED=true`. Health requires a valid key shape plus these
-  flags; it does not probe the account balance.
-- In each language/domain pool, the primary is tried first. Empty or rejected
-  results, timeout, malformed data, account errors, rate limiting and quota
-  exhaustion fall through to the other provider. Non-empty retrieved evidence
-  still needs the existing support checks. If the 52Poké evidence cannot
-  support an answer, research proceeds to the remaining domains; it does not
-  rerun the same 52Poké pool in the backup solely because composition failed.
-- Exa uses `/search`, `type=auto`, six results and bounded `highlights` only.
-  It ignores generated summaries, answer output and page text. Tavily retains
-  basic retrieval, or advanced retrieval for strategy questions, with no
-  generated answer or raw page text. Each call has a five-second maximum,
-  a 64 KiB response limit and no retry. Search across both stages shares a
-  ten-second wall-clock deadline, including any rejected preferred-source pass.
-- Chinese retrieval first isolates `wiki.52poke.com`. A missing or unsupported
-  answer opens the remaining allowlisted domains: one mixed query for narrow
-  questions, concurrent English/Chinese pools for broad advice. Returned URLs
-  must use HTTPS and exactly match the server-owned domain list.
-- Exa HTTP 402 and Tavily HTTP 432/433 indicate credit/budget exhaustion;
-  HTTP 429 is rate limiting. These and other provider failures skip further
-  calls to that provider during the same user question. Already-started language
-  requests can still finish. The next question tries the configured primary
-  again, allowing a replenished quota to recover without a shared counter.
-- Logs contain provider/stage/status/count only, never keys, queries, snippets
-  or upstream error bodies. Retrieved evidence is not stored, indexed or
-  packaged. A URL returned by both engines counts once; independent evidence
-  groups are based on websites, not search-engine names.
+- `EXA_API_KEY` and optional `TAVILY_API_KEY` stay in Worker secrets. Provider
+  flags and `CURATED_WEB_ENABLED=true` also gate retrieval. Health checks key
+  shape and flags; it does not inspect account credit.
+- Chinese and English Exa requests run in parallel, once per language. Each
+  has a five-second limit, six results and a bounded 64 KiB response. The
+  shared retrieval deadline is ten seconds. A failed language does not discard
+  evidence returned by the other language.
+- Exa searches the public web without `includeDomains`. Accepted URLs must
+  use public HTTPS, have no credentials or unusual port, and pass topic/work
+  checks. The Worker uses provider excerpts and does not fetch arbitrary URLs.
+- When explicitly enabled, Tavily can fail over per pool. Account, shape,
+  network, rate-limit and quota failures skip subsequent calls to that provider
+  during the same question. An already-started language request can finish.
+  The next question starts with fresh provider availability.
+- DeepSeek text fallback reuses `CF_ACCOUNT_ID`, `CF_AIG_TOKEN` and the existing
+  explicit BYOK alias. It sends no web tools, has a six-second timeout and
+  bounded output. It is reported separately from web search in health/trace.
+- Logs contain provider, phase, status and count, never keys, query text,
+  excerpts or upstream error bodies. Evidence is not stored or indexed.
+  A duplicate URL counts once; provider names do not establish independence.
 
 Local development can use a git-ignored `.dev.vars` file in this directory with
 `EXA_API_KEY=<your key>`; keep the value out of chat, command arguments and logs.
@@ -286,7 +329,11 @@ References:
 - <https://developers.cloudflare.com/ai-search/configuration/retrieval/filtering/>
 - <https://developers.cloudflare.com/ai-search/configuration/models/supported-models/>
 
-## Optional DeepSeek / custom provider setup
+## Optional legacy DeepSeek native search / custom provider setup
+
+Native search is disabled in the current source candidate. The text fallback
+uses the same Gateway identity with no tools. The following instructions cover
+explicitly enabling the legacy native-search path.
 
 DeepSeek is not AI Search's generation model and is never an unlimited public
 fallback. Qwen remains the public classifier/composer/verifier. After the

@@ -13,6 +13,7 @@
     "EXA_WEB_ENABLED": "false",
     "WEB_SEARCH_PRIMARY": "exa",
     "DEEPSEEK_NATIVE_SEARCH_ENABLED": "false",
+    "DEEPSEEK_TEXT_FALLBACK_ENABLED": "false",
     "DEEPSEEK_NATIVE_PROVIDER": "custom-deepseek-anthropic",
     "DEEPSEEK_NATIVE_KEY_ALIAS": "TitoDex",
     "AI_EXTERNAL_PROVIDER_ENABLED": "false",

@@ -47,7 +47,7 @@ function franchiseContextQuestion(request: AssistantRequest): string {
 
 /** Missing a game selection does not imply an anime/card question. */
 export function isVersionIndependentPokemonRequest(request: AssistantRequest): boolean {
-  return request.context.game === 'general' || isGeneralPokemonFranchiseRequest(request);
+  return !request.questionGameScope && (request.context.game === 'general' || isGeneralPokemonFranchiseRequest(request));
 }
 
 /** Keep Mega Evolution separate from an ordinary species evolution chain. */

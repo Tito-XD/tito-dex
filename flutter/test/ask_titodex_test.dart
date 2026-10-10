@@ -544,9 +544,15 @@ void main() {
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       await tester.pumpAndSettle();
 
-      expect(find.text('在线 4/6'), findsOneWidget);
-      expect(find.text('问答 0/50'), findsOneWidget);
-      expect(find.text('魂银'), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexStatusOnlineReady), findsOneWidget);
+      expect(
+        find.byKey(const Key('ask-titodex-session-summary')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('ask-titodex-edition-summary')),
+        findsNothing,
+      );
       expect(find.text('Journey Worker'), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
@@ -586,12 +592,15 @@ void main() {
         find.byKey(const Key('ask-titodex-connection-dialog')),
         findsOneWidget,
       );
-      expect(find.text('Journey Worker'), findsOneWidget);
-      expect(find.textContaining('Qwen ·'), findsOneWidget);
-      expect(find.textContaining('AI Search ·'), findsOneWidget);
-      expect(find.text('百科资料 · 多个限定来源'), findsOneWidget);
-      expect(find.text('联网搜索'), findsOneWidget);
-      expect(find.text('可用'), findsNWidgets(4));
+      expect(find.text(AppZh.askTitoDexCapOnlineService), findsOneWidget);
+      expect(
+        find.text(AppZh.askTitoDexCapAnswerComposition('Qwen')),
+        findsOneWidget,
+      );
+      expect(find.text(AppZh.askTitoDexCapReviewedHints), findsOneWidget);
+      expect(find.text('百科资料 · 多个限定来源'), findsNothing);
+      expect(find.text(AppZh.askTitoDexCapSearchGeneric), findsOneWidget);
+      expect(find.text('可用'), findsNWidgets(3));
       expect(find.text('未连接'), findsNWidgets(2));
       await tester.tap(find.text('知道了'));
       await tester.pumpAndSettle();
@@ -668,9 +677,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
-      expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
-      expect(find.text('检索 3 路'), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsNothing);
+      expect(find.text(AppZh.askTitoDexTraceModel), findsNothing);
+      expect(find.text('检索 3 路'), findsNothing);
       expect(find.text('参考 3 个来源 · 未逐项核验'), findsOneWidget);
       expect(find.text('已核验 · 参考 3 个来源'), findsNothing);
       expect(find.text('参考 3 个来源'), findsNothing);
@@ -686,9 +695,15 @@ void main() {
       expect(find.text('神奇宝贝百科 · 路卡利欧'), findsNothing);
       expect(find.byKey(const Key('ask-titodex-answer-card')), findsOneWidget);
       expect(find.byIcon(Icons.fact_check_outlined), findsNothing);
-      expect(find.text('在线 4/6'), findsOneWidget);
-      expect(find.text('问答 1/50'), findsOneWidget);
-      expect(find.text('魂银'), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexStatusOnlineReady), findsOneWidget);
+      expect(
+        find.byKey(const Key('ask-titodex-session-summary')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('ask-titodex-edition-summary')),
+        findsNothing,
+      );
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-generating-answer')),
@@ -712,6 +727,9 @@ void main() {
 
       expect(find.byKey(const Key('ask-titodex-source-sheet')), findsOneWidget);
       expect(find.text('回答引用 · 3'), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
+      expect(find.text('检索 3 路'), findsOneWidget);
       expect(find.text('PokeAPI'), findsOneWidget);
       expect(find.text('Exa'), findsOneWidget);
       expect(find.text('Tavily'), findsOneWidget);
@@ -906,35 +924,28 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
-    expect(find.text('在线 6/7'), findsOneWidget);
-    expect(find.text('问答 0/50'), findsOneWidget);
-    expect(find.text('魂银'), findsOneWidget);
+    expect(find.text(AppZh.askTitoDexStatusOnlineReady), findsOneWidget);
+    expect(
+      find.byKey(const Key('ask-titodex-session-summary')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('ask-titodex-edition-summary')), findsNothing);
     await tester.tap(find.byKey(const Key('ask-titodex-connection-summary')));
     await tester.pumpAndSettle();
-    expect(find.text('联网 · Exa'), findsOneWidget);
-    expect(find.text('联网 · Tavily'), findsOneWidget);
-    expect(find.text('可用'), findsNWidgets(6));
+    expect(
+      find.text(AppZh.askTitoDexCapSearchSources('Exa · Tavily')),
+      findsOneWidget,
+    );
+    expect(find.text('可用'), findsNWidgets(4));
     await tester.tap(find.text('知道了'));
     await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('ask-titodex-history-summary')));
+    await tester.tap(find.byKey(const Key('ask-titodex-session-summary')));
     await tester.pumpAndSettle();
-    expect(find.text('问答记录 · 0/50'), findsOneWidget);
-    expect(find.text('还没有问答记录'), findsOneWidget);
-    expect(
-      tester
-          .widget<OutlinedButton>(
-            find.byKey(const Key('ask-titodex-compact-history')),
-          )
-          .onPressed,
-      isNull,
-    );
+    expect(find.text(AppZh.askTitoDexSessionsCount(1)), findsOneWidget);
+    expect(find.byKey(const Key('ask-titodex-session-create')), findsOneWidget);
     await tester.tapAt(const Offset(5, 5));
     await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('ask-titodex-edition-summary')));
-    await tester.pumpAndSettle();
-    expect(find.text('选择游戏版本'), findsOneWidget);
+    expect(find.byKey(const Key('ask-titodex-edition-summary')), findsNothing);
   });
 
   testWidgets('manual Violet context never displays HGSS save badges', (
@@ -962,7 +973,7 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
-    expect(find.text('紫'), findsOneWidget);
+    expect(find.byKey(const Key('ask-titodex-edition-summary')), findsNothing);
     expect(find.byKey(const Key('ask-titodex-save-context')), findsNothing);
     expect(find.text(AppZh.askTitoDexBadgeContext(3)), findsNothing);
     expect(find.byKey(const Key('ask-titodex-location-context')), findsNothing);
@@ -1013,7 +1024,7 @@ void main() {
     service.completeContext(0);
     await tester.pumpAndSettle();
 
-    expect(find.text('紫'), findsOneWidget);
+    expect(find.byKey(const Key('ask-titodex-edition-summary')), findsNothing);
     expect(find.byKey(const Key('ask-titodex-save-context')), findsNothing);
     expect(find.byKey(const Key('ask-titodex-location-context')), findsNothing);
     expect(find.byKey(const Key('ask-titodex-badge-context')), findsNothing);
@@ -1070,8 +1081,11 @@ void main() {
     edition.value = gameEditionFromSlug('sv')!.withFlavor('violet');
     await tester.pumpAndSettle();
 
-    expect(find.text('紫'), findsOneWidget);
-    expect(find.text('切换版本后还能看到这条吗？'), findsOneWidget);
+    expect(find.byKey(const Key('ask-titodex-edition-summary')), findsNothing);
+    expect(
+      find.byKey(const Key('ask-titodex-question-bubble')),
+      findsOneWidget,
+    );
     expect(find.text('这是切换版本前已经完成的回答。'), findsOneWidget);
   });
 

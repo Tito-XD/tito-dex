@@ -16,6 +16,10 @@ TitoDex registers these files with Flutter's `LicenseRegistry`. Settings →
 “查看开源许可证” displays them together with the notices registered by Flutter
 and Dart packages. Release APKs also contain Flutter's generated `NOTICES.Z`.
 
+`flutter_custom_tabs` (Apache-2.0) supplies the source browser interface using
+Android Custom Tabs and the system Safari view controller. Its package notices
+are included through the same Flutter-generated license registry.
+
 ## Data and generated artifacts
 
 - PKHeX-derived encounter data and its generator are covered separately by

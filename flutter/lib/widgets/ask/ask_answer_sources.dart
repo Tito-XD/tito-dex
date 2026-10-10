@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/journey/progression_hints.dart';
+import '../../features/journey/ask_titodex_source_browser.dart';
 import '../../l10n/app_zh.dart';
 import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
@@ -62,9 +63,11 @@ class AskAnswerEvidenceSummary extends StatelessWidget {
     required this.sourceKinds,
     required this.sourceOpener,
     this.evidence,
+    this.result,
   });
 
   final AskTitoDexEvidence? evidence;
+  final AskTitoDexResult? result;
   final List<ProgressionSource> sources;
   final List<String> sourceKinds;
   final AskTitoDexSourceOpener sourceOpener;
@@ -72,6 +75,7 @@ class AskAnswerEvidenceSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasSources = sources.isNotEmpty;
+    final canInspect = hasSources || result != null;
     final verified =
         evidence?.basis == 'structured' &&
         evidence?.scope == 'game' &&
@@ -86,17 +90,18 @@ class AskAnswerEvidenceSummary extends StatelessWidget {
         ? AppZh.askTitoDexSourcesAvailable(sources.length)
         : AppZh.askTitoDexEvidenceUnverified;
     return Semantics(
-      button: hasSources,
-      label: hasSources ? AppZh.askTitoDexViewCitations(label) : label,
+      button: canInspect,
+      label: canInspect ? AppZh.askTitoDexViewCitations(label) : label,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           key: const Key('ask-titodex-source-summary'),
           borderRadius: BorderRadius.circular(TitoRadii.md),
-          onTap: hasSources
+          onTap: canInspect
               ? () => showAskAnswerSources(
                   context,
                   sources: sources,
+                  result: result,
                   sourceKinds: sourceKinds,
                   sourceOpener: sourceOpener,
                 )
@@ -134,7 +139,7 @@ class AskAnswerEvidenceSummary extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (hasSources) ...[
+                if (canInspect) ...[
                   Text(
                     AppZh.viewAction,
                     style: SecondaryTypography.onCard.small12.copyWith(
@@ -159,6 +164,7 @@ Future<void> showAskAnswerSources(
   required List<ProgressionSource> sources,
   required List<String> sourceKinds,
   required AskTitoDexSourceOpener sourceOpener,
+  AskTitoDexResult? result,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -168,7 +174,7 @@ Future<void> showAskAnswerSources(
     builder: (sheetContext) => DraggableScrollableSheet(
       key: const Key('ask-titodex-source-sheet'),
       expand: false,
-      initialChildSize: 0.68,
+      initialChildSize: sources.isEmpty ? 0.42 : 0.68,
       minChildSize: 0.42,
       maxChildSize: 0.92,
       builder: (context, scrollController) => SafeArea(
@@ -182,7 +188,9 @@ Future<void> showAskAnswerSources(
                 children: [
                   Expanded(
                     child: Text(
-                      '${AppZh.askTitoDexSourceSheetTitle} · ${sources.length}',
+                      sources.isEmpty
+                          ? AppZh.askTitoDexAnswerDetails
+                          : '${AppZh.askTitoDexSourceSheetTitle} · ${sources.length}',
                       style: SecondaryTypography.onCard.h15,
                     ),
                   ),
@@ -204,6 +212,36 @@ Future<void> showAskAnswerSources(
                 ),
               ),
             ),
+            if (result != null) ...[
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: Wrap(
+                  key: const Key('ask-titodex-answer-trace'),
+                  spacing: 9,
+                  runSpacing: 4,
+                  children: [
+                    _AnswerMetaLabel(label: _answerModeLabel(result)),
+                    _AnswerMetaLabel(
+                      label: _modelTraceLabel(result),
+                      emphasized: result.modelUsed,
+                    ),
+                    if (result.aiSearchUsed)
+                      _AnswerMetaLabel(
+                        label: AppZh.askTitoDexTraceAiSearch,
+                        emphasized: true,
+                      ),
+                    if (sourceKinds.isNotEmpty)
+                      _AnswerMetaLabel(
+                        label: AppZh.askTitoDexTraceSearchRoutes(
+                          sourceKinds.length,
+                        ),
+                        emphasized: true,
+                      ),
+                  ],
+                ),
+              ),
+            ],
             if (sourceKinds.isNotEmpty) ...[
               const SizedBox(height: 10),
               Padding(
@@ -255,7 +293,7 @@ class _SourceReferenceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uri = _safeSourceUri(source.url);
+    final uri = askTitoDexSourceUri(source.url);
     final host = uri == null
         ? AppZh.askTitoDexSourceLinkInvalid
         : _sourceHost(uri);
@@ -347,24 +385,13 @@ List<ProgressionSource> uniqueAskAnswerSources(
   final seen = <String>{};
   final unique = <ProgressionSource>[];
   for (final source in sources) {
-    final uri = _safeSourceUri(source.url);
+    final uri = askTitoDexSourceUri(source.url);
     final key =
         uri?.replace(fragment: '').toString() ??
         '${source.title.trim()}\n${source.url.trim()}';
     if (seen.add(key)) unique.add(source);
   }
   return List.unmodifiable(unique);
-}
-
-Uri? _safeSourceUri(String raw) {
-  final uri = Uri.tryParse(raw.trim());
-  if (uri == null ||
-      uri.scheme != 'https' ||
-      uri.host.isEmpty ||
-      uri.userInfo.isNotEmpty) {
-    return null;
-  }
-  return uri;
 }
 
 String _sourceHost(Uri uri) =>
@@ -388,3 +415,76 @@ String _sourceKindLabel(String value) => switch (value) {
   'brave' => 'Brave Search',
   _ => value,
 };
+
+class _AnswerMetaLabel extends StatelessWidget {
+  const _AnswerMetaLabel({required this.label, this.emphasized = false});
+
+  final String label;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 4,
+          height: 4,
+          decoration: BoxDecoration(
+            color: emphasized ? TitoColors.mint : TitoColors.skyBlue,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            color: emphasized ? TitoColors.deepBlue : TitoColors.mutedInk,
+            fontWeight: emphasized ? FontWeight.w800 : FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+String _modelTraceLabel(AskTitoDexResult result) {
+  if (result.modelProviders.contains('deepseek-text')) {
+    return result.modelProviders.contains('workers-ai-qwen')
+        ? AppZh.askTitoDexTraceQwenDeepseek
+        : AppZh.askTitoDexTraceDeepseekText;
+  }
+  return result.modelUsed
+      ? AppZh.askTitoDexTraceModel
+      : AppZh.askTitoDexTraceNoModel;
+}
+
+String _answerModeLabel(AskTitoDexResult result) {
+  if (result.outlineMode == 'basic_web_outline') {
+    return AppZh.askTitoDexBasicOutline;
+  }
+  if (result.modelProviders.contains('deepseek-text')) {
+    final fallback = switch (result.answerMode) {
+      AskTitoDexAnswerMode.curatedSourcesQwen =>
+        AppZh.askTitoDexRouteCuratedFallback,
+      AskTitoDexAnswerMode.auditedOnline =>
+        AppZh.askTitoDexRouteAuditedFallback,
+      AskTitoDexAnswerMode.aiSearchAudited =>
+        AppZh.askTitoDexRouteAiSearchFallback,
+      _ => null,
+    };
+    if (fallback != null) return fallback;
+  }
+  return switch (result.answerMode) {
+    AskTitoDexAnswerMode.localAudited => AppZh.askTitoDexRouteLocal,
+    AskTitoDexAnswerMode.auditedOnline => AppZh.askTitoDexRouteAuditedOnline,
+    AskTitoDexAnswerMode.aiSearchAudited => AppZh.askTitoDexRouteAiSearch,
+    AskTitoDexAnswerMode.curatedSourcesDeterministic =>
+      AppZh.askTitoDexRouteCuratedDeterministic,
+    AskTitoDexAnswerMode.curatedSourcesQwen => AppZh.askTitoDexRouteCuratedQwen,
+    AskTitoDexAnswerMode.deepseekNativeSearch =>
+      AppZh.askTitoDexRouteDeepseekNative,
+    AskTitoDexAnswerMode.multiSourceQwen => AppZh.askTitoDexRouteMultiSource,
+    AskTitoDexAnswerMode.noMatch => AppZh.askTitoDexOnlineSearchedNoMatch,
+  };
+}

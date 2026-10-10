@@ -98,9 +98,40 @@ export async function readSearchResponse(response: Response): Promise<unknown> {
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 
+/** Validate citation URLs without fetching them or resolving caller-owned hosts. */
+export function publicHttpsUrl(raw: string): URL | null {
+  if (raw.length > 2_048) return null;
+  let url: URL;
+  try { url = new URL(raw); } catch { return null; }
+  if (url.protocol !== 'https:' || url.username || url.password ||
+      (url.port && url.port !== '443')) return null;
+  const host = url.hostname.toLowerCase().replace(/\.$/u, '');
+  if (!host || /(?:^|\.)(?:localhost|local|localdomain|internal|intranet|lan|home|test|invalid)$/u.test(host)) return null;
+  if (host.startsWith('[')) {
+    // Only globally routed IPv6. This also rejects IPv4-mapped, loopback,
+    // link-local, unique-local and NAT64 encodings of private IPv4 addresses.
+    const address = host.slice(1, -1);
+    const prefix = Number.parseInt(address.split(':')[0], 16);
+    if (!(prefix >= 0x2000 && prefix <= 0x3fff) ||
+        /^2001:db8:/iu.test(address) || /^2002:/iu.test(address)) return null;
+  } else if (/^\d+(?:\.\d+){3}$/u.test(host)) {
+    const [a, b, c] = host.split('.').map(Number);
+    if (a === 0 || a === 10 || a === 127 || a >= 224 ||
+        (a === 100 && b >= 64 && b <= 127) || (a === 169 && b === 254) ||
+        (a === 172 && b >= 16 && b <= 31) ||
+        (a === 192 && (b === 168 || (b === 0 && (c === 0 || c === 2)))) ||
+        (a === 198 && (b === 18 || b === 19 || (b === 51 && c === 100))) ||
+        (a === 203 && b === 0 && c === 113)) return null;
+  } else if (!host.includes('.') || !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/u.test(host)) {
+    return null;
+  }
+  url.hash = '';
+  return url;
+}
+
 export function collectSearchSources(
   results: unknown[],
-  domains: readonly string[],
+  domains: readonly string[] | null,
   contentFor: (value: Record<string, unknown>) => string | null,
   strategy: boolean,
   idPrefix: string,
@@ -117,13 +148,11 @@ export function collectSearchSources(
     const text = rawText.replace(/[\u0000\u000b\u000c\u007f]/gu, ' ').trim()
       .slice(0, Math.min(strategy ? 3_000 : 1_500, remaining));
     if (!title || text.length < 20) continue;
-    let url: URL;
-    try { url = new URL(value.url); } catch { continue; }
-    if (url.protocol !== 'https:' || url.username || url.password ||
-        (url.port && url.port !== '443') || !domains.includes(url.hostname)) continue;
-    url.hash = '';
-    if (seen.has(url.href)) continue;
-    seen.add(url.href);
+    const url = publicHttpsUrl(value.url);
+    if (!url || (domains && !domains.includes(url.hostname))) continue;
+    const key = searchSourceUrlKey(url.href);
+    if (seen.has(key)) continue;
+    seen.add(key);
     sources.push({ id: `${idPrefix}-${sources.length + 1}`, title, url: url.href, text });
     remaining -= text.length;
     if (remaining < 20) break;
@@ -131,11 +160,18 @@ export function collectSearchSources(
   return sources;
 }
 
+function searchSourceUrlKey(raw: string): string {
+  const url = new URL(raw);
+  url.hostname = url.hostname.replace(/^www\./u, '');
+  url.hash = '';
+  return url.href;
+}
+
 /** URL/host diversity counts as evidence; search engines themselves do not. */
 export function mergeSearchSources(pools: CuratedSource[][]): CuratedSource[] {
   const byUrl = new Map<string, CuratedSource>();
   for (const source of pools.flat()) {
-    const key = source.url ?? source.id;
+    const key = source.url ? searchSourceUrlKey(source.url) : source.id;
     const existing = byUrl.get(key);
     if (!existing) byUrl.set(key, { ...source });
     else if (!existing.text.includes(source.text)) {
@@ -151,7 +187,7 @@ export function mergeSearchSources(pools: CuratedSource[][]): CuratedSource[] {
   const deferred: CuratedSource[] = [];
   const hosts = new Set<string>();
   for (const source of byUrl.values()) {
-    const host = source.url ? new URL(source.url).hostname : '';
+    const host = source.url ? new URL(source.url).hostname.replace(/^www\./u, '') : '';
     if (host && !hosts.has(host)) { hosts.add(host); selected.push(source); }
     else deferred.push(source);
   }

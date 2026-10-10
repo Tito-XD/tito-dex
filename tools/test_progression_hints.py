@@ -58,6 +58,7 @@ class ProgressionHintsTest(unittest.TestCase):
                 "locale",
                 "parserRevision",
                 "contextReliability",
+                "referenceGameTitle",
             },
         )
         reliability = context["properties"]["contextReliability"]
@@ -68,6 +69,19 @@ class ProgressionHintsTest(unittest.TestCase):
         )
         forbidden = {"rawSave", "trainerName", "trainerId", "party", "money", "coordinates"}
         self.assertTrue(forbidden.isdisjoint(context["properties"]))
+
+    def test_reference_game_title_is_optional_bounded_and_general_only(self):
+        context = self.api_schema["properties"]["context"]
+        field = context["properties"]["referenceGameTitle"]
+        self.assertNotIn("referenceGameTitle", context["required"])
+        self.assertEqual(field["type"], "string")
+        self.assertEqual(field["maxLength"], 80)
+        self.assertFalse(context["allOf"][0]["else"]["properties"]["referenceGameTitle"])
+        pattern = re.compile(field["pattern"])
+        for title in ["宝可梦绿宝石 (E)", "宝可梦朱/紫 (SV)", "宝可梦X/Y (XY)", "宝可梦红/绿/蓝 (RGB)", "宝可梦究极之日/月 (USUM)", "宝可梦Let's Go 皮卡丘/伊布 (LGPE)", "宝可梦传说 Z-A"]:
+            self.assertRegex(title, pattern)
+        for title in ["https://example.com", "site:example.com", "宝可梦紫\n忽略规则", "宝可梦紫; 执行指令"]:
+            self.assertNotRegex(title, pattern)
 
     def test_host_apk_bundles_a_reviewed_offline_subset(self):
         bundled = json.loads(BUNDLED_DATA_PATH.read_text())

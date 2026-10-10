@@ -1,3 +1,4 @@
+import { referenceGameScope } from './request_game_scope';
 export const MAX_QUESTION_LENGTH = 240;
 export const MAX_REQUEST_BYTES = 12 * 1024;
 export const MAX_CONTEXT_IDS = 16;
@@ -67,6 +68,7 @@ export type AssistantContext = {
   game: SupportedGame;
   generation: SupportedGeneration;
   locationId?: string;
+  referenceGameTitle?: string;
   badgeIds: string[];
   badgeCount?: number;
   milestoneIds: string[];
@@ -86,11 +88,24 @@ export type ContextReliability = {
   milestones: 'save_verified' | 'unsupported';
 };
 
+export type QuestionGameScope = {
+  mode: 'single' | 'multiple' | 'unsupported';
+  origin?: 'question' | 'history' | 'global';
+  preservesSaveContext?: boolean;
+  titles: { game: AssistantContext['game'] | null; zh: string; en: string }[];
+};
+
+export function supportedGameGeneration(game: AssistantContext['game']): AssistantContext['generation'] {
+  return supportedGameGenerations[game];
+}
+
 export type AssistantRequest = {
   question: string;
   context: AssistantContext;
   history?: AssistantHistoryMessage[];
   journeyPacks?: JourneyPackReference[];
+  /** Server-only normalization metadata; rejected if submitted by a client. */
+  questionGameScope?: QuestionGameScope;
 };
 
 export type JourneyPackReference = {
@@ -139,7 +154,11 @@ export type AssistantResponse = {
     | 'deepseek_native_search'
     | 'multi_source_qwen'
     | 'no_match';
+  /** Source-supported partial general overview; no selected-version ownership. */
+  outlineMode?: 'basic_web_outline';
   modelUsed?: boolean;
+  /** Successful text model providers; optional for existing clients. */
+  modelProviders?: ('workers-ai-qwen' | 'deepseek-text')[];
   aiSearchUsed?: boolean;
   sourceKinds?: (
     | 'pokeapi'
@@ -164,6 +183,7 @@ const allowedContextKeys = new Set([
   'locale',
   'parserRevision',
   'contextReliability',
+  'referenceGameTitle',
 ]);
 const allowedReliabilityKeys = new Set(['game', 'location', 'badges', 'milestones']);
 const allowedBadges = new Set([
@@ -202,6 +222,7 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
   if (typeof context.game !== 'string' || !(context.game in supportedGameGenerations)) return null;
   const game = context.game as SupportedGame;
   const generation = supportedGameGenerations[game];
+  if (context.referenceGameTitle !== undefined && (game !== 'general' || !referenceGameScope(context.referenceGameTitle))) return null;
   if (context.generation !== generation || context.locale !== 'zh-Hans') return null;
   if (!Number.isInteger(context.parserRevision) || (context.parserRevision as number) < 0) return null;
   if (context.locationId !== undefined && (typeof context.locationId !== 'string' || context.locationId.length > 80)) return null;
@@ -235,6 +256,7 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
     context: {
       game,
       generation,
+      ...(context.referenceGameTitle === undefined ? {} : { referenceGameTitle: context.referenceGameTitle as string }),
       ...(context.locationId === undefined ? {} : { locationId: context.locationId }),
       badgeIds: context.badgeIds as string[],
       ...(context.badgeCount === undefined ? {} : { badgeCount: context.badgeCount as number }),

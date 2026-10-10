@@ -94,6 +94,7 @@ class AskTitoDexContext {
     required this.milestoneIds,
     required this.parserRevision,
     this.badgeCount,
+    this.referenceGameTitle,
     this.gameReliability = 'save_verified',
     this.locationReliability = 'save_verified',
     this.badgesReliability = 'save_verified',
@@ -112,6 +113,7 @@ class AskTitoDexContext {
   final List<String> milestoneIds;
   final int parserRevision;
   final int? badgeCount;
+  final String? referenceGameTitle;
   final String gameReliability;
   final String locationReliability;
   final String badgesReliability;
@@ -164,6 +166,9 @@ class AskTitoDexContext {
     final badgeCount = hasVerifiedBadgeCount ? journey.badges : null;
     return AskTitoDexContext(
       game: exactGame,
+      referenceGameTitle: exactGame == null && !edition.isGeneral
+          ? '宝可梦 ${edition.selectedLabelZh}'
+          : null,
       generation: edition.generation,
       locationLabel: exactHgss ? journey.location : null,
       locationId: exactHgss ? locationId : null,
@@ -193,6 +198,7 @@ class AskTitoDexContext {
     List<JourneyPackReference>? journeyPacks,
   }) => AskTitoDexContext(
     game: game,
+    referenceGameTitle: referenceGameTitle,
     generation: generation,
     locationLabel: locationLabel,
     locationId: locationId ?? this.locationId,
@@ -215,6 +221,8 @@ class AskTitoDexContext {
       return {
         'game': 'general',
         'generation': 0,
+        if (referenceGameTitle != null)
+          'referenceGameTitle': referenceGameTitle,
         'badgeIds': <String>[],
         'milestoneIds': <String>[],
         'locale': locale,
@@ -367,6 +375,8 @@ class AskTitoDexResult {
     this.onlineComposed = false,
     this.answerMode = AskTitoDexAnswerMode.localAudited,
     this.modelUsed = false,
+    this.modelProviders = const [],
+    this.outlineMode,
     this.aiSearchUsed = false,
     this.sourceKinds = const [],
     this.answerBlocks = const [],
@@ -388,6 +398,8 @@ class AskTitoDexResult {
   final bool onlineComposed;
   final AskTitoDexAnswerMode answerMode;
   final bool modelUsed;
+  final List<String> modelProviders;
+  final String? outlineMode;
   final bool aiSearchUsed;
   final List<String> sourceKinds;
   final List<AskTitoDexAnswerBlock> answerBlocks;
@@ -412,6 +424,8 @@ class AskTitoDexResult {
     onlineComposed: onlineComposed,
     answerMode: answerMode,
     modelUsed: modelUsed,
+    modelProviders: modelProviders,
+    outlineMode: outlineMode,
     aiSearchUsed: aiSearchUsed,
     sourceKinds: sourceKinds,
     answerBlocks: answerBlocks,
@@ -455,7 +469,17 @@ class AskTitoDexResult {
         matchedHintIds: matchedHintIds,
       ),
       modelUsed: json['modelUsed'] as bool? ?? onlineComposed,
+      modelProviders: _strings(json['modelProviders'])
+          .where(
+            (value) =>
+                const {'workers-ai-qwen', 'deepseek-text'}.contains(value),
+          )
+          .toSet()
+          .toList(growable: false),
       aiSearchUsed: json['aiSearchUsed'] as bool? ?? false,
+      outlineMode: json['outlineMode'] == 'basic_web_outline'
+          ? 'basic_web_outline'
+          : null,
       sourceKinds: _strings(json['sourceKinds']),
       answerBlocks: _answerBlocks(json['answerBlocks']),
       clarificationCandidates: _clarificationCandidates(
@@ -485,6 +509,8 @@ class AskTitoDexResult {
     'onlineComposed': onlineComposed,
     'answerMode': answerMode.wireValue,
     'modelUsed': modelUsed,
+    if (modelProviders.isNotEmpty) 'modelProviders': modelProviders,
+    if (outlineMode != null) 'outlineMode': outlineMode,
     'aiSearchUsed': aiSearchUsed,
     'sourceKinds': sourceKinds,
     if (answerBlocks.isNotEmpty)

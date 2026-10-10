@@ -1146,6 +1146,18 @@ function compactSpeciesEvidence(
       }),
     };
   }
+  if (game === 'general' && isPlainObject(detail.evolutionChain)) {
+    // General conditions describe catalogue routes, not applicability to every
+    // edition. Omit incomplete trigger records and version-sensitive numbers.
+    evidence.generalEvolution = collectEvolutionEdges(detail.evolutionChain)
+      .filter((edge) => edge.fromId === species.id || edge.toId === species.id)
+      .slice(0, 10).flatMap((edge) => {
+        const from = entityName('pokemon', edge.fromId), to = entityName('pokemon', edge.toId);
+        if (!from || !to) return [];
+        const conditions = describeGeneralEvolutionTriggers(edge.triggers);
+        return [{ from, to, ...(conditions ? { conditions } : {}) }];
+      });
+  }
   if (game !== 'general' && gameplayShard && gameplayShard.evolutions.length > 0) {
     evidence.adjacentEvolution = gameplayShard.evolutions.slice(0, 6).map((row) => {
       const safeTriggers = Array.isArray(row.triggers)
@@ -1171,7 +1183,7 @@ function compactSpeciesEvidence(
       }));
   }
   evidence.scopeNote = game === 'general'
-    ? 'General reference fields only; no selected-game encounters, learnsets or evolution conditions.'
+    ? 'General reference fields and catalogue evolution routes only; conditions may differ by edition. No selected-game encounters or learnsets.'
     : gameplayShard
     ? 'encounters and moveSet come from the bounded audited v20 species shard; evolution triggers are global and exact-game applicability remains explicit'
     : 'encounters and moveSet are selected-game facts; stats/types/abilities/evolution are general bundle fields and may differ in older games';
@@ -1308,6 +1320,23 @@ function describeEvolutionTriggers(triggers: Record<string, unknown>[]): string 
     if (trigger.turnUpsideDown === true) details.push('倒置设备');
     return details.length > 0 ? details.join('、') : '特殊条件';
   }).join('；或 ');
+}
+
+function describeGeneralEvolutionTriggers(triggers: Record<string, unknown>[]): string {
+  if (triggers.length === 0) return '';
+  const allowed = new Set(['trigger', 'minLevel', 'minHappiness', 'timeOfDay', 'item', 'heldItem', 'knownMove',
+    'needsOverworldRain', 'turnUpsideDown']);
+  const alternatives: string[] = [];
+  for (const trigger of triggers) {
+    if (Object.entries(trigger).some(([key, value]) => !allowed.has(key) && value !== null && value !== '' && value !== false) ||
+        !['level-up', 'use-item', 'trade'].includes(String(trigger.trigger))) return '';
+    const conditions = describeEvolutionTriggers([trigger])
+      .replace(/亲密度至少 \d+/gu, '亲密度较高')
+      .replace(/至少 Lv\.\d+/gu, '达到相应进化等级');
+    if (!conditions || /(?:特殊条件|图鉴包未记录)/u.test(conditions)) return '';
+    alternatives.push(conditions);
+  }
+  return alternatives.join('；或 ');
 }
 
 function labelForSlug(slug: string, targets: EntityTarget[]): string {

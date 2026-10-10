@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../features/journey/ask_titodex_answer_copy.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../features/journey/ask_motion_theme.dart';
@@ -564,30 +566,6 @@ class _AnswerCardContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Wrap(
-          key: const Key('ask-titodex-answer-trace'),
-          spacing: 9,
-          runSpacing: 4,
-          children: [
-            _AnswerMetaLabel(label: _answerModeLabel(result.answerMode)),
-            _AnswerMetaLabel(
-              label: result.modelUsed
-                  ? AppZh.askTitoDexTraceModel
-                  : AppZh.askTitoDexTraceNoModel,
-              emphasized: result.modelUsed,
-            ),
-            if (result.aiSearchUsed)
-              _AnswerMetaLabel(
-                label: AppZh.askTitoDexTraceAiSearch,
-                emphasized: true,
-              ),
-            if (sourceKinds.isNotEmpty)
-              _AnswerMetaLabel(
-                label: AppZh.askTitoDexTraceSearchRoutes(sourceKinds.length),
-                emphasized: true,
-              ),
-          ],
-        ),
         if (!answerAlreadyVisible) ...[
           const SizedBox(height: 12),
           if (result.answerBlocks.isNotEmpty)
@@ -618,12 +596,41 @@ class _AnswerCardContent extends StatelessWidget {
           onComplete: onContentSettled,
           child: AskAnswerEvidenceSummary(
             evidence: result.evidence,
+            result: result,
             sources: sources,
             sourceKinds: sourceKinds,
             sourceOpener: sourceOpener,
           ),
         ),
         if (answerBody.isNotEmpty) ...[
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              key: const Key('ask-titodex-copy-answer'),
+              icon: const Icon(Icons.copy_rounded, size: 16),
+              label: Text(AppZh.askTitoDexCopyAnswer),
+              onPressed: () async {
+                try {
+                  await Clipboard.setData(
+                    ClipboardData(
+                      text: askTitoDexAnswerCopyText(question, result),
+                    ),
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(AppZh.askTitoDexAnswerCopied)),
+                    );
+                  }
+                } on Object {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(AppZh.askTitoDexCopyFailed)),
+                    );
+                  }
+                }
+              },
+            ),
+          ),
           const SizedBox(height: 10),
           AskEntityLinkCards(
             question: question,
@@ -639,48 +646,3 @@ class _AnswerCardContent extends StatelessWidget {
     );
   }
 }
-
-class _AnswerMetaLabel extends StatelessWidget {
-  const _AnswerMetaLabel({required this.label, this.emphasized = false});
-
-  final String label;
-  final bool emphasized;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 4,
-          height: 4,
-          decoration: BoxDecoration(
-            color: emphasized ? TitoColors.mint : TitoColors.skyBlue,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: SecondaryTypography.onCard.small12.copyWith(
-            color: emphasized ? TitoColors.deepBlue : TitoColors.mutedInk,
-            fontWeight: emphasized ? FontWeight.w800 : FontWeight.w700,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-String _answerModeLabel(AskTitoDexAnswerMode mode) => switch (mode) {
-  AskTitoDexAnswerMode.localAudited => AppZh.askTitoDexRouteLocal,
-  AskTitoDexAnswerMode.auditedOnline => AppZh.askTitoDexRouteAuditedOnline,
-  AskTitoDexAnswerMode.aiSearchAudited => AppZh.askTitoDexRouteAiSearch,
-  AskTitoDexAnswerMode.curatedSourcesDeterministic =>
-    AppZh.askTitoDexRouteCuratedDeterministic,
-  AskTitoDexAnswerMode.curatedSourcesQwen => AppZh.askTitoDexRouteCuratedQwen,
-  AskTitoDexAnswerMode.deepseekNativeSearch =>
-    AppZh.askTitoDexRouteDeepseekNative,
-  AskTitoDexAnswerMode.multiSourceQwen => AppZh.askTitoDexRouteMultiSource,
-  AskTitoDexAnswerMode.noMatch => AppZh.askTitoDexOnlineSearchedNoMatch,
-};

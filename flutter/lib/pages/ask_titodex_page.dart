@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
-import 'package:url_launcher/url_launcher.dart';
 
 import '../features/companion/companion_repository.dart';
-import '../features/game/game_catalog.dart';
 import '../features/game/game_edition.dart';
-import '../features/game/game_edition_repository.dart';
 import '../features/journey/ask_titodex_answer_blocks.dart';
 import '../features/journey/ask_motion_images.dart';
 import '../features/journey/ask_titodex_entity_links.dart';
@@ -15,6 +12,7 @@ import '../features/journey/ask_titodex_history.dart';
 import '../features/journey/ask_titodex_reveal_controller.dart';
 import '../features/journey/ask_titodex_service.dart';
 import '../features/journey/ask_titodex_settings.dart';
+import '../features/journey/ask_titodex_source_browser.dart';
 import '../features/journey/progression_hints.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
@@ -24,7 +22,8 @@ import '../widgets/ask/ask_answer_card.dart';
 import '../widgets/ask/ask_answer_sources.dart';
 import '../widgets/ask/ask_connection_status_card.dart';
 import '../widgets/ask/ask_conversation.dart';
-import '../widgets/ask/ask_history_sheet.dart';
+import '../widgets/ask/ask_sessions_sheet.dart';
+import '../features/journey/ask_titodex_sessions.dart';
 import '../widgets/ask/ask_paper_style.dart';
 import '../widgets/ask_titodex_loading.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -81,9 +80,6 @@ String _takeTrailingCodeUnits(String value, int maxLength) {
   return String.fromCharCodes(selected.reversed);
 }
 
-Future<bool> _openExternalSource(Uri uri) =>
-    launchUrl(uri, mode: LaunchMode.externalApplication);
-
 class AskTitoDexPage extends StatefulWidget {
   const AskTitoDexPage({
     super.key,
@@ -110,6 +106,15 @@ class AskTitoDexPage extends StatefulWidget {
 
 class _AskTitoDexPageState extends State<AskTitoDexPage> {
   late final TextEditingController _questionController;
+  final _questionFocus = FocusNode();
+  AskTitoDexSessions? _sessions;
+  late final AskTitoDexSessionStore _sessionStore;
+  bool _sessionBusy = false;
+  String? _notice;
+  final _sessionDrafts = <String, TextEditingValue>{};
+  int _draftRevision = 0;
+  String _draftText = '';
+  late final bool _ownsService;
   late final ScrollController _answerScrollController;
   late final AskTitoDexService _service;
   late final AskTitoDexHistoryStore _historyStore;
@@ -139,9 +144,18 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   void initState() {
     super.initState();
     _questionController = TextEditingController();
+    _questionController.addListener(() {
+      final text = _questionController.text;
+      if (text != _draftText) {
+        _draftText = text;
+        _draftRevision += 1;
+      }
+    });
     _answerScrollController = ScrollController();
-    _service = widget.service ?? askTitoDexService;
+    _ownsService = widget.service == null;
+    _service = widget.service ?? AskTitoDexService();
     _historyStore = widget.historyStore ?? askTitoDexHistoryStore;
+    _sessionStore = AskTitoDexSessionStore(legacy: _historyStore);
     _entityResolver = widget.entityResolver ?? askTitoDexEntityResolver;
     _edition = widget.edition;
     _reveal = AskTitoDexRevealController(
@@ -209,6 +223,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     if (oldWidget.edition.slug != widget.edition.slug ||
         oldWidget.edition.selectedFlavor != widget.edition.selectedFlavor) {
       _requestSeed += 1;
+      _service.cancelActiveQuestion();
       _reveal.clear();
       _edition = widget.edition;
 
@@ -224,9 +239,12 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   }
 
   Future<void> _loadHistory() async {
-    final loaded = await _historyStore.load();
+    final snapshot = await _sessionStore.load();
     if (!mounted) return;
-    setState(() => _history = loaded);
+    setState(() {
+      _sessions = snapshot;
+      _history = snapshot.active.entries;
+    });
     _scrollToLatest(animate: false, force: true);
   }
 
@@ -248,88 +266,217 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     }
   }
 
-  Future<void> _pickEdition() async {
-    if (_loading) return;
-    final picked = await showGameEditionGridPicker(context, selected: _edition);
-    if (!mounted || picked == null || _loading) return;
-    if (picked.slug == _edition.slug &&
-        picked.selectedFlavor == _edition.selectedFlavor) {
-      return;
-    }
-    await gameEditionRepository.save(picked);
-    if (!mounted || _loading) return;
+  void _stopWaiting({bool announce = true}) {
+    if (!_loading) return;
     setState(() {
       _requestSeed += 1;
-      _reveal.clear();
-      _edition = picked;
-      _context = null;
+      _loading = false;
       _submittedQuestion = null;
       _activeEntryId = null;
       _activeResult = null;
+      _reveal.clear();
+      _notice = announce ? AppZh.askTitoDexStoppedWaiting : null;
     });
-    await _prepareContext();
+    _service.cancelActiveQuestion();
+    _scrollToLatest(animate: false, force: true);
   }
 
-  Future<void> _showHistoryManager() async {
-    final action = await showModalBottomSheet<AskHistoryManagerAction>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => AskHistoryManagerSheet(entries: _history),
-    );
-    if (!mounted || action == null) return;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(
-          action == AskHistoryManagerAction.clear
-              ? AppZh.askTitoDexHistoryClearTitle
-              : AppZh.askTitoDexHistoryCompactTitle,
-        ),
-        content: Text(
-          action == AskHistoryManagerAction.clear
-              ? AppZh.askTitoDexHistoryClearBody
-              : AppZh.askTitoDexHistoryCompactBody,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(AppZh.cancel),
+  void _applySessions(AskTitoDexSessions snapshot, {bool reset = true}) {
+    if (reset) {
+      _stopWaiting(announce: false);
+      _service.cancelActiveQuestion();
+    }
+    final previousId = _sessions?.activeId;
+    if (reset && previousId != snapshot.activeId) {
+      if (previousId != null) {
+        _sessionDrafts[previousId] = _questionController.value;
+      }
+      _questionController.value =
+          _sessionDrafts[snapshot.activeId] ?? TextEditingValue.empty;
+    }
+    setState(() {
+      if (reset) {
+        _notice = null;
+        _requestSeed += 1;
+        _reveal.clear();
+        _submittedQuestion = null;
+        _activeEntryId = null;
+        _activeResult = null;
+      }
+      _sessions = snapshot;
+      _history = snapshot.active.entries;
+    });
+    if (reset) _scrollToLatest(animate: false, force: true);
+  }
+
+  Future<bool> _confirmSessionDelete(AskTitoDexSession session) async =>
+      await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(
+            session.title.isEmpty ? AppZh.askTitoDexNewTopic : session.title,
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(
-              action == AskHistoryManagerAction.clear
-                  ? AppZh.askTitoDexHistoryClearConfirm
-                  : AppZh.askTitoDexHistoryCompactConfirm,
+          content: Text(
+            '${AppZh.askTitoDexDeleteSessionBody}\n\n${askSessionSummary(session)}',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(AppZh.cancel),
             ),
+            FilledButton(
+              key: const Key('ask-session-delete-confirm'),
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(AppZh.askTitoDexDeleteSession),
+            ),
+          ],
+        ),
+      ) ??
+      false;
+
+  Future<void> _startNewTopic() async {
+    await _historyReady;
+    if (!mounted || _sessionBusy || _sessions == null) return;
+    _stopWaiting(announce: false);
+    setState(() => _sessionBusy = true);
+    try {
+      final snapshot = await _sessionStore.load();
+      if (!mounted) return;
+      String? replacement;
+      if (snapshot.sessions.length >= askTitoDexSessionLimit &&
+          snapshot.active.entries.isNotEmpty) {
+        final choice = await showDialog<String>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(AppZh.askTitoDexSessionLimitTitle),
+            content: Text(AppZh.askTitoDexSessionLimitBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(AppZh.cancel),
+              ),
+              TextButton(
+                key: const Key('ask-session-limit-select'),
+                onPressed: () => Navigator.pop(dialogContext, 'select'),
+                child: Text(AppZh.askTitoDexPickSessionDelete),
+              ),
+              FilledButton(
+                key: const Key('ask-session-limit-oldest'),
+                onPressed: () => Navigator.pop(dialogContext, 'oldest'),
+                child: Text(AppZh.askTitoDexDeleteOldestSession),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-    if (!mounted || confirmed != true) return;
-    if (action == AskHistoryManagerAction.clear) {
-      await _historyStore.clear();
-      if (mounted) setState(() => _history = const []);
+        );
+        if (!mounted || choice == null) return;
+        if (choice == 'oldest') {
+          final oldest = [...snapshot.sessions]
+            ..sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
+          replacement = oldest.first.id;
+        } else {
+          final action = await showAskSessions(
+            context,
+            snapshot,
+            chooseDeletion: true,
+          );
+          if (!mounted || action == null) return;
+          replacement = action.id;
+        }
+        final selected = snapshot.sessions.firstWhere(
+          (session) => session.id == replacement,
+        );
+        if (!await _confirmSessionDelete(selected) || !mounted) return;
+      }
+      final updated = await _sessionStore.create(replaceId: replacement);
+      if (!mounted) return;
+      _applySessions(updated);
+    } on Object {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppZh.askTitoDexSessionSaveFailed)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _sessionBusy = false);
+    }
+  }
+
+  Future<void> _showSessionManager() async {
+    final snapshot = _sessions;
+    if (snapshot == null || _sessionBusy) return;
+    final action = await showAskSessions(context, snapshot);
+    if (!mounted || action == null) return;
+    if (action.kind == 'create') {
+      await _startNewTopic();
       return;
     }
-    final compacted = await _historyStore.compact();
-    if (mounted) setState(() => _history = compacted);
+    if (action.kind == 'delete') {
+      final selected = snapshot.sessions.firstWhere(
+        (session) => session.id == action.id,
+      );
+      if (!await _confirmSessionDelete(selected) || !mounted) return;
+    }
+    setState(() => _sessionBusy = true);
+    try {
+      final updated = action.kind == 'delete'
+          ? await _sessionStore.delete(action.id!)
+          : await _sessionStore.select(action.id!);
+      if (mounted) {
+        _applySessions(
+          updated,
+          reset: action.kind != 'delete' || action.id == snapshot.activeId,
+        );
+      }
+    } on Object {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppZh.askTitoDexSessionSaveFailed)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _sessionBusy = false);
+    }
   }
+
+  void _selectSuggestion(String question) {
+    _questionController.value = TextEditingValue(
+      text: question,
+      selection: TextSelection.collapsed(offset: question.length),
+    );
+    _questionFocus.requestFocus();
+  }
+
+  List<String> get _suggestions => _edition.isGeneral
+      ? [
+          AppZh.askTitoDexExampleGeneralEvolution,
+          AppZh.askTitoDexExampleGeneralTypes,
+        ]
+      : [
+          AppZh.askTitoDexExampleEvolution(_edition.selectedLabel),
+          AppZh.askTitoDexExampleMoves(_edition.selectedLabel),
+        ];
 
   Future<void> _submit([String? retryQuestion]) async {
     await _historyReady;
     if (!mounted) return;
     final contextValue = _context;
     final question = (retryQuestion ?? _questionController.text).trim();
-    if (contextValue == null || question.isEmpty || _loading) return;
+    if (contextValue == null ||
+        question.isEmpty ||
+        _loading ||
+        _sessionBusy ||
+        _sessions == null) {
+      return;
+    }
+    final sessionId = _sessions!.activeId;
+    final draftRevision = _draftRevision;
     final requestId = _requestSeed + 1;
     final editionToken = _editionToken(_edition);
     FocusScope.of(context).unfocus();
 
     setState(() {
       _loading = true;
+      _notice = null;
       _submittedQuestion = question;
 
       _requestSeed = requestId;
@@ -348,6 +495,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       history: askTitoDexRequestHistory(
         _history,
         game: contextValue.game ?? 'general',
+        includeOtherGames: true,
       ),
       onProgress: (progress) {
         _reveal.queueProgress(progress, requestId, editionToken);
@@ -360,27 +508,38 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     await _reveal.revealVerifiedResult(result, requestId, editionToken);
     if (!_isActiveRequest(requestId, editionToken)) return;
     final entry = AskTitoDexHistoryEntry(
-      game: contextValue.game ?? 'general',
+      game: result.contextUsed['game'] is String
+          ? result.contextUsed['game'] as String
+          : contextValue.game ?? 'general',
       question: question,
       result: result,
       createdAt: DateTime.now(),
     );
     List<AskTitoDexHistoryEntry> saved;
+    AskTitoDexSessions? savedSessions;
     try {
-      saved = await _historyStore.append(entry);
-    } on Object catch (error) {
-      // Persistence is best-effort: keep the turn for this session and
-      // surface the failure instead of dropping it silently.
-      debugPrint('AskTitoDex history append failed: $error');
-      saved = askTitoDexHistoryAppend(_history, entry);
+      savedSessions = await _sessionStore.append(sessionId, entry);
+      saved = savedSessions.active.entries;
+      // Preserve existing integrations that supply their own legacy store.
+      if (widget.historyStore != null) await _historyStore.append(entry);
+    } on Object {
+      saved = [..._history, entry];
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppZh.askTitoDexSessionSaveFailed)),
+        );
+      }
     }
     if (!_isActiveRequest(requestId, editionToken)) return;
     setState(() {
       _loading = false;
       _history = saved;
+      if (savedSessions != null) _sessions = savedSessions;
       _activeEntryId = entry.createdAt.microsecondsSinceEpoch;
       _activeResult = result;
-      if (retryQuestion == null && result.status == AskTitoDexStatus.answered) {
+      if (retryQuestion == null &&
+          result.status == AskTitoDexStatus.answered &&
+          _draftRevision == draftRevision) {
         _questionController.clear();
       }
     });
@@ -487,7 +646,10 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       _historyReadyCompleter.complete();
     }
 
+    _service.cancelActiveQuestion();
+    if (_ownsService) _service.dispose();
     _reveal.dispose();
+    _questionFocus.dispose();
     _questionController.dispose();
     _answerScrollController.dispose();
     super.dispose();
@@ -510,7 +672,9 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
           question: entry.question,
           result: entry.result,
           entityResolver: _entityResolver,
-          sourceOpener: widget.sourceOpener ?? _openExternalSource,
+          sourceOpener:
+              widget.sourceOpener ??
+              (uri) => openAskTitoDexSource(uri, theme: Theme.of(context)),
           animateEvidence: false,
           onRetry: () => _submit(entry.question),
           onClarificationSelected: (candidate) =>
@@ -537,7 +701,9 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
           clarification: _reveal.clarification,
           result: _activeResult,
           entityResolver: _entityResolver,
-          sourceOpener: widget.sourceOpener ?? _openExternalSource,
+          sourceOpener:
+              widget.sourceOpener ??
+              (uri) => openAskTitoDexSource(uri, theme: Theme.of(context)),
           onRetry: () => _submit(question),
           onClarificationSelected: (candidate) =>
               _submitClarification(question, candidate),
@@ -593,8 +759,12 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                   contextValue: contextValue,
                   edition: _edition,
                   onRefresh: _checkConnection,
-                  onShowHistory: _showHistoryManager,
-                  onChangeEdition: _loading ? null : _pickEdition,
+                  onShowHistory: _showSessionManager,
+                  sessionTitle: _sessions?.active.title.isNotEmpty == true
+                      ? _sessions!.active.title
+                      : AppZh.askTitoDexNewTopic,
+                  onShowSessions: _sessionBusy ? null : _showSessionManager,
+                  onChangeEdition: null,
                   onRemoveLocation: _loading || contextValue == null
                       ? null
                       : () => setState(
@@ -656,6 +826,8 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                               sliver: SliverToBoxAdapter(
                                 child: showEmptyConversation
                                     ? AskConversationEmptyState(
+                                        suggestions: _suggestions,
+                                        onSelectSuggestion: _selectSuggestion,
                                         revealFrame: AskTitoDexRevealController
                                             .revealFrame,
                                         cursorHold: AskTitoDexRevealController
@@ -678,11 +850,28 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                   ),
                 ),
                 SizedBox(height: spacing),
+                if (_notice != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        _notice!,
+                        key: const Key('ask-titodex-notice'),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ),
                 AskQuestionComposer(
                   questionLimit: _askTitoDexQuestionLimit,
                   controller: _questionController,
+                  focusNode: _questionFocus,
+                  onStop: _stopWaiting,
                   loading: _loading,
-                  enabled: contextValue != null,
+                  enabled:
+                      contextValue != null &&
+                      _sessions != null &&
+                      !_sessionBusy,
                   onSubmit: _submit,
                 ),
               ],

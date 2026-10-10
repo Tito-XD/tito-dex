@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../features/game/game_edition.dart';
-import '../../features/journey/ask_titodex_history.dart';
 import '../../features/journey/ask_titodex_service.dart';
 import '../../features/journey/progression_hints.dart';
 import '../../l10n/app_zh.dart';
@@ -22,6 +21,8 @@ class AskConnectionStatusCard extends StatelessWidget {
     required this.edition,
     required this.onRefresh,
     required this.onShowHistory,
+    this.sessionTitle,
+    this.onShowSessions,
     required this.onChangeEdition,
     this.onManagePacks,
     required this.onRemoveLocation,
@@ -34,6 +35,8 @@ class AskConnectionStatusCard extends StatelessWidget {
   final GameEdition edition;
   final VoidCallback onRefresh;
   final VoidCallback onShowHistory;
+  final String? sessionTitle;
+  final VoidCallback? onShowSessions;
   final VoidCallback? onChangeEdition;
   final VoidCallback? onManagePacks;
   final VoidCallback? onRemoveLocation;
@@ -41,13 +44,10 @@ class AskConnectionStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final online = status.availability == AskTitoDexAvailability.online;
-    final capabilities = _connectionCapabilities(status);
-    final enabledCount = online
-        ? capabilities.where((capability) => capability.$2).length
-        : 0;
-    final capabilityCount = capabilities.length;
     final editionLabel = edition.selectedLabel;
+    final sessionMode = sessionTitle != null || onShowSessions != null;
+    final title = sessionTitle?.trim() ?? '';
+    final sessionLabel = title.isEmpty ? AppZh.askTitoDexCurrentSession : title;
     final value = contextValue;
     final showLocation = value != null && value.hasVerifiedLocationContext;
     final showVerifiedBadges =
@@ -62,6 +62,8 @@ class AskConnectionStatusCard extends StatelessWidget {
         value.badgeCount != null;
     final showSaveContext =
         showLocation || showVerifiedBadges || showBadgeCount;
+    final showContext =
+        !sessionMode || showSaveContext || onManagePacks != null;
     final statusColor = switch (status.availability) {
       AskTitoDexAvailability.checking => TitoColors.skyBlue,
       AskTitoDexAvailability.online => TitoColors.mint,
@@ -70,20 +72,13 @@ class AskConnectionStatusCard extends StatelessWidget {
     };
     final statusLabel = switch (status.availability) {
       AskTitoDexAvailability.checking => AppZh.askTitoDexStatusChecking,
-      AskTitoDexAvailability.online => AppZh.askTitoDexStatusOnlineCount(
-        enabledCount,
-        capabilityCount,
-      ),
-      AskTitoDexAvailability.disabled => AppZh.askTitoDexStatusClosed,
+      AskTitoDexAvailability.online => AppZh.askTitoDexStatusOnlineReady,
+      AskTitoDexAvailability.disabled ||
       AskTitoDexAvailability.unavailable => AppZh.askTitoDexStatusLocalOnly,
     };
     return AssistantSurface(
       key: const Key('ask-titodex-connection-status'),
       padding: EdgeInsets.zero,
-      // Use one explicit continuous-corner family for both the expandable
-      // status surface and its context chips. An adaptive 999px stadium became
-      // visually over-rounded as the second row arrived, while InputChip kept
-      // its unrelated theme radius.
       radius: askAssistantStatusRadius,
       color: usesAskPaperLook
           ? Color.alphaBlend(
@@ -100,11 +95,11 @@ class AskConnectionStatusCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
+              key: const Key('ask-titodex-status-segments'),
               height: 44,
               child: Row(
                 children: [
                   Expanded(
-                    flex: 4,
                     child: _StatusSegment(
                       key: const Key('ask-titodex-connection-summary'),
                       leading: _StatusDot(
@@ -120,141 +115,131 @@ class AskConnectionStatusCard extends StatelessWidget {
                       onTap: () => _showConnectionDetails(
                         context,
                         status: status,
-                        enabledCount: enabledCount,
-                        capabilityCount: capabilityCount,
-                        historyCount: historyCount,
                         onRefresh: onRefresh,
                       ),
                     ),
                   ),
                   const _StatusDivider(),
                   Expanded(
-                    flex: 4,
                     child: _StatusSegment(
-                      key: const Key('ask-titodex-history-summary'),
+                      key: sessionMode
+                          ? const Key('ask-titodex-session-summary')
+                          : const Key('ask-titodex-history-summary'),
                       leading: const Icon(
                         Icons.chat_bubble_outline_rounded,
                         color: TitoColors.deepBlue,
                         size: 18,
                       ),
-                      label: AppZh.askTitoDexHistoryCount(
-                        historyCount,
-                        askTitoDexHistoryLimit,
-                      ),
-                      semanticsLabel: AppZh.askTitoDexHistoryCountSemantics(
-                        historyCount,
-                        askTitoDexHistoryLimit,
-                      ),
-                      onTap: onShowHistory,
-                    ),
-                  ),
-                  const _StatusDivider(),
-                  Expanded(
-                    flex: 5,
-                    child: _StatusSegment(
-                      key: const Key('ask-titodex-edition-summary'),
-                      leading: const Icon(
-                        Icons.shield_outlined,
-                        color: TitoColors.deepBlue,
-                        size: 19,
-                      ),
-                      label: editionLabel,
-                      textKey: const Key('ask-titodex-current-edition'),
-                      semanticsLabel: AppZh.askTitoDexEditionSemantics(
-                        editionLabel,
-                      ),
-                      onTap: onChangeEdition,
-                      trailing: onManagePacks == null
-                          ? null
-                          : IconButton(
-                              key: const Key('ask-titodex-packs-entry'),
-                              tooltip: AppZh.manageJourneyPacks,
-                              onPressed: onManagePacks,
-                              constraints: const BoxConstraints.tightFor(
-                                width: 28,
-                                height: 32,
-                              ),
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                              icon: const Icon(
-                                Icons.download_for_offline_outlined,
-                                color: TitoColors.deepBlue,
-                                size: 18,
-                              ),
+                      label: sessionMode
+                          ? sessionLabel
+                          : AppZh.askTitoDexHistoryEntries(historyCount),
+                      semanticsLabel: sessionMode
+                          ? AppZh.askTitoDexSessionSemantics(sessionLabel)
+                          : AppZh.askTitoDexHistoryEntriesSemantics(
+                              historyCount,
                             ),
+                      onTap: sessionMode ? onShowSessions : onShowHistory,
+                      truncateLabel: sessionMode,
+                      tooltip: sessionMode ? sessionLabel : null,
+                      trailing: sessionMode
+                          ? const Icon(
+                              Icons.expand_more_rounded,
+                              color: TitoColors.deepBlue,
+                              size: 16,
+                            )
+                          : null,
                     ),
                   ),
                 ],
               ),
             ),
-            Builder(
-              key: const Key('ask-titodex-save-context-size'),
-              builder: (context) {
-                final saveContextChild = showSaveContext
-                    ? Column(
-                        key: const ValueKey('save-context-visible'),
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Divider(
-                            height: 1,
-                            thickness: 1,
-                            indent: 11,
-                            endIndent: 11,
-                            color: TitoColors.deepBlue.withValues(alpha: 0.12),
+            if (showContext)
+              Divider(
+                height: 1,
+                thickness: 1,
+                indent: 11,
+                endIndent: 11,
+                color: TitoColors.deepBlue.withValues(alpha: 0.12),
+              ),
+            if (showContext)
+              Builder(
+                key: const Key('ask-titodex-save-context-size'),
+                builder: (context) {
+                  final chips = Padding(
+                    key: showSaveContext
+                        ? const Key('ask-titodex-save-context')
+                        : null,
+                    padding: const EdgeInsets.fromLTRB(11, 6, 11, 7),
+                    child: Wrap(
+                      key: const Key('ask-titodex-context-row'),
+                      spacing: 5,
+                      runSpacing: 4,
+                      children: [
+                        if (!sessionMode)
+                          _ContextChip(
+                            key: const Key('ask-titodex-edition-summary'),
+                            icon: Icons.shield_outlined,
+                            label: editionLabel,
+                            textKey: const Key('ask-titodex-current-edition'),
+                            semanticsLabel: AppZh.askTitoDexEditionSemantics(
+                              editionLabel,
+                            ),
+                            onPressed: onChangeEdition,
                           ),
-                          Padding(
-                            key: const Key('ask-titodex-save-context'),
-                            padding: const EdgeInsets.fromLTRB(11, 6, 11, 7),
-                            child: Wrap(
-                              spacing: 5,
-                              runSpacing: 4,
-                              children: [
-                                if (showLocation)
-                                  _ContextChip(
-                                    key: const Key(
-                                      'ask-titodex-location-context',
-                                    ),
-                                    icon: Icons.place_outlined,
-                                    label: localizeLocation(
-                                      value.locationLabel!,
-                                    ),
-                                    onDeleted: onRemoveLocation,
-                                  ),
-                                if (showVerifiedBadges)
-                                  _ContextChip(
-                                    key: const Key('ask-titodex-badge-context'),
-                                    icon: Icons.military_tech,
-                                    label: AppZh.askTitoDexBadgeContext(
-                                      value.badgeIds.length,
-                                    ),
-                                    onDeleted: onRemoveBadges,
-                                  ),
-                                if (showBadgeCount)
-                                  _ContextChip(
-                                    key: const Key('ask-titodex-badge-context'),
-                                    icon: Icons.military_tech,
-                                    label: AppZh.askTitoDexSaveBadgeCount(
-                                      value.badgeCount!,
-                                    ),
-                                    onDeleted: onRemoveBadges,
-                                  ),
-                              ],
+                        if (showLocation)
+                          _ContextChip(
+                            key: const Key('ask-titodex-location-context'),
+                            icon: Icons.place_outlined,
+                            label: localizeLocation(value.locationLabel!),
+                            onDeleted: onRemoveLocation,
+                          ),
+                        if (showVerifiedBadges)
+                          _ContextChip(
+                            key: const Key('ask-titodex-badge-context'),
+                            icon: Icons.military_tech,
+                            label: AppZh.askTitoDexBadgeContext(
+                              value.badgeIds.length,
+                            ),
+                            onDeleted: onRemoveBadges,
+                          ),
+                        if (showBadgeCount)
+                          _ContextChip(
+                            key: const Key('ask-titodex-badge-context'),
+                            icon: Icons.military_tech,
+                            label: AppZh.askTitoDexSaveBadgeCount(
+                              value.badgeCount!,
+                            ),
+                            onDeleted: onRemoveBadges,
+                          ),
+                        if (onManagePacks != null)
+                          IconButton(
+                            key: const Key('ask-titodex-packs-entry'),
+                            tooltip: AppZh.manageJourneyPacks,
+                            onPressed: onManagePacks,
+                            constraints: const BoxConstraints.tightFor(
+                              width: 32,
+                              height: 32,
+                            ),
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(
+                              Icons.download_for_offline_outlined,
+                              color: TitoColors.deepBlue,
+                              size: 18,
                             ),
                           ),
-                        ],
-                      )
-                    : const SizedBox(key: ValueKey('save-context-hidden'));
-                if (TitoMotion.disabled(context)) {
-                  return saveContextChild;
-                }
-                return AnimatedSize(
-                  duration: TitoMotion.standard,
-                  curve: Curves.easeOutCubic,
-                  alignment: Alignment.topCenter,
-                  child: saveContextChild,
-                );
-              },
-            ),
+                      ],
+                    ),
+                  );
+                  if (TitoMotion.disabled(context)) return chips;
+                  return AnimatedSize(
+                    duration: TitoMotion.standard,
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.topCenter,
+                    child: chips,
+                  );
+                },
+              ),
           ],
         ),
       ),
@@ -269,20 +254,32 @@ class _StatusSegment extends StatelessWidget {
     required this.label,
     required this.semanticsLabel,
     required this.onTap,
-    this.textKey,
     this.trailing,
+    this.truncateLabel = false,
+    this.tooltip,
   });
 
   final Widget leading;
   final String label;
   final String semanticsLabel;
   final VoidCallback? onTap;
-  final Key? textKey;
   final Widget? trailing;
+  final bool truncateLabel;
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
+    final text = Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: SecondaryTypography.onCard.body14.copyWith(
+        color: TitoColors.deepBlue,
+        fontWeight: FontWeight.w900,
+        height: 1,
+      ),
+    );
+    final segment = Semantics(
       button: onTap != null,
       enabled: onTap != null,
       label: semanticsLabel,
@@ -297,25 +294,21 @@ class _StatusSegment extends StatelessWidget {
               leading,
               const SizedBox(width: 6),
               Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    label,
-                    key: textKey,
-                    maxLines: 1,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      color: TitoColors.deepBlue,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                    ),
-                  ),
-                ),
+                child: truncateLabel
+                    ? text
+                    : FittedBox(fit: BoxFit.scaleDown, child: text),
               ),
-              if (trailing case final trailing?) trailing,
+              if (trailing != null) ...[const SizedBox(width: 4), trailing!],
             ],
           ),
         ),
       ),
+    );
+    return SizedBox(
+      height: 44,
+      child: tooltip == null
+          ? segment
+          : Tooltip(message: tooltip!, child: segment),
     );
   }
 }
@@ -363,9 +356,6 @@ class _StatusDot extends StatelessWidget {
 Future<void> _showConnectionDetails(
   BuildContext context, {
   required AskTitoDexWorkerStatus status,
-  required int enabledCount,
-  required int capabilityCount,
-  required int historyCount,
   required VoidCallback onRefresh,
 }) async {
   final workerOnline = status.availability == AskTitoDexAvailability.online;
@@ -373,14 +363,7 @@ Future<void> _showConnectionDetails(
     context: context,
     builder: (dialogContext) => AlertDialog(
       key: const Key('ask-titodex-connection-dialog'),
-      title: Text(
-        AppZh.askTitoDexConnectionDialogTitle(
-          enabledCount,
-          capabilityCount,
-          historyCount,
-          askTitoDexHistoryLimit,
-        ),
-      ),
+      title: Text(AppZh.askTitoDexConnectionsTitle),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -443,20 +426,36 @@ Future<void> _showConnectionDetails(
   );
 }
 
-List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) => [
-  ('Journey Worker', status.availability == AskTitoDexAvailability.online),
-  (AppZh.askTitoDexCapQwen, status.qwenConfigured),
-  (AppZh.askTitoDexCapAiSearch, status.aiSearchEnabled),
-  (AppZh.askTitoDexCapBundle, status.dexBundleEnabled),
-  (AppZh.askTitoDexCapEncyclopedia, status.curatedSourcesEnabled),
-  for (final provider in status.webSearchProviders)
+List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) {
+  final models = [
+    if (status.qwenConfigured) 'Qwen',
+    if (status.textFallbackConfigured) AppZh.askTitoDexTextFallbackShort,
+  ].join(' · ');
+  final providers = status.webSearchProviders
+      .toSet()
+      .map(_webSearchProviderLabel)
+      .join(' · ');
+  return [
     (
-      AppZh.askTitoDexCapWebSearch(_webSearchProviderLabel(provider)),
+      AppZh.askTitoDexCapOnlineService,
+      status.availability == AskTitoDexAvailability.online,
+    ),
+    (
+      models.isEmpty
+          ? AppZh.askTitoDexCapAnswerGeneric
+          : AppZh.askTitoDexCapAnswerComposition(models),
+      status.qwenConfigured || status.textFallbackConfigured,
+    ),
+    (
+      providers.isEmpty
+          ? AppZh.askTitoDexCapSearchGeneric
+          : AppZh.askTitoDexCapSearchSources(providers),
       status.webSearchEnabled,
     ),
-  if (status.webSearchProviders.isEmpty)
-    (AppZh.askTitoDexCapWebSearchGeneric, false),
-];
+    (AppZh.askTitoDexCapDexFacts, status.dexBundleEnabled),
+    (AppZh.askTitoDexCapReviewedHints, status.aiSearchEnabled),
+  ];
+}
 
 class _CapabilityDetail extends StatelessWidget {
   const _CapabilityDetail({required this.label, required this.enabled});
@@ -500,27 +499,43 @@ class _ContextChip extends StatelessWidget {
     required this.icon,
     required this.label,
     this.onDeleted,
+    this.onPressed,
+    this.textKey,
+    this.semanticsLabel,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback? onDeleted;
+  final VoidCallback? onPressed;
+  final Key? textKey;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     // Colours come from chipTheme; only the corner family is pinned so the
     // chips match the status surface they live in.
-    return InputChip(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(askAssistantContextChipRadius),
+    return Semantics(
+      label: semanticsLabel,
+      button: onPressed != null,
+      child: InputChip(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(askAssistantContextChipRadius),
+        ),
+        clipBehavior: Clip.antiAlias,
+        visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        avatar: Icon(icon, size: 14),
+        label: Text(
+          label,
+          key: textKey,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        deleteIcon: const Icon(Icons.close_rounded, size: 14),
+        onDeleted: onDeleted,
+        onPressed: onPressed,
       ),
-      clipBehavior: Clip.antiAlias,
-      visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      avatar: Icon(icon, size: 14),
-      label: Text(label),
-      deleteIcon: const Icon(Icons.close_rounded, size: 14),
-      onDeleted: onDeleted,
     );
   }
 }

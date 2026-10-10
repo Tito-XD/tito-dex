@@ -83,6 +83,13 @@
           ]
         },
         "generation": { "enum": [0, 4, 5, 6, 7, 8, 9] },
+        "referenceGameTitle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Optional global game title for general-only research. The server accepts only recognized canonical game aliases and never uses the original string as model instructions.",
+          "pattern": "^(?!.*[\\u0000-\\u001f\\u007f])(?!.*(?:[hH][tT][tT][pP][sS]?:|[wW][wW][wW]\\.|[sS][iI][tT][eE]\\s*:|忽略|指令|提示词|系统))[\\u3400-\\u9fffA-Za-zÀ-ÖØ-öø-ÿ0-9 '’():：/／&·.,+\\-《》]+$"
+        },
         "locationId": { "$ref": "#/$defs/id" },
         "badgeIds": {
           "type": "array",
@@ -130,7 +137,7 @@
               }
             }
           },
-          "else": { "properties": { "generation": { "minimum": 4 } } }
+          "else": { "properties": { "generation": { "minimum": 4 }, "referenceGameTitle": false } }
         }
       ]
     }

@@ -828,7 +828,10 @@ void main() {
     expect(service.contextBuilds, 1);
     expect(service.connectionChecks, 1);
     expect(historyStore.loadCalls, 1);
-    expect(find.text('保存的问题'), findsOneWidget);
+    expect(
+      find.byKey(const Key('ask-titodex-question-bubble')),
+      findsOneWidget,
+    );
     await tester.enterText(
       find.byKey(const Key('ask-titodex-question')),
       '返回后可以继续提问',
@@ -865,73 +868,79 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('general follow-ups reuse only the general conversation', (
-    tester,
-  ) async {
-    final service = _SemanticStreamService();
-    final historyStore = _CountingHistoryStore([
-      AskTitoDexHistoryEntry(
-        game: 'soulsilver',
-        question: '游戏版本的问题',
-        result: const AskTitoDexResult(
-          status: AskTitoDexStatus.answered,
-          answer: '魂银专属回答',
+  testWidgets(
+    'follow-ups retain current-session user context across game scopes',
+    (tester) async {
+      final service = _SemanticStreamService();
+      final historyStore = _CountingHistoryStore([
+        AskTitoDexHistoryEntry(
+          game: 'soulsilver',
+          question: '游戏版本的问题',
+          result: const AskTitoDexResult(
+            status: AskTitoDexStatus.answered,
+            answer: '魂银专属回答',
+          ),
+          createdAt: DateTime.utc(2026, 9, 14),
         ),
-        createdAt: DateTime.utc(2026, 9, 14),
-      ),
-    ]);
-    await _pumpAskPage(
-      tester,
-      service,
-      edition: GameEdition.general,
-      historyStore: historyStore,
-    );
-    await tester.enterText(
-      find.byKey(const Key('ask-titodex-question')),
-      '动画中的皮卡丘叫什么？',
-    );
-    await tester.tap(find.byKey(const Key('ask-titodex-submit')));
-    await tester.pump();
-    expect(service.requestHistories.single, isEmpty);
-    service.complete(
-      const AskTitoDexResult(
-        status: AskTitoDexStatus.answered,
-        answer: '小智的皮卡丘。',
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(historyStore._entries.last.game, 'general');
+      ]);
+      await _pumpAskPage(
+        tester,
+        service,
+        edition: GameEdition.general,
+        historyStore: historyStore,
+      );
+      await tester.enterText(
+        find.byKey(const Key('ask-titodex-question')),
+        '动画中的皮卡丘叫什么？',
+      );
+      await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+      await tester.pump();
+      expect(service.requestHistories.single, [
+        {'role': 'user', 'content': '游戏版本的问题'},
+        {'role': 'assistant', 'content': '魂银专属回答'},
+      ]);
+      service.complete(
+        const AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: '小智的皮卡丘。',
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(historyStore._entries.last.game, 'general');
 
-    await tester.enterText(
-      find.byKey(const Key('ask-titodex-question')),
-      '它最擅长什么？',
-    );
-    await tester.tap(find.byKey(const Key('ask-titodex-submit')));
-    await tester.pump();
-    expect(service.requestHistories.last, [
-      {'role': 'user', 'content': '动画中的皮卡丘叫什么？'},
-      {'role': 'assistant', 'content': '小智的皮卡丘。'},
-    ]);
-    final position = _conversationPosition(tester);
-    position.jumpTo(position.minScrollExtent);
-    await tester.pump();
-    final previousQuestion = tester.widget<AskQuestionBubble>(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is AskQuestionBubble && widget.question == '动画中的皮卡丘叫什么？',
-      ),
-    );
-    expect(previousQuestion.showGame, isFalse);
-    position.jumpTo(0);
-    service.complete(
-      const AskTitoDexResult(
-        status: AskTitoDexStatus.answered,
-        answer: '电属性招式。',
-      ),
-    );
-    await tester.pumpAndSettle();
-    await tester.pumpWidget(const SizedBox());
-  });
+      await tester.enterText(
+        find.byKey(const Key('ask-titodex-question')),
+        '它最擅长什么？',
+      );
+      await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+      await tester.pump();
+      expect(service.requestHistories.last, [
+        {'role': 'user', 'content': '游戏版本的问题'},
+        {'role': 'assistant', 'content': '魂银专属回答'},
+        {'role': 'user', 'content': '动画中的皮卡丘叫什么？'},
+        {'role': 'assistant', 'content': '小智的皮卡丘。'},
+      ]);
+      final position = _conversationPosition(tester);
+      position.jumpTo(position.minScrollExtent);
+      await tester.pump();
+      final previousQuestion = tester.widget<AskQuestionBubble>(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is AskQuestionBubble && widget.question == '动画中的皮卡丘叫什么？',
+        ),
+      );
+      expect(previousQuestion.showGame, isFalse);
+      position.jumpTo(0);
+      service.complete(
+        const AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: '电属性招式。',
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
 
   testWidgets('reduced motion still starts deferred initialization', (
     tester,

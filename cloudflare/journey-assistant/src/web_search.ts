@@ -58,6 +58,14 @@ export function createWebSearch(options: WebSearchOptions, fetcher: typeof fetch
 
   return {
     enabled: configured.length > 0,
+    /** One English and one Chinese pool; no staged 52Poké or repeated searches. */
+    async searchBilingual(decision: ScopeDecision, englishName: string, chineseName: string) {
+      const pools = await Promise.all([
+        search(decision, englishName, 'english', 'all', '-en'),
+        search(decision, chineseName, 'chinese', 'all', '-zh'),
+      ]);
+      return mergeSearchSources(pools);
+    },
     search52Poke: (decision: ScopeDecision, name: string) =>
       search(decision, name, 'chinese', '52poke', '-52poke'),
     searchFallback: (decision: ScopeDecision, name: string) =>

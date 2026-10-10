@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) |
-| **`main` / lite source** | `0.9.23+214` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.23-offline+215` — APK-bundled verified v20 archive |
+| **Latest release** | v0.9.24 release preparation (v0.9.23 remains public until publication) |
+| **`main` / lite source** | `0.9.24+216` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.24-offline+217` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -47,6 +47,38 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 ## Current feature status (latest release line: v0.9.23)
 
 **Exa search live (2026-10-08):** Worker version `337a442a-3a13-49c0-bdbb-80c54f7666fe` serves 100% of production traffic, from verified source `7b30345`. Exa is enabled and primary; Tavily is disabled by default and requires explicit opt-in. Existing source/version checks and DeepSeek remain. Production health confirms Exa without Tavily; a live cultivation answer returned an Exa citation in 11.6s. Existing App clients remain compatible; Exa labels ship with the next normal App release.
+
+### Current source: compact Search and Exa/Ask integration (not released)
+
+- Search introduces the Exa/AI experimental assistant copy and equal-height
+  reference/battle entry cards. Recent searches and suggestions reveal below
+  the focused empty field, default to one horizontally scrollable row, and
+  expand on demand. Selecting a shortcut runs a real search and records it;
+  clearing results captures the old list safely during the transition.
+- The Exa/Ask handoff was integrated from `code/exa-search` worktree changes
+  based on `b15f1b4`, preserving the v0.9.23 type/focus/ink and security changes.
+  Exa queries Chinese/English in parallel; Tavily and DeepSeek native web
+  search remain disabled by default. Qwen organizes sources with a bounded
+  DeepSeek text fallback; grounding and contradictory-evidence guards remain.
+- Ask citations open through browser-owned Custom Tabs (pinned 2.5.0), retain
+  public source URLs, and reject local/private URL forms. The two status
+  columns show connection/session; new conversations live in the switcher.
+  Up to 20 sessions preserve their entries, capacity needs explicit deletion,
+  drafts are isolated, and canceled/late replies cannot restore deleted work.
+- Ask follows the global game, with explicit question/follow-up scope parsed
+  by the Worker. Optional `context.referenceGameTitle` handles nonstandard
+  global editions; deploy the compatible Worker before releasing this App.
+  Source-supported basic outlines include bounded evolution/weakness cache
+  projections and strict version/location projections for capture questions.
+- Integrated validation: 914 Flutter tests passed / 2 skipped; analysis clean;
+  Worker 566 passed / 10 skipped, structured 27 passed / 10 skipped, schema
+  7 passed, type/config check and dry-run passed. Arm64 Android debug build
+  validates the browser dependency against the current Android project.
+  Three-theme Search rendering and final query-section layout were checked.
+- A fresh deployment listing on 2026-10-10 still shows Worker
+  `337a442a-3a13-49c0-bdbb-80c54f7666fe` at 100%. These merged changes are
+  unpublished; the user authorized production rollover and the new signed App on 2026-10-10.
+  Physical RG/controller and source-browser acceptance remain unverified.
 
 ### v0.9.23: visible handheld focus and bounded navigation ink
 

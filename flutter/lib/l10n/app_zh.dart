@@ -305,7 +305,7 @@ abstract final class AppZh {
   static String get askTitoDexAiSearchEnabled =>
       t('askTitoDexAiSearchEnabled', 'AI Search 已开启');
   static String get askTitoDexCuratedSourcesEnabled =>
-      t('askTitoDexCuratedSourcesEnabled', '限定来源已开启');
+      t('askTitoDexCuratedSourcesEnabled', '网页检索已开启');
   static String get askTitoDexBraveNotConnected =>
       t('askTitoDexBraveNotConnected', '未接入 Brave Search');
   static String get askTitoDexStatusDisabledHint =>
@@ -323,9 +323,19 @@ abstract final class AppZh {
   static String get askTitoDexRouteAiSearch =>
       t('askTitoDexRouteAiSearch', 'R2 AI Search · Qwen 匹配');
   static String get askTitoDexRouteCuratedDeterministic =>
-      t('askTitoDexRouteCuratedDeterministic', '限定来源 · 确定性提取');
+      t('askTitoDexRouteCuratedDeterministic', '网页来源 · 确定性提取');
   static String get askTitoDexRouteCuratedQwen =>
-      t('askTitoDexRouteCuratedQwen', '限定来源 · Qwen 整理');
+      t('askTitoDexRouteCuratedQwen', '网页来源 · Qwen 整理');
+  static String get askTitoDexRouteCuratedFallback =>
+      t('askTitoDexRouteCuratedFallback', '网页来源 · 文本模型备用整理');
+  static String get askTitoDexRouteAuditedFallback =>
+      t('askTitoDexRouteAuditedFallback', '审核资料 · 备用模型匹配');
+  static String get askTitoDexRouteAiSearchFallback =>
+      t('askTitoDexRouteAiSearchFallback', 'R2 AI Search · 备用模型匹配');
+  static String get askTitoDexTraceQwenDeepseek =>
+      t('askTitoDexTraceQwenDeepseek', 'Qwen / DeepSeek 已参与');
+  static String get askTitoDexTraceDeepseekText =>
+      t('askTitoDexTraceDeepseekText', 'DeepSeek 备用模型已参与');
   static String get askTitoDexTraceNoModel =>
       t('askTitoDexTraceNoModel', '本次未调用 Qwen');
   static String get askTitoDexTraceModel =>
@@ -385,7 +395,7 @@ abstract final class AppZh {
       t('askTitoDexNoticeTitle', '开启问 TitoDex？');
   static String get askTitoDexNoticeBody => t(
     'askTitoDexNoticeBody',
-    '这个助手默认关闭。确认开启后，TitoDex 仍会优先使用 App 内的本地资料；本地不足时才会连接 Journey Worker，并可能使用 AI Search、Workers AI（Qwen）、限定来源联网检索与 DeepSeek 来整理答案。请求只包含你确认后的游戏版本、可靠的地点/徽章/里程碑 ID、语言、解析器版本、本次问题，以及同一游戏最近最多 6 组问答用于理解追问。最近 50 组问答只保存在本机，超出会自动删除最早一组。不会上传原始存档、训练家姓名、ID、金钱、队伍或个体数据。你之后可单独关闭在线回答，或关闭整个助手并隐藏所有入口。',
+    '这个助手默认关闭。确认开启后，TitoDex 仍会优先使用 App 内的本地资料；本地不足时才会连接 Journey Worker，并可能使用 AI Search、Workers AI（Qwen）、Exa 网页检索来整理答案，文本模型不可用时可能使用 DeepSeek 备用模型。请求只包含你确认后的游戏版本、可靠的地点/徽章/里程碑 ID、语言、解析器版本、本次问题，以及当前会话最近最多 6 组问答用于理解追问。本机最多保存 20 个会话；达到上限后，新建会话需要先选择删除旧会话。不会上传原始存档、训练家姓名、ID、金钱、队伍或个体数据。你之后可单独关闭在线回答，或关闭整个助手并隐藏所有入口。',
   );
   static String get askTitoDexNoticeAccept =>
       t('askTitoDexNoticeAccept', '确认开启');
@@ -676,7 +686,7 @@ abstract final class AppZh {
     'settingsAttributionBody',
     'TitoDex 是非官方、非商业、仅面向学习与个人游玩辅助的工具，与 Nintendo Co., Ltd.、Creatures Inc.、GAME FREAK inc.、The Pokémon Company 及其关联公司不存在隶属、授权、赞助或认可关系。Pokémon、宝可梦、角色、游戏名称、图像、音频与商标归各自权利人所有；本工具不提供 ROM、密钥、付费内容或存档修改。\n\n'
         '资料与文字：PokéAPI（物种、形态、招式、特性、道具、版本与基础地点；数据／代码仓库 BSD-3-Clause）、52Poké Wiki／神奇宝贝百科（部分中文说明、携带道具、地点与体形；百科原创内容 CC BY-NC-SA 3.0）、Bulbapedia（道具分组与少量地点语言链接；CC BY-NC-SA 2.5）、PKHeX（固定提交导出的现代遭遇覆盖；GPL-3.0-or-later，App 不嵌入或执行）、Project Pokémon（HGSS 存档／PKM 结构与地图编号技术参考）。\n\n'
-        '问 TitoDex 的限定联网来源：中文检索优先 52Poké Wiki；没有足够可靠的结果时，才回退到 Pokémon 官方网站、Bulbapedia、StrategyWiki、Serebii、PokéAPI、Wikidata、Pokémon Database、Smogon、Marriland、GameFAQs、Game8、IGN、Nintendo Life 与 Eurogamer。联网摘要只用于当次回答与引用核验，不会自动写入 R2、AI Search、APK 或本地图鉴包；各站内容仍适用其自身条款与权利说明。检索优先使用 Exa；Tavily 默认关闭，仅在维护者显式开启后作为备用；Exa、Tavily 与 DeepSeek 是检索／生成服务，不是百科内容权利人。\n\n'
+        '问 TitoDex 的网页来源：Exa 使用中英文关键词检索公共网页，按问题主题、作品、游戏版本和原文依据筛选；每条回答保留实际采用的来源链接。Qwen 负责整理与核验，文本模型不可用时可能使用 DeepSeek 备用模型。联网摘要只用于当次回答与引用核验，不会自动写入 R2、AI Search、APK 或本地图鉴包；各站内容仍适用其自身条款与权利说明。Tavily 与 DeepSeek 原生联网默认关闭，需要维护者显式开启。Exa、Tavily 与 DeepSeek 是检索／生成服务，各网页内容权利仍属于原权利人。\n\n'
         '媒体：PokéAPI/sprites、Pokémon Showdown／Smogon 社区创作者、Pokémon Paraíso 与 ShinyHunters 同行动画候选、PokéSprite 类型图标（MIT）、SteamGridDB 社区来源页、Pokémon HOME 与各代游戏的官方图像／音频；Nunito 字体依 SIL OFL 1.1 随包分发。百科开放许可不自动覆盖其中的官方游戏媒体，各素材仍按记录级来源与原权利状态处理。\n\n'
         '外部工具：Pokémon Sleep 二级页的睡眠分数、19 种食材数值、食谱等级倍率与料理能量公式移植自 Neroli’s Lab 固定提交 cb533f2，依 Apache-2.0 使用并随 App 提供许可证与 NOTICE；完整配队和长期模拟仍保留为外部入口。\n\n'
         '来源入口：pokemon.com · wiki.52poke.com · bulbapedia.bulbagarden.net · strategywiki.org · serebii.net · pokeapi.co · wikidata.org · pokemondb.net · smogon.com · marriland.com · gamefaqs.gamespot.com · game8.co · ign.com · nintendolife.com · eurogamer.net · github.com/PokeAPI/sprites · github.com/msikma/pokesprite · github.com/kwsch/PKHeX · projectpokemon.org · pokemonshowdown.com · steamgriddb.com · nerolislab.com。固定提交、逐文件来源和构建批次说明见项目根目录 CREDITS.md、THIRD_PARTY_NOTICES.md 及数据包随附 attribution 文件。',
@@ -1995,12 +2005,104 @@ abstract final class AppZh {
   static String get askTitoDexHistoryCompactConfirm =>
       t('askTitoDexHistoryCompactConfirm', '确认压缩');
   static String get askTitoDexStatusChecking =>
-      t('askTitoDexStatusChecking', '检查 --');
+      t('askTitoDexStatusChecking', '检查中');
   static String askTitoDexStatusOnlineCount(int enabled, int total) => t(
     'askTitoDexStatusOnlineCount',
     '在线 $enabled/$total',
     {'enabled': enabled, 'total': total},
   );
+  static String get askTitoDexStatusOnlineReady =>
+      t('askTitoDexStatusOnlineReady', '联网可用');
+  static String get askTitoDexConnectionsTitle =>
+      t('askTitoDexConnectionsTitle', '联网连接');
+  static String get askTitoDexCapOnlineService =>
+      t('askTitoDexCapOnlineService', '联网服务 · Journey Worker');
+  static String get askTitoDexTextFallbackShort =>
+      t('askTitoDexTextFallbackShort', 'DeepSeek 文本备用');
+  static String get askTitoDexCapSearchGeneric =>
+      t('askTitoDexCapSearchGeneric', '网页检索');
+  static String get askTitoDexCapAnswerGeneric =>
+      t('askTitoDexCapAnswerGeneric', '回答整理与核验');
+  static String get askTitoDexCapDexFacts =>
+      t('askTitoDexCapDexFacts', '图鉴资料 · TitoDex Bundle');
+  static String get askTitoDexCapReviewedHints =>
+      t('askTitoDexCapReviewedHints', '审核提示 · AI Search');
+  static String get askTitoDexNewTopic => t('askTitoDexNewTopic', '新会话');
+  static String get askTitoDexNewTopicStarted =>
+      t('askTitoDexNewTopicStarted', '已开启新会话，旧会话可从会话栏切换。');
+  static String get askTitoDexStoppedWaiting =>
+      t('askTitoDexStoppedWaiting', '已停止等待，输入内容已保留。');
+  static String get askTitoDexStopWaiting => t('askTitoDexStopWaiting', '停止等待');
+  static String get askTitoDexSendQuestion =>
+      t('askTitoDexSendQuestion', '发送问题');
+  static String get askTitoDexAnswerDetails =>
+      t('askTitoDexAnswerDetails', '回答信息');
+  static String get askTitoDexCopyAnswer => t('askTitoDexCopyAnswer', '复制回答');
+  static String get askTitoDexAnswerCopied =>
+      t('askTitoDexAnswerCopied', '已复制回答和来源链接。');
+  static String get askTitoDexCopyFailed =>
+      t('askTitoDexCopyFailed', '暂时无法复制，请长按正文选择文字。');
+  static String get askTitoDexCopySources => t('askTitoDexCopySources', '来源');
+  static String get askTitoDexExampleTitle =>
+      t('askTitoDexExampleTitle', '试着问问');
+  static String get askTitoDexExampleGeneralEvolution =>
+      t('askTitoDexExampleGeneralEvolution', '伊布的进化方式有哪些？');
+  static String get askTitoDexExampleGeneralTypes =>
+      t('askTitoDexExampleGeneralTypes', '皮卡丘的属性和弱点是什么？');
+  static String askTitoDexHistoryEntries(int count) =>
+      t('askTitoDexHistoryEntries', '历史 $count 条', {'count': count});
+  static String askTitoDexHistoryEntriesSemantics(int count) => t(
+    'askTitoDexHistoryEntriesSemantics',
+    '查看 $count 条本机问答记录',
+    {'count': count},
+  );
+  static String askTitoDexCapAnswerComposition(String models) => t(
+    'askTitoDexCapAnswerComposition',
+    '回答整理与核验 · $models',
+    {'models': models},
+  );
+  static String askTitoDexCapSearchSources(String providers) => t(
+    'askTitoDexCapSearchSources',
+    '网页检索 · $providers',
+    {'providers': providers},
+  );
+  static String askTitoDexExampleEvolution(String game) =>
+      t('askTitoDexExampleEvolution', '《$game》里伊布怎么进化成太阳伊布？', {'game': game});
+  static String askTitoDexExampleMoves(String game) =>
+      t('askTitoDexExampleMoves', '《$game》里皮卡丘能学哪些招式？', {'game': game});
+  static String get askTitoDexCurrentSession =>
+      t('askTitoDexCurrentSession', '当前会话');
+  static String get askTitoDexDeleteSession =>
+      t('askTitoDexDeleteSession', '删除会话');
+  static String get askTitoDexChooseSessionDelete =>
+      t('askTitoDexChooseSessionDelete', '选择要删除的会话');
+  static String get askTitoDexSessionLimitTitle =>
+      t('askTitoDexSessionLimitTitle', '已保存 20 个会话');
+  static String get askTitoDexSessionLimitBody =>
+      t('askTitoDexSessionLimitBody', '新建前需要腾出一个位置。你可以删除最旧的会话，或自己选择要删除的会话。');
+  static String get askTitoDexDeleteOldestSession =>
+      t('askTitoDexDeleteOldestSession', '删除最旧会话');
+  static String get askTitoDexPickSessionDelete =>
+      t('askTitoDexPickSessionDelete', '选择删除');
+  static String get askTitoDexSessionSaveFailed =>
+      t('askTitoDexSessionSaveFailed', '会话未能保存，请稍后重试。');
+  static String get askTitoDexDeleteSessionBody =>
+      t('askTitoDexDeleteSessionBody', '此会话的全部问答会从本机删除。');
+  static String askTitoDexSessionSemantics(String title) =>
+      t('askTitoDexSessionSemantics', '当前会话 $title，点击切换', {'title': title});
+  static String askTitoDexSessionsCount(int count) =>
+      t('askTitoDexSessionsCount', '会话 · $count/20', {'count': count});
+  static String askTitoDexSessionTurns(int count) =>
+      t('askTitoDexSessionTurns', '$count 组问答', {'count': count});
+  static String get askTitoDexOtherGameNoLocal =>
+      t('askTitoDexOtherGameNoLocal', '本地记录未包含这个版本的相关资料，可联网继续查找。');
+  static String askTitoDexSessionSummary(int count, String time) => t(
+    'askTitoDexSessionSummary',
+    '$count 组问答 · $time',
+    {'count': count, 'time': time},
+  );
+  static String get askTitoDexBasicOutline =>
+      t('askTitoDexBasicOutline', '基础概述 · 参考资料');
   static String get askTitoDexStatusClosed =>
       t('askTitoDexStatusClosed', '已关闭');
   static String get askTitoDexStatusLocalOnly =>
@@ -2036,7 +2138,7 @@ abstract final class AppZh {
   );
   static String get askTitoDexBroadTrialHint => t(
     'askTitoDexBroadTrialHint',
-    '当前为宽范围试用：仍只接受宝可梦主题和固定来源域名，但证据不足时会降为低置信度回答，不再直接丢弃。',
+    '当前为宽范围试用：仍只接受宝可梦主题和公开网页与原文依据，但证据不足时会降为低置信度回答，不再直接丢弃。',
   );
   static String get askTitoDexCapQwen =>
       t('askTitoDexCapQwen', 'Qwen · 回答整理/核对');

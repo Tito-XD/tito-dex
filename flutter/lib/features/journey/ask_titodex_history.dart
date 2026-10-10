@@ -170,10 +170,11 @@ class SharedPreferencesAskTitoDexHistoryStore
 List<Map<String, String>> askTitoDexRequestHistory(
   List<AskTitoDexHistoryEntry> entries, {
   required String game,
+  bool includeOtherGames = false,
 }) {
   final eligible = <AskTitoDexHistoryEntry>[];
   for (final entry in entries) {
-    if (entry.game != game) continue;
+    if (!includeOtherGames && entry.game != game) continue;
     final usable =
         entry.assistantContent != null &&
         (entry.result.status == AskTitoDexStatus.answered ||

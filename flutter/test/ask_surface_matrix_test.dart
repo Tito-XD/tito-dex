@@ -36,7 +36,7 @@ void main() {
             sources: [
               ProgressionSource(
                 title: 'Evolution reference',
-                url: 'https://example.test/evolution',
+                url: 'https://example.org/evolution',
                 accessedAt: '2026-09-14',
               ),
             ],
@@ -115,7 +115,7 @@ void main() {
           await tester.tap(find.byKey(const Key('ask-titodex-source-summary')));
           await capture('sources');
           await tester.tap(find.byKey(const Key('ask-titodex-source-0')));
-          expect(opened.single.toString(), 'https://example.test/evolution');
+          expect(opened.single.toString(), 'https://example.org/evolution');
           await tester.tap(
             find.byKey(const Key('ask-titodex-source-sheet-close')),
           );

@@ -600,7 +600,7 @@ describe('curated key-free web research', () => {
       if (phase === 'curated-web-compose') return {
         supported: true,
         answer: '在《宝可梦 紫》中，利欧路可在南第4区找到。',
-        usedSourceIds: [`${provider}-1`],
+        usedSourceIds: [`${provider}-en-1`],
       };
       if (phase === 'curated-web-verify') return {
         supported: true,
@@ -615,9 +615,7 @@ describe('curated key-free web research', () => {
       calls.push(host);
       if (host === 'api.exa.ai' && exaStatus !== 200) return json({}, exaStatus);
       const body = JSON.parse(init?.body as string) as Record<string, unknown>;
-      const domains = (body.includeDomains ?? body.include_domains) as string[];
-      if (domains.includes('wiki.52poke.com')) return json({ results: [] });
-      expect(body.query).toContain('Pokémon Violet');
+      expect(body.query).toMatch(/Pokémon Violet|宝可梦 紫/u);
       const text = 'In Pokémon Violet, Riolu can be found in South Province Area Four.';
       return json({ results: [{
         title: 'Riolu - Bulbapedia',
@@ -630,7 +628,7 @@ describe('curated key-free web research', () => {
       undefined, { exaApiKey: 'e'.repeat(32), tavilyApiKey: 't'.repeat(32) },
     );
     expect(calls[0]).toBe('api.exa.ai');
-    expect(calls.filter((host) => host === 'api.exa.ai')).toHaveLength(exaStatus === 200 ? 2 : 1);
+    expect(calls.filter((host) => host === 'api.exa.ai')).toHaveLength(2);
     expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
     expect(result).toMatchObject({
       status: 'answered', sourceKinds: [provider],
@@ -638,7 +636,7 @@ describe('curated key-free web research', () => {
     });
   });
 
-  it('continues other domains after unsupported Exa evidence and rejects unsupported answers', async () => {
+  it('does not start an extra search stage after unsupported Exa evidence', async () => {
     const phases: string[] = [];
     const runModel: CuratedWebModelRunner = async (phase) => {
       phases.push(phase);
@@ -647,12 +645,12 @@ describe('curated key-free web research', () => {
     const domainsUsed: string[][] = [];
     const fetcher = vi.fn<typeof fetch>(async (input, init) => {
       if (new URL(input.toString()).hostname !== 'api.exa.ai') return json({}, 503);
-      const body = JSON.parse(init?.body as string) as { includeDomains: string[] };
-      domainsUsed.push(body.includeDomains);
+      const body = JSON.parse(init?.body as string) as { includeDomains?: string[] };
+      expect(body.includeDomains).toBeUndefined();
+      domainsUsed.push([]);
       return json({ results: [{
         title: 'Unrelated evidence',
-        url: body.includeDomains.includes('wiki.52poke.com')
-          ? 'https://wiki.52poke.com/wiki/Riolu' : 'https://www.serebii.net/pokedex-sv/riolu/',
+        url: 'https://www.serebii.net/pokedex-sv/riolu/',
         highlights: ['Riolu is a Fighting-type Pokémon, with no supported encounter location here.'],
       }] });
     });
@@ -661,9 +659,7 @@ describe('curated key-free web research', () => {
       context: { ...request.context, game: 'violet', generation: 9 },
     }, runModel, fetcher, undefined, undefined, { exaApiKey: 'e'.repeat(32) })).toBeNull();
     expect(domainsUsed).toHaveLength(2);
-    expect(domainsUsed[0]).toEqual(['wiki.52poke.com']);
-    expect(domainsUsed[1]).not.toContain('wiki.52poke.com');
-    expect(phases).toEqual(['curated-web-compose', 'curated-web-compose']);
+    expect(phases).toEqual(['curated-web-compose']);
   });
 
   it('uses Tavily only after fixed sources fail, then composes and verifies citations', async () => {

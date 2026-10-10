@@ -46,7 +46,7 @@ export async function searchExaWithStatus(
   if (!validSearchKey(key)) return { status: 'invalid_key', sources: [] };
   const query = searchQuery(decision, exactGameName, queryMode, domainMode);
   if (query.length < 2) return { status: 'empty', sources: [] };
-  const domains = searchDomains(domainMode);
+  const domains = domainMode === 'all' ? null : searchDomains(domainMode);
   const strategy = isStrategySearch(decision);
   try {
     const response = await fetcher(EXA_SEARCH_ENDPOINT, {
@@ -61,7 +61,7 @@ export async function searchExaWithStatus(
         query,
         type: 'auto',
         numResults: MAX_SEARCH_RESULTS,
-        includeDomains: domains,
+        ...(domains ? { includeDomains: domains } : {}),
         contents: {
           highlights: { query, maxCharacters: strategy ? 3_000 : 1_500 },
           livecrawlTimeout: 2_000,

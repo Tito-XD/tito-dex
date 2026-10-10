@@ -1,0 +1,1300 @@
+[
+  {
+    "targets": [
+      {
+        "game": "diamond",
+        "zh": "钻石",
+        "en": "Diamond"
+      }
+    ],
+    "aliases": [
+      "钻石",
+      "Diamond"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "pearl",
+        "zh": "珍珠",
+        "en": "Pearl"
+      }
+    ],
+    "aliases": [
+      "珍珠",
+      "Pearl"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "platinum",
+        "zh": "白金",
+        "en": "Platinum"
+      }
+    ],
+    "aliases": [
+      "白金",
+      "Platinum"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "heartgold",
+        "zh": "心金",
+        "en": "HeartGold"
+      }
+    ],
+    "aliases": [
+      "心金",
+      "HeartGold"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "soulsilver",
+        "zh": "魂银",
+        "en": "SoulSilver"
+      }
+    ],
+    "aliases": [
+      "魂银",
+      "SoulSilver"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "black",
+        "zh": "黑",
+        "en": "Black"
+      }
+    ],
+    "aliases": [
+      "黑",
+      "Black"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "white",
+        "zh": "白",
+        "en": "White"
+      }
+    ],
+    "aliases": [
+      "白",
+      "White"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "black-2",
+        "zh": "黑2",
+        "en": "Black 2"
+      }
+    ],
+    "aliases": [
+      "黑2",
+      "Black 2",
+      "Black2"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "white-2",
+        "zh": "白2",
+        "en": "White 2"
+      }
+    ],
+    "aliases": [
+      "白2",
+      "White 2",
+      "White2"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "x",
+        "zh": "X",
+        "en": "X"
+      }
+    ],
+    "aliases": [
+      "X"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "y",
+        "zh": "Y",
+        "en": "Y"
+      }
+    ],
+    "aliases": [
+      "Y"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "omega-ruby",
+        "zh": "欧米伽红宝石",
+        "en": "Omega Ruby"
+      }
+    ],
+    "aliases": [
+      "欧米伽红宝石",
+      "Omega Ruby",
+      "欧米加红宝石"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "alpha-sapphire",
+        "zh": "阿尔法蓝宝石",
+        "en": "Alpha Sapphire"
+      }
+    ],
+    "aliases": [
+      "阿尔法蓝宝石",
+      "Alpha Sapphire"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "sun",
+        "zh": "太阳",
+        "en": "Sun"
+      }
+    ],
+    "aliases": [
+      "太阳",
+      "Sun"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "moon",
+        "zh": "月亮",
+        "en": "Moon"
+      }
+    ],
+    "aliases": [
+      "月亮",
+      "Moon"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "ultra-sun",
+        "zh": "究极之日",
+        "en": "Ultra Sun"
+      }
+    ],
+    "aliases": [
+      "究极之日",
+      "Ultra Sun"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "ultra-moon",
+        "zh": "究极之月",
+        "en": "Ultra Moon"
+      }
+    ],
+    "aliases": [
+      "究极之月",
+      "Ultra Moon"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "sword",
+        "zh": "剑",
+        "en": "Sword"
+      }
+    ],
+    "aliases": [
+      "剑",
+      "Sword"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "shield",
+        "zh": "盾",
+        "en": "Shield"
+      }
+    ],
+    "aliases": [
+      "盾",
+      "Shield"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "brilliant-diamond",
+        "zh": "晶灿钻石",
+        "en": "Brilliant Diamond"
+      }
+    ],
+    "aliases": [
+      "晶灿钻石",
+      "Brilliant Diamond"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "shining-pearl",
+        "zh": "明亮珍珠",
+        "en": "Shining Pearl"
+      }
+    ],
+    "aliases": [
+      "明亮珍珠",
+      "Shining Pearl"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "legends-arceus",
+        "zh": "传说阿尔宙斯",
+        "en": "Legends Arceus"
+      }
+    ],
+    "aliases": [
+      "传说阿尔宙斯",
+      "Legends Arceus",
+      "传说 阿尔宙斯",
+      "Legends: Arceus"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "scarlet",
+        "zh": "朱",
+        "en": "Scarlet"
+      }
+    ],
+    "aliases": [
+      "朱",
+      "Scarlet"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "violet",
+        "zh": "紫",
+        "en": "Violet"
+      }
+    ],
+    "aliases": [
+      "紫",
+      "Violet"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "scarlet",
+        "zh": "朱",
+        "en": "Scarlet"
+      },
+      {
+        "game": "violet",
+        "zh": "紫",
+        "en": "Violet"
+      }
+    ],
+    "aliases": [
+      "朱紫",
+      "Scarlet and Violet",
+      "Scarlet/Violet",
+      "S/V"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "sword",
+        "zh": "剑",
+        "en": "Sword"
+      },
+      {
+        "game": "shield",
+        "zh": "盾",
+        "en": "Shield"
+      }
+    ],
+    "aliases": [
+      "剑盾",
+      "SwSh"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "sword",
+        "zh": "剑",
+        "en": "Sword"
+      },
+      {
+        "game": "shield",
+        "zh": "盾",
+        "en": "Shield"
+      }
+    ],
+    "aliases": [
+      "Sword and Shield",
+      "Sword/Shield"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "diamond",
+        "zh": "钻石",
+        "en": "Diamond"
+      },
+      {
+        "game": "pearl",
+        "zh": "珍珠",
+        "en": "Pearl"
+      }
+    ],
+    "aliases": [
+      "钻石珍珠",
+      "Diamond and Pearl",
+      "Diamond/Pearl",
+      "DP"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "heartgold",
+        "zh": "心金",
+        "en": "HeartGold"
+      },
+      {
+        "game": "soulsilver",
+        "zh": "魂银",
+        "en": "SoulSilver"
+      }
+    ],
+    "aliases": [
+      "心金魂银",
+      "HGSS"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "heartgold",
+        "zh": "心金",
+        "en": "HeartGold"
+      },
+      {
+        "game": "soulsilver",
+        "zh": "魂银",
+        "en": "SoulSilver"
+      }
+    ],
+    "aliases": [
+      "HeartGold and SoulSilver"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "black",
+        "zh": "黑",
+        "en": "Black"
+      },
+      {
+        "game": "white",
+        "zh": "白",
+        "en": "White"
+      }
+    ],
+    "aliases": [
+      "黑白",
+      "Black and White",
+      "Black/White",
+      "BW"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "black-2",
+        "zh": "黑2",
+        "en": "Black 2"
+      },
+      {
+        "game": "white-2",
+        "zh": "白2",
+        "en": "White 2"
+      }
+    ],
+    "aliases": [
+      "黑2白2",
+      "B2W2"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "black-2",
+        "zh": "黑2",
+        "en": "Black 2"
+      },
+      {
+        "game": "white-2",
+        "zh": "白2",
+        "en": "White 2"
+      }
+    ],
+    "aliases": [
+      "Black 2 and White 2"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "x",
+        "zh": "X",
+        "en": "X"
+      },
+      {
+        "game": "y",
+        "zh": "Y",
+        "en": "Y"
+      }
+    ],
+    "aliases": [
+      "XY",
+      "X/Y"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "sun",
+        "zh": "太阳",
+        "en": "Sun"
+      },
+      {
+        "game": "moon",
+        "zh": "月亮",
+        "en": "Moon"
+      }
+    ],
+    "aliases": [
+      "日月",
+      "太阳月亮",
+      "Sun and Moon",
+      "Sun/Moon",
+      "SM"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "ultra-sun",
+        "zh": "究极之日",
+        "en": "Ultra Sun"
+      },
+      {
+        "game": "ultra-moon",
+        "zh": "究极之月",
+        "en": "Ultra Moon"
+      }
+    ],
+    "aliases": [
+      "究极日月",
+      "USUM"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "ultra-sun",
+        "zh": "究极之日",
+        "en": "Ultra Sun"
+      },
+      {
+        "game": "ultra-moon",
+        "zh": "究极之月",
+        "en": "Ultra Moon"
+      }
+    ],
+    "aliases": [
+      "Ultra Sun and Ultra Moon"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "brilliant-diamond",
+        "zh": "晶灿钻石",
+        "en": "Brilliant Diamond"
+      },
+      {
+        "game": "shining-pearl",
+        "zh": "明亮珍珠",
+        "en": "Shining Pearl"
+      }
+    ],
+    "aliases": [
+      "晶灿钻石明亮珍珠",
+      "BDSP"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "brilliant-diamond",
+        "zh": "晶灿钻石",
+        "en": "Brilliant Diamond"
+      },
+      {
+        "game": "shining-pearl",
+        "zh": "明亮珍珠",
+        "en": "Shining Pearl"
+      }
+    ],
+    "aliases": [
+      "Brilliant Diamond and Shining Pearl"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "omega-ruby",
+        "zh": "欧米伽红宝石",
+        "en": "Omega Ruby"
+      },
+      {
+        "game": "alpha-sapphire",
+        "zh": "阿尔法蓝宝石",
+        "en": "Alpha Sapphire"
+      }
+    ],
+    "aliases": [
+      "ORAS"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "omega-ruby",
+        "zh": "欧米伽红宝石",
+        "en": "Omega Ruby"
+      },
+      {
+        "game": "alpha-sapphire",
+        "zh": "阿尔法蓝宝石",
+        "en": "Alpha Sapphire"
+      }
+    ],
+    "aliases": [
+      "Omega Ruby and Alpha Sapphire"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "红",
+        "en": "Red"
+      }
+    ],
+    "aliases": [
+      "红",
+      "Red"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "蓝",
+        "en": "Blue"
+      }
+    ],
+    "aliases": [
+      "蓝",
+      "Blue"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "绿",
+        "en": "Green"
+      }
+    ],
+    "aliases": [
+      "绿",
+      "Green"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "黄",
+        "en": "Yellow"
+      }
+    ],
+    "aliases": [
+      "黄",
+      "Yellow"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "金",
+        "en": "Gold"
+      }
+    ],
+    "aliases": [
+      "金",
+      "Gold"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "银",
+        "en": "Silver"
+      }
+    ],
+    "aliases": [
+      "银",
+      "Silver"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "水晶",
+        "en": "Crystal"
+      }
+    ],
+    "aliases": [
+      "水晶",
+      "Crystal"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "火红",
+        "en": "FireRed"
+      }
+    ],
+    "aliases": [
+      "火红",
+      "FireRed",
+      "Fire Red"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "叶绿",
+        "en": "LeafGreen"
+      }
+    ],
+    "aliases": [
+      "叶绿",
+      "LeafGreen",
+      "Leaf Green"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "红宝石",
+        "en": "Ruby"
+      }
+    ],
+    "aliases": [
+      "红宝石",
+      "Ruby"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "蓝宝石",
+        "en": "Sapphire"
+      }
+    ],
+    "aliases": [
+      "蓝宝石",
+      "Sapphire"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "绿宝石",
+        "en": "Emerald"
+      }
+    ],
+    "aliases": [
+      "绿宝石",
+      "Emerald"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "传说Z-A",
+        "en": "Legends Z-A"
+      }
+    ],
+    "aliases": [
+      "传说Z-A",
+      "传说 Z-A",
+      "Legends Z-A",
+      "Legends: Z-A"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "红",
+        "en": "Red"
+      },
+      {
+        "game": null,
+        "zh": "蓝",
+        "en": "Blue"
+      }
+    ],
+    "aliases": [
+      "红蓝",
+      "红/蓝",
+      "Red and Blue",
+      "Red/Blue",
+      "RB"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "金",
+        "en": "Gold"
+      },
+      {
+        "game": null,
+        "zh": "银",
+        "en": "Silver"
+      }
+    ],
+    "aliases": [
+      "金银",
+      "Gold and Silver",
+      "Gold/Silver",
+      "GS"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "红宝石",
+        "en": "Ruby"
+      },
+      {
+        "game": null,
+        "zh": "蓝宝石",
+        "en": "Sapphire"
+      }
+    ],
+    "aliases": [
+      "红蓝宝石",
+      "红宝石蓝宝石",
+      "Ruby and Sapphire",
+      "Ruby/Sapphire",
+      "RS"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "火红",
+        "en": "FireRed"
+      },
+      {
+        "game": null,
+        "zh": "叶绿",
+        "en": "LeafGreen"
+      }
+    ],
+    "aliases": [
+      "火红叶绿",
+      "FireRed and LeafGreen",
+      "FireRed/LeafGreen",
+      "FRLG"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "Let's Go 皮卡丘",
+        "en": "Let's Go Pikachu"
+      }
+    ],
+    "aliases": [
+      "Let's Go Pikachu",
+      "Let's Go 皮卡丘"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "Let's Go 伊布",
+        "en": "Let's Go Eevee"
+      }
+    ],
+    "aliases": [
+      "Let's Go Eevee",
+      "Let's Go 伊布"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "Champions",
+        "en": "Champions"
+      }
+    ],
+    "aliases": [
+      "Champions"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "超级维度",
+        "en": "Legends Z-A Mega Dimension"
+      }
+    ],
+    "aliases": [
+      "超级维度",
+      "Mega Dimension"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "黄",
+        "en": "Yellow"
+      }
+    ],
+    "aliases": [
+      "皮卡丘",
+      "皮卡丘 (Y)"
+    ],
+    "contextRequired": true,
+    "referenceOnly": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "黄",
+        "en": "Yellow"
+      }
+    ],
+    "aliases": [
+      "皮卡丘版"
+    ],
+    "contextRequired": false
+  },
+  {
+    "targets": [
+      {
+        "game": "scarlet",
+        "zh": "朱",
+        "en": "Scarlet"
+      },
+      {
+        "game": "violet",
+        "zh": "紫",
+        "en": "Violet"
+      }
+    ],
+    "aliases": [
+      "朱/紫"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "sword",
+        "zh": "剑",
+        "en": "Sword"
+      },
+      {
+        "game": "shield",
+        "zh": "盾",
+        "en": "Shield"
+      }
+    ],
+    "aliases": [
+      "剑/盾"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "diamond",
+        "zh": "钻石",
+        "en": "Diamond"
+      },
+      {
+        "game": "pearl",
+        "zh": "珍珠",
+        "en": "Pearl"
+      }
+    ],
+    "aliases": [
+      "钻石/珍珠"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "sun",
+        "zh": "太阳",
+        "en": "Sun"
+      },
+      {
+        "game": "moon",
+        "zh": "月亮",
+        "en": "Moon"
+      }
+    ],
+    "aliases": [
+      "太阳/月亮"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "ultra-sun",
+        "zh": "究极之日",
+        "en": "Ultra Sun"
+      },
+      {
+        "game": "ultra-moon",
+        "zh": "究极之月",
+        "en": "Ultra Moon"
+      }
+    ],
+    "aliases": [
+      "究极之日/月"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "红",
+        "en": "Red"
+      },
+      {
+        "game": null,
+        "zh": "绿",
+        "en": "Green"
+      },
+      {
+        "game": null,
+        "zh": "蓝",
+        "en": "Blue"
+      }
+    ],
+    "aliases": [
+      "红/绿/蓝"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "金",
+        "en": "Gold"
+      },
+      {
+        "game": null,
+        "zh": "银",
+        "en": "Silver"
+      }
+    ],
+    "aliases": [
+      "金/银"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "Let's Go 皮卡丘",
+        "en": "Let's Go Pikachu"
+      },
+      {
+        "game": null,
+        "zh": "Let's Go 伊布",
+        "en": "Let's Go Eevee"
+      }
+    ],
+    "aliases": [
+      "Let's Go 皮卡丘/伊布",
+      "Let's Go Pikachu/Eevee",
+      "LGPE"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "heartgold",
+        "zh": "心金",
+        "en": "HeartGold"
+      },
+      {
+        "game": "soulsilver",
+        "zh": "魂银",
+        "en": "SoulSilver"
+      }
+    ],
+    "aliases": [
+      "心金/魂银"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "black",
+        "zh": "黑",
+        "en": "Black"
+      },
+      {
+        "game": "white",
+        "zh": "白",
+        "en": "White"
+      }
+    ],
+    "aliases": [
+      "黑/白"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "black-2",
+        "zh": "黑2",
+        "en": "Black 2"
+      },
+      {
+        "game": "white-2",
+        "zh": "白2",
+        "en": "White 2"
+      }
+    ],
+    "aliases": [
+      "黑2/白2"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "omega-ruby",
+        "zh": "欧米伽红宝石",
+        "en": "Omega Ruby"
+      },
+      {
+        "game": "alpha-sapphire",
+        "zh": "阿尔法蓝宝石",
+        "en": "Alpha Sapphire"
+      }
+    ],
+    "aliases": [
+      "欧米加红宝石/阿尔法蓝宝石",
+      "欧米伽红宝石/阿尔法蓝宝石"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": "brilliant-diamond",
+        "zh": "晶灿钻石",
+        "en": "Brilliant Diamond"
+      },
+      {
+        "game": "shining-pearl",
+        "zh": "明亮珍珠",
+        "en": "Shining Pearl"
+      }
+    ],
+    "aliases": [
+      "晶灿钻石/明亮珍珠"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "红宝石",
+        "en": "Ruby"
+      },
+      {
+        "game": null,
+        "zh": "蓝宝石",
+        "en": "Sapphire"
+      }
+    ],
+    "aliases": [
+      "红宝石/蓝宝石"
+    ],
+    "contextRequired": true
+  },
+  {
+    "targets": [
+      {
+        "game": null,
+        "zh": "火红",
+        "en": "FireRed"
+      },
+      {
+        "game": null,
+        "zh": "叶绿",
+        "en": "LeafGreen"
+      }
+    ],
+    "aliases": [
+      "火红/叶绿"
+    ],
+    "contextRequired": true
+  }
+]

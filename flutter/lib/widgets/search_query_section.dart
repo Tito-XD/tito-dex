@@ -57,6 +57,9 @@ class _SearchQuerySectionState extends State<SearchQuerySection> {
               TextButton(
                 onPressed: widget.onClear,
                 style: TextButton.styleFrom(
+                  textStyle: SecondaryTypography.onCard.small12.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                   minimumSize: const Size(44, 44),
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                 ),
@@ -66,6 +69,9 @@ class _SearchQuerySectionState extends State<SearchQuerySection> {
               TextButton.icon(
                 onPressed: () => setState(() => _expanded = !_expanded),
                 style: TextButton.styleFrom(
+                  textStyle: SecondaryTypography.onCard.small12.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                   minimumSize: const Size(44, 44),
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                 ),
@@ -91,6 +97,10 @@ class _SearchQuerySectionState extends State<SearchQuerySection> {
                   key: ValueKey('search-query-$query'),
                   onPressed: () => widget.onQuery(query),
                   tooltip: query,
+                  labelStyle: SecondaryTypography.onCard.small12.copyWith(
+                    color: Theme.of(context).chipTheme.labelStyle?.color,
+                    fontWeight: FontWeight.w800,
+                  ),
                   label: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxWidth: constraints.maxWidth - 32,

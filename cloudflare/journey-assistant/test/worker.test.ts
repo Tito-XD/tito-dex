@@ -1437,7 +1437,7 @@ describe('journey assistant Worker contract', () => {
     expect(value.answer).not.toContain('本地资料与 PokéAPI 核对');
     expect(value.verifiedFacts).toContain('TitoDex Dex bundle v20');
     expect(value.unknowns).not.toContain(
-      '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
+      '公开资料联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
     );
   });
 
@@ -1497,7 +1497,7 @@ describe('journey assistant Worker contract', () => {
     expect(value.answer).toContain('本地结构化说明');
     expect(value.answer).not.toContain('不算联网核验');
     expect(value.unknowns).toContain(
-      '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
+      '公开资料联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
     );
   });
 

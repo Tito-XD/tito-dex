@@ -20,6 +20,12 @@
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
 
+## Prepared for v0.9.24
+
+- Search assistant copy, equal entry heights and on-demand single-row query shortcuts.
+- Browser-owned citations, 20 local sessions, global/question game scope and Exa bilingual retrieval.
+- Source-supported basic overview with strict capture-location projection.
+
 ## Completed in v0.9.23
 
 - Visible-control D-pad navigation with atomic actions and a persistent foreground focus cue.

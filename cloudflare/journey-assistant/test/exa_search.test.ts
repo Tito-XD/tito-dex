@@ -28,8 +28,8 @@ function result(url = guideUrl, highlights = ['Riolu appears in South Province A
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('bounded Exa allowlist retrieval', () => {
-  it('uses fixed search endpoint, domain filters and bounded highlights without score', async () => {
+describe('bounded Exa public web retrieval', () => {
+  it('uses fixed search endpoint and bounded highlights without score or domain filters', async () => {
     const fetcher = vi.fn<typeof fetch>(async (input, init) => {
       expect(input.toString()).toBe('https://api.exa.ai/search');
       expect(init?.method).toBe('POST');
@@ -41,13 +41,13 @@ describe('bounded Exa allowlist retrieval', () => {
       expect(body).toMatchObject({
         type: 'auto',
         numResults: 6,
-        includeDomains: POKEMON_WEB_ALLOWED_DOMAINS,
         contents: {
           highlights: { maxCharacters: 1_500 },
           livecrawlTimeout: 2_000,
         },
       });
       expect(body.query).toBe('Pokémon Violet Riolu encounter location 紫版 利欧路 捕捉地点');
+      expect(body).not.toHaveProperty('includeDomains');
       expect(body).not.toHaveProperty('outputSchema');
       expect(body.contents).not.toHaveProperty('text');
       expect(body.contents).not.toHaveProperty('summary');
@@ -105,15 +105,15 @@ describe('bounded Exa allowlist retrieval', () => {
   });
 
   it.each([
-    'https://example.com/pokemon',
-    'https://www.serebii.net.attacker.test/riolu',
-    'https://evil.www.serebii.net/riolu',
+    'https://127.0.0.1/pokemon',
+    'https://localhost/pokemon',
+    'https://10.0.0.1/riolu',
     'http://www.serebii.net/riolu',
     'https://user:password@www.serebii.net/riolu',
     'https://www.serebii.net:8443/riolu',
     'javascript:alert(1)',
     'not a URL',
-  ])('rejects result URL %s while retaining a valid allowlisted source', async (url) => {
+  ])('rejects unsafe result URL %s while retaining a valid public source', async (url) => {
     const fetcher = vi.fn<typeof fetch>(async () => json({
       results: [result(url), result(guideUrl)],
     }));

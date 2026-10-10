@@ -21,12 +21,16 @@ class AskConversationEmptyState extends StatefulWidget {
   const AskConversationEmptyState({
     super.key,
     this.prepareImages,
+    this.suggestions = const [],
+    this.onSelectSuggestion,
     required this.revealFrame,
     required this.cursorHold,
   });
   final Duration revealFrame;
   final Duration cursorHold;
   final AskMotionImagePreparer? prepareImages;
+  final List<String> suggestions;
+  final ValueChanged<String>? onSelectSuggestion;
 
   @override
   State<AskConversationEmptyState> createState() =>
@@ -185,6 +189,26 @@ class _AskConversationEmptyStateState extends State<AskConversationEmptyState>
                     ),
             ),
           ),
+          if (widget.suggestions.isNotEmpty &&
+              widget.onSelectSuggestion != null) ...[
+            const SizedBox(height: 18),
+            Text(AppZh.askTitoDexExampleTitle, style: style),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              alignment: WrapAlignment.center,
+              children: [
+                for (var index = 0; index < widget.suggestions.length; index++)
+                  ActionChip(
+                    key: ValueKey('ask-titodex-suggestion-$index'),
+                    label: Text(widget.suggestions[index], style: style),
+                    onPressed: () =>
+                        widget.onSelectSuggestion!(widget.suggestions[index]),
+                  ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -273,6 +297,8 @@ class AskQuestionComposer extends StatelessWidget {
     required this.loading,
     required this.enabled,
     required this.onSubmit,
+    this.onStop,
+    this.focusNode,
   });
 
   final int questionLimit;
@@ -280,6 +306,8 @@ class AskQuestionComposer extends StatelessWidget {
   final bool loading;
   final bool enabled;
   final VoidCallback onSubmit;
+  final VoidCallback? onStop;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -294,6 +322,7 @@ class AskQuestionComposer extends StatelessWidget {
             child: TextField(
               key: const Key('ask-titodex-question'),
               controller: controller,
+              focusNode: focusNode,
               enabled: enabled,
               minLines: 1,
               maxLines: 3,
@@ -319,14 +348,22 @@ class AskQuestionComposer extends StatelessWidget {
           const SizedBox(width: 7),
           SizedBox.square(
             dimension: 44,
-            child: FilledButton(
-              key: const Key('ask-titodex-submit'),
-              onPressed: loading || !enabled ? null : onSubmit,
-              style: FilledButton.styleFrom(
-                padding: EdgeInsets.zero,
-                shape: const CircleBorder(),
+            child: Tooltip(
+              message: loading
+                  ? AppZh.askTitoDexStopWaiting
+                  : AppZh.askTitoDexSendQuestion,
+              child: FilledButton(
+                key: Key(loading ? 'ask-titodex-stop' : 'ask-titodex-submit'),
+                onPressed: loading ? onStop : (enabled ? onSubmit : null),
+                style: FilledButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  shape: const CircleBorder(),
+                ),
+                child: Icon(
+                  loading ? Icons.stop_rounded : Icons.arrow_upward_rounded,
+                  size: 22,
+                ),
               ),
-              child: const Icon(Icons.arrow_upward_rounded, size: 22),
             ),
           ),
         ],

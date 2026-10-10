@@ -1,3 +1,4 @@
+import { basicSnapshotFallback, isBasicOutlineRequest } from './basic_web_outline';
 export { QuestionBudget } from './question_budget';
 import { answerQuestion } from './assistant';
 import {
@@ -33,6 +34,8 @@ import {
 } from './dex_bundle_retrieval';
 import { attachSemanticAnswer, semanticBlockDeltas } from './semantic_stream';
 import { generatedAnswerGuardFailure } from './answer_quality_guards';
+import { resolveRequestGameScope } from './request_game_scope';
+import { isDeepSeekTextConfigured, runDeepSeekText } from './deepseek_text';
 import { enforceFinalFacts } from './final_answer_facts';
 import {
   answerKnownPokemonFranchiseFact,
@@ -86,6 +89,8 @@ type ModelMessage = { role: 'system' | 'user'; content: string };
 type RequestTrace = {
   modelUsed: boolean;
   aiSearchUsed: boolean;
+  modelProviders?: ('workers-ai-qwen' | 'deepseek-text')[];
+  qwenUnavailable?: boolean;
 };
 
 type ResponseStage = 'retrieving' | 'resolving' | 'verifying' | 'writing';
@@ -129,10 +134,11 @@ export default {
           semanticStreaming: true,
           providerTokenStreaming: false,
           publicModel: env.AI ? 'workers-ai-qwen' : 'unavailable',
+          publicModelFallback: isDeepSeekTextConfigured(deepSeekTextConfig(env)) ? 'deepseek-text' : 'unavailable',
           aiSearch: env.AI_SEARCH_ENABLED === 'true' && Boolean(env.JOURNEY_SEARCH_NAMESPACE),
           dexBundle: Boolean(env.DEX_CONTENT),
           curatedSources: env.CURATED_WEB_ENABLED === 'true',
-          sourceProviders: ['pokeapi', 'strategywiki', 'wikidata'],
+          sourceProviders: exaConfigured ? [] : ['pokeapi', 'strategywiki', 'wikidata'],
           experimentalAnswers: env.EXPERIMENTAL_BROAD_ANSWERS === 'true',
           webSearch: webSearchProviders.length > 0,
           webSearchProviders,
@@ -174,8 +180,9 @@ export default {
       }
       return jsonError('invalid_json', 400);
     }
-    const parsed = parseAssistantRequest(value);
-    if (!parsed) return jsonError('invalid_request', 400);
+    const validated = parseAssistantRequest(value);
+    if (!validated) return jsonError('invalid_request', 400);
+    const parsed = resolveRequestGameScope(validated);
     try {
       // Reserve for the entire bounded pipeline before R2/search/model work.
       if (!await env.QUESTION_BUDGET.getByName('journey-questions-v1').admit()) return jsonError('rate_limited', 429);
@@ -231,16 +238,23 @@ export default {
       let dexBundleSources: CuratedSource[] = [];
       if (response.status !== 'answered' && !clarificationLocked && env.DEX_CONTENT) {
         try {
-          const bundleResult = await answerFromDexBundle(parsed, env.DEX_CONTENT);
-          structuredResponse = bundleResult?.coversQuestion ? bundleResult.response : null;
-          if (bundleResult?.requiresOnlineVerification) {
+          // A multi-version or unsupported-title question has no selected-version
+          // fact owner. General bundle projections may corroborate sources only.
+          const bundleResult = parsed.questionGameScope && parsed.context.game === 'general'
+            ? null : await answerFromDexBundle(parsed, env.DEX_CONTENT);
+          structuredResponse = !isBasicOutlineRequest(parsed) && bundleResult?.coversQuestion ? bundleResult.response : null;
+          if (bundleResult && (bundleResult.requiresOnlineVerification ||
+              (isBasicOutlineRequest(parsed) && bundleResult.response.evidence?.complete === false))) {
             bundleFallback = bundleResult.response;
             dexBundleSources = [
               { ...bundleResult.localSource, id: `${bundleResult.localSource.id}-answer` },
               ...await buildDexBundleSources(parsed, env.DEX_CONTENT),
             ];
           } else if (bundleResult) {
-            response = bundleResult.response;
+            if (isBasicOutlineRequest(parsed)) {
+              dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
+            }
+            response = basicSnapshotFallback(parsed, dexBundleSources, () => new Date()) ?? bundleResult.response;
           } else {
             dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
           }
@@ -249,12 +263,12 @@ export default {
           // missing/invalid object falls through to the existing safe pipeline.
         }
       }
-      if (response.status !== 'answered' && !clarificationLocked && env.AI) {
+      if (response.status !== 'answered' && !clarificationLocked && env.AI && !isExaConfigured(env)) {
         response = await answerQuestion(
           parsed,
           undefined,
           async (hints, assistantRequest) => {
-            const route = await resolveQuestionRoute(env, hints, assistantRequest);
+            const route = await resolveQuestionRoute(env, hints, assistantRequest, trace);
             trace.modelUsed ||= route.modelUsed;
             trace.aiSearchUsed = route.aiSearchUsed;
             curatedDecision = route.curatedDecision;
@@ -277,7 +291,7 @@ export default {
               parsed,
               (phase, messages, jsonSchema, maxTokens, temperature) => {
                 trace.modelUsed = true;
-                return runWorkersAi(env, phase, messages, jsonSchema, maxTokens, temperature);
+                return runQwenWithTextFallback(env, phase, messages, jsonSchema, maxTokens, temperature, trace);
               },
               fetch,
               () => new Date(),
@@ -440,8 +454,11 @@ export default {
           }
         }
       }
-      if (response.status !== 'answered' && !clarificationLocked && bundleFallback) {
-        const verificationNote = '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。';
+      if (response.status !== 'answered' && !clarificationLocked && response.errorCode !== 'basic_outline_conflict') {
+        response = basicSnapshotFallback(parsed, dexBundleSources, () => new Date()) ?? response;
+      }
+      if (response.status !== 'answered' && !clarificationLocked && bundleFallback && response.errorCode !== 'basic_outline_conflict') {
+        const verificationNote = '公开资料联网核验未完成，当前显示 TitoDex 本地结构化底稿。';
         response = {
           ...bundleFallback,
           unknowns: Array.from(new Set([
@@ -450,7 +467,7 @@ export default {
           ])),
         };
       }
-      if (bundleFallback && !structuredResponse && response.answer &&
+      if (bundleFallback && !structuredResponse && response.outlineMode !== 'basic_web_outline' && response.answer &&
           response.answer !== bundleFallback.answer && generatedAnswerGuardFailure({
             answer: response.answer,
             question: parsed.question,
@@ -478,6 +495,11 @@ export default {
       response = contextualizeFinalNoMatch(response, parsed.question);
       response = normalizeResponseAnswer(response);
       if (response.status === 'answered') observer?.stage('verifying');
+      if (parsed.questionGameScope) response = {
+        ...response,
+        contextUsed: { ...(response.contextUsed ?? {}), game: parsed.context.game,
+          questionGameTitles: parsed.questionGameScope.titles.map((title) => title.zh) },
+      };
       response = attachExecutionTrace(response, trace, curatedSourcesUsed);
       response = attachSemanticAnswer(response);
       console.log(JSON.stringify(buildLogRecord(response, parsed)));
@@ -691,6 +713,7 @@ async function resolveQuestionRoute(
   env: Env,
   hints: ProgressionHint[],
   request: AssistantRequest,
+  trace?: RequestTrace,
 ): Promise<{
   hintId: string;
   aiSearchUsed: boolean;
@@ -732,7 +755,7 @@ async function resolveQuestionRoute(
       // Retrieval is optional. The model remains restricted to local audited hints.
     }
   }
-  const routed = await resolveRouteWithModel(env, candidates, request);
+  const routed = await resolveRouteWithModel(env, candidates, request, trace);
   if (!isPlainObject(routed) || typeof routed.hintId !== 'string') {
     return { hintId: '', aiSearchUsed, modelUsed: true };
   }
@@ -792,6 +815,7 @@ function attachExecutionTrace(
     ...response,
     answerMode,
     modelUsed: trace.modelUsed,
+    ...(trace.modelProviders?.length ? { modelProviders: trace.modelProviders } : {}),
     aiSearchUsed: trace.aiSearchUsed,
     sourceKinds,
   };
@@ -865,7 +889,7 @@ export async function reconcileParallelAnswers(
     ),
     unknowns: [
       ...(curated.unknowns ?? []),
-      'DeepSeek 限定来源结果与主回答的核心结论完成了独立交叉核对；最终正文仍以 TitoDex／Qwen 的证据链为准。',
+      'DeepSeek 限定来源结果与主回答的核心结论完成了独立交叉核对；最终正文仍以主检索证据链为准。',
     ],
   };
 }
@@ -1058,7 +1082,7 @@ function buildDeepSeekNativeResponse(
         ? '仅保留有原文证据支持的部分；资料不足的断言已省略，尚未经过人工审核。'
         : supportVerified
         ? '该回答来自 DeepSeek V4 Flash 对限定公开来源的即时检索，并由 Workers AI 做了片段支持核对；尚未经过 TitoDex 人工审核。'
-        : '试用宽松模式：DeepSeek 已执行限定来源联网检索，回答尚未通过 Qwen 二次逐句事实核对，请核对列出的来源。',
+        : '试用宽松模式：DeepSeek 已执行限定来源联网检索，回答尚未通过文本模型二次逐句事实核对，请核对列出的来源。',
     ],
     confidence: supportVerified && !partiallyVerified ? 'medium' : 'low',
     sources: citedSources.map((source) => ({
@@ -1113,6 +1137,7 @@ async function resolveRouteWithModel(
   env: Env,
   hints: ProgressionHint[],
   request: AssistantRequest,
+  trace?: RequestTrace,
 ): Promise<unknown> {
   const hintIds = hints.map((hint) => hint.id);
   return runJsonModel(env, 'curated-web-route', [
@@ -1155,7 +1180,7 @@ async function resolveRouteWithModel(
       },
       pokeApiSlug: { type: 'string', maxLength: 80 },
     },
-  }, 180, 0);
+  }, 180, 0, trace);
 }
 
 const GENERIC_EVIDENCE = new Set([
@@ -1220,6 +1245,7 @@ async function runJsonModel(
   jsonSchema: Record<string, unknown>,
   maxTokens: number,
   temperature: number,
+  trace?: RequestTrace,
 ): Promise<unknown> {
   if (
     env.AI_EXTERNAL_PROVIDER_ENABLED === 'true' &&
@@ -1231,7 +1257,39 @@ async function runJsonModel(
       // An optional provider must never make the audited Workers AI path unusable.
     }
   }
-  return runWorkersAi(env, phase, messages, jsonSchema, maxTokens, temperature);
+  return runQwenWithTextFallback(env, phase, messages, jsonSchema, maxTokens, temperature, trace);
+}
+
+export async function runQwenWithTextFallback(
+  env: Env,
+  phase: string,
+  messages: ModelMessage[],
+  schema: Record<string, unknown>,
+  maxTokens: number,
+  temperature: number,
+  trace?: RequestTrace,
+): Promise<unknown> {
+  const mark = (provider: 'workers-ai-qwen' | 'deepseek-text') => {
+    if (trace) trace.modelProviders = Array.from(new Set([...(trace.modelProviders ?? []), provider]));
+  };
+  let failure: unknown = new Error('qwen_unavailable_this_request');
+  if (!trace?.qwenUnavailable) {
+    try {
+      const value = await runWorkersAi(env, phase, messages, schema, maxTokens, temperature);
+      if (!isPlainObject(value)) throw new Error('invalid_qwen_json');
+      mark('workers-ai-qwen');
+      return value;
+    } catch (error) {
+      failure = error;
+      if (trace) trace.qwenUnavailable = true;
+    }
+  }
+  const config = deepSeekTextConfig(env);
+  if (!isDeepSeekTextConfigured(config)) throw failure;
+  const value = await runDeepSeekText(config, phase, messages, schema, maxTokens, temperature);
+  mark('deepseek-text');
+  console.log(JSON.stringify({ event: 'assistant_model_fallback', provider: 'deepseek-text', phase }));
+  return value;
 }
 
 async function runWorkersAi(
@@ -1457,6 +1515,13 @@ function deepSeekNativeConfig(env: Env): DeepSeekNativeSearchConfig {
     endpoint: DEEPSEEK_NATIVE_ENDPOINT,
     model: DEEPSEEK_NATIVE_MODEL,
     allowIncompleteAnswer: env.EXPERIMENTAL_BROAD_ANSWERS === 'true',
+  };
+}
+
+function deepSeekTextConfig(env: Env): DeepSeekNativeSearchConfig {
+  return {
+    ...deepSeekNativeConfig(env),
+    enabled: 'DEEPSEEK_TEXT_FALLBACK_ENABLED' in env && env.DEEPSEEK_TEXT_FALLBACK_ENABLED === 'true',
   };
 }
 

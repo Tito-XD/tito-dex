@@ -1,3 +1,4 @@
+import '../../l10n/app_zh.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -11,6 +12,7 @@ import 'journey_pack_models.dart';
 import 'journey_worker_config.dart';
 import 'journey_pack_repository.dart';
 import 'progression_hints.dart';
+import 'ask_question_game_scope.dart';
 
 class AskTitoDexConfig {
   static const workerUrl = JourneyWorkerConfig.askUrl;
@@ -83,6 +85,7 @@ class AskTitoDexWorkerStatus {
   const AskTitoDexWorkerStatus({
     required this.availability,
     this.qwenConfigured = false,
+    this.textFallbackConfigured = false,
     this.aiSearchEnabled = false,
     this.dexBundleEnabled = false,
     this.curatedSourcesEnabled = false,
@@ -109,6 +112,7 @@ class AskTitoDexWorkerStatus {
 
   final AskTitoDexAvailability availability;
   final bool qwenConfigured;
+  final bool textFallbackConfigured;
   final bool aiSearchEnabled;
   final bool dexBundleEnabled;
   final bool curatedSourcesEnabled;
@@ -200,19 +204,46 @@ abstract interface class AskTitoDexStreamingOnlineClient {
   });
 }
 
+abstract interface class AskTitoDexCancelableOnlineClient {
+  void cancelActiveQuestion();
+}
+
 class HttpAskTitoDexOnlineClient
-    implements AskTitoDexOnlineClient, AskTitoDexStreamingOnlineClient {
+    implements
+        AskTitoDexOnlineClient,
+        AskTitoDexStreamingOnlineClient,
+        AskTitoDexCancelableOnlineClient {
   HttpAskTitoDexOnlineClient({
     http.Client? client,
     String endpoint = AskTitoDexConfig.workerUrl,
     this.timeout = const Duration(seconds: 35),
     Future<String> Function()? deviceKeyProvider,
-  }) : _client = client ?? http.Client(),
+  }) : _ownsClient = client == null,
+       _client = client ?? http.Client(),
        endpoint = endpoint.trim(),
        _deviceKeyProvider =
            deviceKeyProvider ?? askTitoDexSettings.anonymousDeviceKey;
 
   final http.Client _client;
+  final bool _ownsClient;
+  Completer<void>? _activeAbort;
+
+  @override
+  void cancelActiveQuestion() {
+    final active = _activeAbort;
+    if (active != null && !active.isCompleted) active.complete();
+  }
+
+  void dispose() {
+    cancelActiveQuestion();
+    if (_ownsClient) _client.close();
+  }
+
+  Completer<void> _beginQuestion() {
+    cancelActiveQuestion();
+    return _activeAbort = Completer<void>();
+  }
+
   final String endpoint;
   final Duration timeout;
   final Future<String> Function() _deviceKeyProvider;
@@ -268,6 +299,8 @@ class HttpAskTitoDexOnlineClient
     return AskTitoDexWorkerStatus(
       availability: AskTitoDexAvailability.online,
       qwenConfigured: capabilities['publicModel'] == 'workers-ai-qwen',
+      textFallbackConfigured:
+          capabilities['publicModelFallback'] == 'deepseek-text',
       aiSearchEnabled: capabilities['aiSearch'] == true,
       dexBundleEnabled: capabilities['dexBundle'] == true,
       curatedSourcesEnabled: capabilities['curatedSources'] == true,
@@ -292,28 +325,39 @@ class HttpAskTitoDexOnlineClient
     if (!isConfigured) {
       throw const AskTitoDexOnlineException('worker_not_configured');
     }
-    final deviceKey = await _deviceKeyProvider();
-    final response = await _client
-        .post(
-          Uri.parse(endpoint),
-          headers: {
-            'content-type': 'application/json',
-            'x-titodex-device-key': deviceKey,
-          },
-          body: _encodeAskRequest(question, context, history),
-        )
-        .timeout(timeout);
-    final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-    if (decoded is! Map) {
-      throw const AskTitoDexOnlineException('invalid_response');
+    final abort = _beginQuestion();
+    try {
+      final deviceKey = await _deviceKeyProvider();
+      if (abort.isCompleted) throw http.RequestAbortedException();
+      final request =
+          http.AbortableRequest(
+              'POST',
+              Uri.parse(endpoint),
+              abortTrigger: abort.future,
+            )
+            ..headers.addAll({
+              'content-type': 'application/json',
+              'x-titodex-device-key': deviceKey,
+            })
+            ..body = _encodeAskRequest(question, context, history);
+      final response = await http.Response.fromStream(
+        await _client.send(request).timeout(timeout),
+      ).timeout(timeout);
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      if (decoded is! Map) {
+        throw const AskTitoDexOnlineException('invalid_response');
+      }
+      final body = Map<String, dynamic>.from(decoded);
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw AskTitoDexOnlineException(
+          body['errorCode'] as String? ?? 'http_${response.statusCode}',
+        );
+      }
+      return AskTitoDexResult.fromJson(body);
+    } finally {
+      if (!abort.isCompleted) abort.complete();
+      if (identical(_activeAbort, abort)) _activeAbort = null;
     }
-    final body = Map<String, dynamic>.from(decoded);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw AskTitoDexOnlineException(
-        body['errorCode'] as String? ?? 'http_${response.statusCode}',
-      );
-    }
-    return AskTitoDexResult.fromJson(body);
   }
 
   @override
@@ -325,106 +369,118 @@ class HttpAskTitoDexOnlineClient
     if (!isConfigured) {
       throw const AskTitoDexOnlineException('worker_not_configured');
     }
-    final deviceKey = await _deviceKeyProvider();
-    final request = http.Request('POST', Uri.parse(endpoint))
-      ..headers.addAll({
-        'content-type': 'application/json',
-        'accept': 'application/x-ndjson, application/json',
-        'x-titodex-device-key': deviceKey,
-      })
-      ..body = _encodeAskRequest(question, context, history);
-    final response = await _client.send(request).timeout(timeout);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw AskTitoDexOnlineException('http_${response.statusCode}');
-    }
+    final abort = _beginQuestion();
+    try {
+      final deviceKey = await _deviceKeyProvider();
+      if (abort.isCompleted) throw http.RequestAbortedException();
+      final request =
+          http.AbortableRequest(
+              'POST',
+              Uri.parse(endpoint),
+              abortTrigger: abort.future,
+            )
+            ..headers.addAll({
+              'content-type': 'application/json',
+              'accept': 'application/x-ndjson, application/json',
+              'x-titodex-device-key': deviceKey,
+            })
+            ..body = _encodeAskRequest(question, context, history);
+      final response = await _client.send(request).timeout(timeout);
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw AskTitoDexOnlineException('http_${response.statusCode}');
+      }
 
-    var totalBytes = 0;
-    var sawResult = false;
-    final semanticDecoder = AskTitoDexSemanticStreamDecoder();
-    final lines = response.stream
-        .timeout(timeout)
-        .transform(utf8.decoder)
-        .transform(const LineSplitter());
-    await for (final line in lines) {
-      if (line.trim().isEmpty) continue;
-      totalBytes += utf8.encode(line).length + 1;
-      if (totalBytes > _maxAskStreamResponseBytes) {
-        throw const AskTitoDexOnlineException('stream_response_too_large');
-      }
-      final decoded = jsonDecode(line);
-      if (decoded is! Map) {
-        throw const AskTitoDexOnlineException('invalid_stream_event');
-      }
-      final body = Map<String, dynamic>.from(decoded);
-      final semanticWasDisabled = semanticDecoder.isDisabled;
-      final semantic = semanticDecoder.decode(body);
-      if (!semanticWasDisabled && semanticDecoder.isDisabled) {
-        yield AskTitoDexOnlineStreamEvent.semanticReset(
-          turnId: isAskTitoDexStableId(body['turnId'])
-              ? body['turnId'] as String
-              : null,
-        );
-      }
-      switch (body['type']) {
-        case 'progress':
-          final stage = semantic?.stage;
-          if (stage != null) {
-            yield AskTitoDexOnlineStreamEvent.progress(
-              _progressForStreamStage(stage),
-              stage: stage,
-              turnId: semantic?.turnId,
-            );
-          }
-        case 'answer_plan':
-          final plan = semantic?.answerPlan;
-          if (plan != null) {
-            yield AskTitoDexOnlineStreamEvent.answerPlan(plan);
-          }
-        case 'block_start':
-        case 'block_delta':
-        case 'block_end':
-          final block = semantic?.answerBlock;
-          if (block != null) {
-            yield AskTitoDexOnlineStreamEvent.answerBlock(block);
-          }
-        case 'clarification':
-          final clarification = semantic?.clarification;
-          if (clarification != null) {
-            yield AskTitoDexOnlineStreamEvent.clarification(clarification);
-          }
-        case 'result':
-          if (body['result'] is! Map) {
-            throw const AskTitoDexOnlineException('invalid_stream_result');
-          }
-          final result = AskTitoDexResult.fromJson(
-            Map<String, dynamic>.from(body['result'] as Map),
-          );
-          if (!semanticDecoder.validateFinal(
-            turnId: body['turnId'],
-            blocks: result.answerBlocks,
-          )) {
-            throw const AskTitoDexOnlineException('semantic_stream_mismatch');
-          }
-          sawResult = true;
-          yield AskTitoDexOnlineStreamEvent.result(
-            result,
+      var totalBytes = 0;
+      var sawResult = false;
+      final semanticDecoder = AskTitoDexSemanticStreamDecoder();
+      final lines = response.stream
+          .timeout(timeout)
+          .transform(utf8.decoder)
+          .transform(const LineSplitter());
+      await for (final line in lines) {
+        if (line.trim().isEmpty) continue;
+        totalBytes += utf8.encode(line).length + 1;
+        if (totalBytes > _maxAskStreamResponseBytes) {
+          throw const AskTitoDexOnlineException('stream_response_too_large');
+        }
+        final decoded = jsonDecode(line);
+        if (decoded is! Map) {
+          throw const AskTitoDexOnlineException('invalid_stream_event');
+        }
+        final body = Map<String, dynamic>.from(decoded);
+        final semanticWasDisabled = semanticDecoder.isDisabled;
+        final semantic = semanticDecoder.decode(body);
+        if (!semanticWasDisabled && semanticDecoder.isDisabled) {
+          yield AskTitoDexOnlineStreamEvent.semanticReset(
             turnId: isAskTitoDexStableId(body['turnId'])
                 ? body['turnId'] as String
                 : null,
           );
-        default:
-          // A Worker may still return the original one-line JSON response.
-          if (body['status'] is! String) {
-            throw const AskTitoDexOnlineException('invalid_stream_event');
-          }
-          sawResult = true;
-          yield AskTitoDexOnlineStreamEvent.result(
-            AskTitoDexResult.fromJson(body),
-          );
+        }
+        switch (body['type']) {
+          case 'progress':
+            final stage = semantic?.stage;
+            if (stage != null) {
+              yield AskTitoDexOnlineStreamEvent.progress(
+                _progressForStreamStage(stage),
+                stage: stage,
+                turnId: semantic?.turnId,
+              );
+            }
+          case 'answer_plan':
+            final plan = semantic?.answerPlan;
+            if (plan != null) {
+              yield AskTitoDexOnlineStreamEvent.answerPlan(plan);
+            }
+          case 'block_start':
+          case 'block_delta':
+          case 'block_end':
+            final block = semantic?.answerBlock;
+            if (block != null) {
+              yield AskTitoDexOnlineStreamEvent.answerBlock(block);
+            }
+          case 'clarification':
+            final clarification = semantic?.clarification;
+            if (clarification != null) {
+              yield AskTitoDexOnlineStreamEvent.clarification(clarification);
+            }
+          case 'result':
+            if (body['result'] is! Map) {
+              throw const AskTitoDexOnlineException('invalid_stream_result');
+            }
+            final result = AskTitoDexResult.fromJson(
+              Map<String, dynamic>.from(body['result'] as Map),
+            );
+            if (!semanticDecoder.validateFinal(
+              turnId: body['turnId'],
+              blocks: result.answerBlocks,
+            )) {
+              throw const AskTitoDexOnlineException('semantic_stream_mismatch');
+            }
+            sawResult = true;
+            yield AskTitoDexOnlineStreamEvent.result(
+              result,
+              turnId: isAskTitoDexStableId(body['turnId'])
+                  ? body['turnId'] as String
+                  : null,
+            );
+          default:
+            // A Worker may still return the original one-line JSON response.
+            if (body['status'] is! String) {
+              throw const AskTitoDexOnlineException('invalid_stream_event');
+            }
+            sawResult = true;
+            yield AskTitoDexOnlineStreamEvent.result(
+              AskTitoDexResult.fromJson(body),
+            );
+        }
       }
-    }
-    if (!sawResult) {
-      throw const AskTitoDexOnlineException('stream_missing_result');
+      if (!sawResult) {
+        throw const AskTitoDexOnlineException('stream_missing_result');
+      }
+    } finally {
+      if (!abort.isCompleted) abort.complete();
+      if (identical(_activeAbort, abort)) _activeAbort = null;
     }
   }
 }
@@ -451,6 +507,25 @@ class AskTitoDexService {
   final ProgressionHintRepository _hints;
   final JourneyPackRepository _packs;
   final AskTitoDexOnlineClient? _online;
+  int _questionGeneration = 0;
+  static const _cancelled = AskTitoDexResult(
+    status: AskTitoDexStatus.noMatch,
+    errorCode: 'request_cancelled',
+  );
+
+  void cancelActiveQuestion() {
+    _questionGeneration += 1;
+    final online = _online;
+    if (online is AskTitoDexCancelableOnlineClient) {
+      (online as AskTitoDexCancelableOnlineClient).cancelActiveQuestion();
+    }
+  }
+
+  void dispose() {
+    cancelActiveQuestion();
+    final online = _online;
+    if (online is HttpAskTitoDexOnlineClient) online.dispose();
+  }
 
   Future<AskTitoDexWorkerStatus> checkConnection() async {
     if (!askTitoDexSettings.enabled) {
@@ -489,8 +564,15 @@ class AskTitoDexService {
     void Function(AskTitoDexProgress progress)? onProgress,
     AskTitoDexStreamEventCallback? onStreamEvent,
   }) async {
+    final generation = ++_questionGeneration;
     onProgress?.call(AskTitoDexProgress.checkingLocal);
-    final local = await _hints.answer(question, context, history: history);
+    final local = shouldSkipLocalGameHints(question, context.game, history)
+        ? AskTitoDexResult(
+            status: AskTitoDexStatus.noMatch,
+            followUp: AppZh.askTitoDexOtherGameNoLocal,
+          )
+        : await _hints.answer(question, context, history: history);
+    if (generation != _questionGeneration) return _cancelled;
     final client = _online;
     if (local.status == AskTitoDexStatus.answered ||
         client == null ||
@@ -510,6 +592,7 @@ class AskTitoDexService {
           context,
           history: history,
         )) {
+          if (generation != _questionGeneration) return _cancelled;
           await onStreamEvent?.call(event);
           if (event.semanticReset) {
             plannedBlockIds = null;
@@ -600,10 +683,14 @@ class AskTitoDexService {
             }
           }
         }
+        if (generation != _questionGeneration) return _cancelled;
         return online.withRuntimeTrace(onlineAttempted: true);
       }
       final online = await client.ask(question, context, history: history);
+      if (generation != _questionGeneration) return _cancelled;
       return online.withRuntimeTrace(onlineAttempted: true);
+    } on http.RequestAbortedException {
+      return _cancelled;
     } on TimeoutException {
       return local.withRuntimeTrace(
         onlineAttempted: true,
