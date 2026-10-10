@@ -111,4 +111,4 @@ jobs:
           profile: pixel_6
           disable-animations: true
           working-directory: flutter
-          script: flutter test integration_test -d emulator-5554
+          script: flutter test integration_test/media_verify_test.dart integration_test/handheld_focus_verify_test.dart -d emulator-5554

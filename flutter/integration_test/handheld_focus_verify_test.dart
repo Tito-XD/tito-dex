@@ -17,7 +17,7 @@ import 'package:titodex/widgets/handheld_input.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
 
 void main() {
-  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'Android Home RG layout keeps D-pad highlight and action aligned',
@@ -34,8 +34,8 @@ void main() {
       tester.view.physicalSize = const Size(720, 720);
       tester.view.devicePixelRatio = 2;
       addTearDown(tester.view.reset);
-      await binding.convertFlutterSurfaceToImage();
       for (final style in AppVisualStyle.values) {
+        debugPrint('Verifying Android RG Home: ${style.name}');
         await appVisualStyle.setStyle(style);
         final router = GoRouter(
           routes: [
@@ -117,7 +117,6 @@ void main() {
                     .painter!
                 as HandheldFocusCuePainter;
         expect(paint.bounds, tester.getRect(search));
-        await binding.takeScreenshot('home_focus_${style.name}_search');
         await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
         await tester.pumpAndSettle();
         expect(node(search).hasPrimaryFocus, isTrue);
