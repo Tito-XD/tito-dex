@@ -12,8 +12,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.9.22](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.22) · App `0.9.22+212` | Compact, readable type selection across all three themes; on-demand v20 data |
-| Offline APK | [v0.9.22](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.22) · App `0.9.22-offline+213` | The same updated UI with the complete verified v20 bundle embedded |
+| Lite APK | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) · App `0.9.23+214` | Visible-control D-pad navigation and clear Home focus; on-demand v20 data |
+| Offline APK | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) · App `0.9.23-offline+215` | The same updated UI with the complete verified v20 bundle embedded |
 | Journey Assistant | Built in | Structured-data-first answers, 50 local Q&A pairs, and category-aware prop motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
@@ -74,11 +74,11 @@ Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.9.22-lite-rg-arm64.apk`** or **`TitoDex-0.9.22-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.22 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.9.23-lite-rg-arm64.apk`** or **`TitoDex-0.9.23-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.23 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
 The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 
-Since v0.9.18, Settings supports updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite · 29.44 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.22/TitoDex-0.9.22-lite-rg-arm64.apk), [Offline · 95.57 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.22/TitoDex-0.9.22-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
+Since v0.9.18, Settings supports updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.23/TitoDex-0.9.23-lite-rg-arm64.apk), [Offline](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.23/TitoDex-0.9.23-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
 
 ## Development
 

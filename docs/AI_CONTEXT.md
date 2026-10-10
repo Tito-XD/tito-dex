@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.22](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.22) |
-| **`main` / lite source** | `0.9.22+212` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.22-offline+213` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) |
+| **`main` / lite source** | `0.9.23+214` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.23-offline+215` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -44,9 +44,27 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.22)
+## Current feature status (latest release line: v0.9.23)
 
 **Exa search live (2026-10-08):** Worker version `337a442a-3a13-49c0-bdbb-80c54f7666fe` serves 100% of production traffic, from verified source `7b30345`. Exa is enabled and primary; Tavily is disabled by default and requires explicit opt-in. Existing source/version checks and DeepSeek remain. Production health confirms Exa without Tavily; a live cultivation answer returned an Exa citation in 11.6s. Existing App clients remain compatible; Exa labels ship with the next normal App release.
+
+### v0.9.23: visible handheld focus
+
+- Every decorated action is one traversal stop; disabled actions and their
+  inner Material focus nodes cannot steal D-pad selection.
+- Directional selection reads the current visible control geometry, excludes
+  hidden/blocked/covered controls, keeps row/column edges, and recalculates after
+  responsive layout changes. Offscreen list targets are revealed on selection.
+- A single top-layer outline follows the real control (including pressed
+  sticker transforms and scroll clips), with a bounded 420 ms arrival pulse.
+  Reduced motion keeps the static outline. Touch hides the handheld cue.
+- Home regressions exercise six actual actions, three themes, square/landscape/
+  portrait layouts, activation, modal isolation and return restoration. Holding
+  confirmation/back does not repeatedly activate, and key-held state clears on
+  focus loss. Input handling now surrounds the Navigator, including popups.
+- Lite source is `0.9.23+214`; Offline uses `0.9.23-offline+215` with verified v20.
+  Local analysis passed; 814 tests passed, 2 skipped. Android focus integration
+  and signed release evidence is recorded after the new CI run and artifact audit.
 
 ### v0.9.22: compact type selection across themes
 

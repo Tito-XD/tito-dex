@@ -127,10 +127,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 }
                 TitoBackNavigation.navigateBack(context, state.uri.path);
               },
-              child: HandheldInputShell(
-                location: state.uri.path,
-                child: DeviceShell(child: child),
-              ),
+              child: DeviceShell(child: child),
             );
           },
           routes: [
@@ -1046,7 +1043,20 @@ class _TitoDexAppState extends State<TitoDexApp> {
               style: TitoTypography.style().copyWith(
                 decoration: TextDecoration.none,
               ),
-              child: child ?? const SizedBox.shrink(),
+              child: HandheldInputShell(
+                onBack: () {
+                  if (_router.canPop()) {
+                    _router.pop();
+                  } else {
+                    final path =
+                        _router.routeInformationProvider.value.uri.path;
+                    if (!TitoBackNavigation.isHome(path)) {
+                      _router.go(TitoBackNavigation.parentPath(path));
+                    }
+                  }
+                },
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           );
         },
