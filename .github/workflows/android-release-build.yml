@@ -356,7 +356,7 @@ jobs:
             -PjourneyPackMinHostVersion="$HOST_VERSION" \
             :journey-assistant-pack:check \
             :journey-assistant-pack:assembleJourneyAssistantPack
-          apk="../build/journey-assistant-pack/outputs/apk/release/journey-assistant-pack-release.apk"
+          apk="../build/journey-assistant-pack/outputs/apk/release/journey-assistant-pack-release-unsigned.apk"
           test -s "$apk"
           mkdir -p ../../dist
           cp "$apk" "../../dist/TitoDex-Journey-Assistant-$EXTENSION_VERSION-rg.apk"
