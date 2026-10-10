@@ -4,7 +4,7 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | v0.9.24 release preparation (v0.9.23 remains public until publication) |
+| **Latest release** | [v0.9.24](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.24) |
 | **`main` / lite source** | `0.9.24+216` (`flutter/pubspec.yaml`) |
 | **Offline package** | `0.9.24-offline+217` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
@@ -44,11 +44,11 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.23)
+## Current feature status (latest release line: v0.9.24)
 
-**Exa search live (2026-10-08):** Worker version `337a442a-3a13-49c0-bdbb-80c54f7666fe` serves 100% of production traffic, from verified source `7b30345`. Exa is enabled and primary; Tavily is disabled by default and requires explicit opt-in. Existing source/version checks and DeepSeek remain. Production health confirms Exa without Tavily; a live cultivation answer returned an Exa citation in 11.6s. Existing App clients remain compatible; Exa labels ship with the next normal App release.
+**Compatible Exa/Ask rollout live (2026-10-10):** Worker `c33bf145-42ee-4a7c-a075-b79bb2ee811c` serves 100% from verified source `75304f9`. Exa is primary, Tavily and DeepSeek native search are off; Qwen uses a bounded DeepSeek text fallback. Four candidate and two ordinary production requests returned answers, including old/new context shapes. Health and the latest deployment were verified; this is API behavior evidence, not an independent audit of every retrieved Pokémon fact.
 
-### Current source: compact Search and Exa/Ask integration (not released)
+### v0.9.24: compact Search and Exa/Ask integration
 
 - Search introduces the Exa/AI experimental assistant copy and equal-height
   reference/battle entry cards. Recent searches and suggestions reveal below
@@ -75,10 +75,14 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
   7 passed, type/config check and dry-run passed. Arm64 Android debug build
   validates the browser dependency against the current Android project.
   Three-theme Search rendering and final query-section layout were checked.
-- A fresh deployment listing on 2026-10-10 still shows Worker
-  `337a442a-3a13-49c0-bdbb-80c54f7666fe` at 100%. These merged changes are
-  unpublished; the user authorized production rollover and the new signed App on 2026-10-10.
-  Physical RG/controller and source-browser acceptance remain unverified.
+- Published 2026-10-10T15:46:50Z from `75304f9c3baa599f0a0e2f7e9ad3eaf9439646d9`.
+  Cloud CI 38063574355 passed the same-source Web/Android checks; signed build
+  38063575856 and publisher 38064645361 passed. Actual uploaded assets were
+  re-downloaded and audited: Lite 29,537,370 bytes, Offline 95,667,482 bytes.
+  The historical signer, fonts/type icons and v20 archive are unchanged.
+  Both anonymous download URLs returned HTTP 200 with matching byte counts.
+  Compatible Worker is live at 100%; physical RG/controller, browser and
+  signed-upgrade acceptance remain unverified. Exact hashes are in RELEASES.md.
 
 ### v0.9.23: visible handheld focus and bounded navigation ink
 
