@@ -118,47 +118,65 @@ class TitoSegmentedControl<T> extends StatelessWidget {
             ),
           ),
         ),
-        Row(
-          children: [
-            for (final entry in options.entries)
-              Expanded(
-                child: HandheldFocusDecorator(
-                  borderRadius: radius,
-                  onActivate: () => onChanged(entry.key),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: Row(
+            children: [
+              for (final entry in options.entries)
+                Expanded(
                   child: Semantics(
                     button: true,
                     selected: entry.key == value,
-                    child: Material(
+                    // Keep a 44px touch target while ink and handheld focus
+                    // follow the inset, painted button rather than the rail.
+                    child: GestureDetector(
                       key: optionKeyBuilder?.call(entry.key),
-                      type: MaterialType.transparency,
-                      child: InkWell(
-                        borderRadius: radius,
-                        onTap: () => onChanged(entry.key),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: 44),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 10,
-                            ),
-                            child: Center(
-                              child: AnimatedDefaultTextStyle(
-                                duration: TitoMotion.duration(
-                                  context,
-                                  TitoMotion.emphasized,
+                      behavior: HitTestBehavior.opaque,
+                      excludeFromSemantics: true,
+                      onTap: () => onChanged(entry.key),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 7),
+                        child: HandheldFocusDecorator(
+                          borderRadius: indicatorRadius,
+                          onActivate: () => onChanged(entry.key),
+                          child: Material(
+                            type: MaterialType.transparency,
+                            borderRadius: indicatorRadius,
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              borderRadius: indicatorRadius,
+                              onTap: () => onChanged(entry.key),
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  minHeight: 30,
                                 ),
-                                curve: Curves.easeOutCubic,
-                                style: SecondaryTypography.onCard.small12
-                                    .copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      color: value == entry.key
-                                          ? selectedForeground ??
-                                                selected.foreground
-                                          : railForeground ?? rail.foreground,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 3,
+                                  ),
+                                  child: Center(
+                                    child: AnimatedDefaultTextStyle(
+                                      duration: TitoMotion.duration(
+                                        context,
+                                        TitoMotion.emphasized,
+                                      ),
+                                      curve: Curves.easeOutCubic,
+                                      style: SecondaryTypography.onCard.small12
+                                          .copyWith(
+                                            fontWeight: FontWeight.w800,
+                                            color: value == entry.key
+                                                ? selectedForeground ??
+                                                      selected.foreground
+                                                : railForeground ??
+                                                      rail.foreground,
+                                          ),
+                                      child: Text(
+                                        entry.value,
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
-                                child: Text(
-                                  entry.value,
-                                  textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
                             ),
@@ -168,8 +186,8 @@ class TitoSegmentedControl<T> extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ],
     );

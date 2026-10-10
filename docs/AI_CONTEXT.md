@@ -48,7 +48,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 **Exa search live (2026-10-08):** Worker version `337a442a-3a13-49c0-bdbb-80c54f7666fe` serves 100% of production traffic, from verified source `7b30345`. Exa is enabled and primary; Tavily is disabled by default and requires explicit opt-in. Existing source/version checks and DeepSeek remain. Production health confirms Exa without Tavily; a live cultivation answer returned an Exa citation in 11.6s. Existing App clients remain compatible; Exa labels ship with the next normal App release.
 
-### v0.9.23: visible handheld focus
+### v0.9.23: visible handheld focus and bounded navigation ink
 
 - Every decorated action is one traversal stop; disabled actions and their
   inner Material focus nodes cannot steal D-pad selection.
@@ -62,8 +62,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
   portrait layouts, activation, modal isolation and return restoration. Holding
   confirmation/back does not repeatedly activate, and key-held state clears on
   focus loss. Input handling now surrounds the Navigator, including popups.
+- Dex detail and battle segmented rails clip ink to each inset button, including
+  its rounded corners. Focus uses the same visible bounds while the 44px touch
+  target and floating shadow remain. Held-press pixel tests cover first/last
+  buttons in all three themes and both rail configurations.
 - Lite source is `0.9.23+214`; Offline uses `0.9.23-offline+215` with verified v20.
-  Local analysis passed; 814 tests passed, 2 skipped. Android focus integration
+  Local analysis passed; 820 tests passed, 2 skipped. Android focus integration
   and signed release evidence is recorded after the new CI run and artifact audit.
 
 ### v0.9.22: compact type selection across themes
