@@ -12,6 +12,8 @@ import 'package:titodex/pages/home_page.dart';
 import 'package:titodex/theme/app_visual_style.dart';
 import 'package:titodex/theme/tito_theme.dart';
 import 'package:titodex/theme/device_layout.dart';
+import 'package:titodex/theme/tito_typography.dart';
+import 'package:titodex/widgets/system_ui_coordinator.dart';
 import 'package:titodex/widgets/device_shell.dart';
 import 'package:titodex/widgets/handheld_input.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
@@ -33,6 +35,12 @@ void main() {
       );
       tester.view.physicalSize = const Size(720, 720);
       tester.view.devicePixelRatio = 2;
+      // Model the RG immersive panel, including its zero system-bar insets.
+      // Retaining a Pixel phone cutout/nav inset with a square fake size
+      // would test a different, artificially shortened screen.
+      tester.view.padding = FakeViewPadding();
+      tester.view.viewPadding = FakeViewPadding();
+      tester.view.viewInsets = FakeViewPadding();
       addTearDown(tester.view.reset);
       for (final style in AppVisualStyle.values) {
         debugPrint('Verifying Android RG Home: ${style.name}');
@@ -76,9 +84,16 @@ void main() {
           MaterialApp.router(
             theme: buildTitoTheme(style),
             routerConfig: router,
-            builder: (context, child) => HandheldInputShell(
-              child: DeviceShell(child: child!),
-              onBack: () => router.pop(),
+            builder: (context, child) => SystemUiCoordinator(
+              child: DefaultTextStyle(
+                style: TitoTypography.style().copyWith(
+                  decoration: TextDecoration.none,
+                ),
+                child: HandheldInputShell(
+                  child: DeviceShell(child: child!),
+                  onBack: () => router.pop(),
+                ),
+              ),
             ),
           ),
         );
