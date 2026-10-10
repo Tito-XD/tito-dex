@@ -20,6 +20,11 @@
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
 
+## Completed in v0.9.22
+
+- Compact selected type colours and equal dual-type icons across all three themes.
+- Responsive three/four-column type options with square proportions, localized names and selection marks.
+
 ## Completed in v0.9.18
 
 - Add variant-aware GitHub stable-release checks, user-initiated verified downloads and Android installation.

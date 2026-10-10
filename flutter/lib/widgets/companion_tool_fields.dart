@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -277,16 +279,16 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
     widget.onChanged(updated);
   }
 
-  String get _selectionLabel {
-    if (widget.selected.isEmpty) {
-      return AppZh.noneSelected;
-    }
-    return widget.selected.map(typeNameZh).join(' / ');
-  }
-
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final colors = widget.selected.map(typeTileColor).toList();
+    final radius = BorderRadius.circular(TitoRadii.md);
+    final emptyFill = appVisualStyle.usesFlatUi
+        ? scheme.surfaceContainerHighest
+        : appVisualStyle.usesSolidPlastic
+        ? Colors.white.withValues(alpha: 0.8)
+        : TitoColors.card;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -297,72 +299,111 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
           ),
         ),
         const SizedBox(height: 4),
-        HandheldFocusDecorator(
-          onActivate: () => setState(() => _expanded = !_expanded),
-          borderRadius: BorderRadius.circular(TitoRadii.md),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => setState(() => _expanded = !_expanded),
-              borderRadius: BorderRadius.circular(TitoRadii.md),
-              child: Ink(
-                height: 44,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: appVisualStyle.usesFlatUi
-                      ? scheme.surfaceContainerHighest
-                      : appVisualStyle.usesSolidPlastic
-                      ? Colors.white.withValues(alpha: 0.8)
-                      : TitoColors.card,
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  border: _companionControlBorder(context),
-                ),
-                child: Row(
-                  children: [
-                    if (widget.selected.isEmpty)
-                      Icon(
-                        Icons.category_rounded,
-                        size: 20,
-                        color: appVisualStyle.usesFlatUi
-                            ? scheme.onSurfaceVariant
-                            : TitoColors.mutedInk,
-                      )
-                    else
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          for (final type in widget.selected) ...[
-                            TypeIconImage(typeEn: type, size: 20),
-                            const SizedBox(width: 4),
+        Semantics(
+          button: true,
+          expanded: _expanded,
+          child: HandheldFocusDecorator(
+            onActivate: () => setState(() => _expanded = !_expanded),
+            borderRadius: radius,
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: radius,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () => setState(() => _expanded = !_expanded),
+                borderRadius: radius,
+                child: Ink(
+                  key: const ValueKey('type-picker-selection'),
+                  height: 48,
+                  padding: EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                    color: colors.isEmpty
+                        ? emptyFill
+                        : colors.length == 1
+                        ? colors.first
+                        : null,
+                    gradient: colors.length > 1
+                        ? LinearGradient(
+                            colors: [
+                              colors.first,
+                              colors.first,
+                              colors.last,
+                              colors.last,
+                            ],
+                            stops: const [0, 0.5, 0.5, 1],
+                          )
+                        : null,
+                    borderRadius: radius,
+                    border: _companionControlBorder(context),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Row(
+                          children: [
+                            for (final type
+                                in widget.selected.isEmpty
+                                    ? <String?>[null]
+                                    : widget.selected)
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (type == null)
+                                        const Icon(
+                                          Icons.category_rounded,
+                                          size: 20,
+                                          color: TitoColors.mutedInk,
+                                        )
+                                      else
+                                        TypeIconImage(typeEn: type, size: 20),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            type == null
+                                                ? AppZh.noneSelected
+                                                : typeNameZh(type),
+                                            style: SecondaryTypography
+                                                .onCard
+                                                .body14
+                                                .copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                  color:
+                                                      colors.isEmpty &&
+                                                          appVisualStyle
+                                                              .usesFlatUi
+                                                      ? scheme.onSurface
+                                                      : TitoColors.ink,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                           ],
-                        ],
-                      ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _selectionLabel,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: appVisualStyle.usesFlatUi
-                              ? scheme.onSurface
-                              : null,
                         ),
                       ),
-                    ),
-                    Icon(
-                      _expanded
-                          ? Icons.expand_less_rounded
-                          : Icons.expand_more_rounded,
-                      color: appVisualStyle.usesFlatUi
-                          ? scheme.onSurfaceVariant
-                          : TitoColors.ink,
-                    ),
-                  ],
+                      Positioned(
+                        top: 3,
+                        right: 3,
+                        child: Icon(
+                          _expanded
+                              ? Icons.expand_less_rounded
+                              : Icons.expand_more_rounded,
+                          size: 12,
+                          color: TitoColors.ink,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -370,39 +411,103 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
         ),
         if (_expanded) ...[
           const SizedBox(height: 8),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 64,
-              mainAxisSpacing: 6,
-              crossAxisSpacing: 6,
-              childAspectRatio: 1,
-            ),
-            itemCount: typeGridOrder.length,
-            itemBuilder: (context, index) {
-              final type = typeGridOrder[index];
-              final active = widget.selected.contains(type);
-              return HandheldFocusDecorator(
-                onActivate: () => _toggleType(type),
-                borderRadius: BorderRadius.circular(TitoRadii.sm),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => _toggleType(type),
-                    borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    child: Ink(
-                      decoration: BoxDecoration(
-                        color: typeTileColor(type),
-                        borderRadius: BorderRadius.circular(TitoRadii.sm),
-                        border: _typeTileBorder(active),
-                      ),
-                      child: Center(
-                        child: TypeIconImage(typeEn: type, size: 22),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 240 ? 4 : 3;
+              final width =
+                  (constraints.maxWidth - 6 * (columns - 1)) / columns;
+              // Keep square tiles where possible; scaled labels and narrow
+              // combatant cards retain a readable 48-pixel touch target.
+              final height = math.max(
+                width,
+                math.max(
+                  48.0,
+                  32 + MediaQuery.textScalerOf(context).scale(12) * 1.2,
+                ),
+              );
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  mainAxisSpacing: 6,
+                  crossAxisSpacing: 6,
+                  mainAxisExtent: height,
+                ),
+                itemCount: typeGridOrder.length,
+                itemBuilder: (context, index) {
+                  final type = typeGridOrder[index];
+                  final active = widget.selected.contains(type);
+                  final tileRadius = BorderRadius.circular(TitoRadii.sm);
+                  return Semantics(
+                    label: typeNameZh(type),
+                    selected: active,
+                    button: true,
+                    child: HandheldFocusDecorator(
+                      onActivate: () => _toggleType(type),
+                      borderRadius: tileRadius,
+                      child: Material(
+                        color: Colors.transparent,
+                        borderRadius: tileRadius,
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: () => _toggleType(type),
+                          borderRadius: tileRadius,
+                          child: Ink(
+                            key: ValueKey('type-picker-option-$type'),
+                            decoration: BoxDecoration(
+                              color: typeTileColor(type),
+                              borderRadius: tileRadius,
+                              border: _typeTileBorder(active),
+                            ),
+                            child: Stack(
+                              children: [
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TypeIconImage(typeEn: type, size: 20),
+                                        const SizedBox(height: 4),
+                                        FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            typeNameZh(type),
+                                            style: SecondaryTypography
+                                                .onCard
+                                                .small12
+                                                .copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                  height: 1.2,
+                                                  color: TitoColors.ink,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                if (active)
+                                  const Positioned(
+                                    top: 3,
+                                    right: 3,
+                                    child: Icon(
+                                      Icons.check_circle,
+                                      size: 12,
+                                      color: TitoColors.ink,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           ),
