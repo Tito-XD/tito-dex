@@ -67,8 +67,15 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
   target and floating shadow remain. Held-press pixel tests cover first/last
   buttons in all three themes and both rail configurations.
 - Lite source is `0.9.23+214`; Offline uses `0.9.23-offline+215` with verified v20.
-  Local analysis passed; 820 tests passed, 2 skipped. Android focus integration
-  and signed release evidence is recorded after the new CI run and artifact audit.
+  Published 2026-10-10T14:25:33Z from `5d0c339f3af64b58f023347100742635e5c40e96`.
+  Local/cloud analysis and 820 tests passed, 2 skipped; Web build and 4 Android
+  integration checks passed in CI 38058838022 with identical App source/assets.
+  Signed build 38057915769 and publisher 38058838813 succeeded. Uploaded APKs
+  were re-downloaded and independently audited; Lite is 29,441,968 bytes and
+  Offline is 95,572,080 bytes. The historical signer, fonts/type icons and v20
+  archive are unchanged. Both anonymous APK URLs return HTTP 200 with matching
+  byte counts. Physical RG/controller and signed-upgrade acceptance
+  have not been repeated. Exact hashes are recorded in RELEASES.md.
 
 ### v0.9.22: compact type selection across themes
 

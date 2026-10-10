@@ -12,7 +12,7 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) · App `0.9.23+214` | Visible-control D-pad navigation and clear Home focus; on-demand v20 data |
+| Lite APK | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) · App `0.9.23+214` | Home D-pad focus and correctly sized ripples; on-demand v20 data |
 | Offline APK | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) · App `0.9.23-offline+215` | The same updated UI with the complete verified v20 bundle embedded |
 | Journey Assistant | Built in | Structured-data-first answers, 50 local Q&A pairs, and category-aware prop motion |
 

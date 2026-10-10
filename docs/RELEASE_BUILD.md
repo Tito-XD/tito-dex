@@ -94,6 +94,12 @@ Update `flutter/pubspec.yaml` `version:` (`x.y.z+build`) **before** building.
 
 Follow [CONTRIBUTING.md](CONTRIBUTING.md): push a `code/` branch, pass `Commit authorship` on the exact commit, then fast-forward main. Build from that verified main SHA. The September 10 history cleanup intentionally retained release tags; old artifact records still use their original source SHA. Do not retag or rebuild v0.9.18 for documentation changes.
 
+If the release source changes workflow files, the Actions token may lack the
+permission needed to create its tag. The maintainer can create an annotated tag
+at the exact approved `source_sha` using their configured identity and check its
+peeled target with `git ls-remote`. The publisher accepts that existing tag only
+when its target matches the requested source. Keep existing release tag targets.
+
 ### Fast cloud build (Lite + Offline)
 
 Run the **Android Release APKs** workflow manually with:

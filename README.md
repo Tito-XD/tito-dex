@@ -12,7 +12,7 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) · App `0.9.23+214` | 可视控件方向导航与首页清晰焦点；v20 按需下载 |
+| Lite APK | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) · App `0.9.23+214` | 首页方向键焦点与悬浮栏涟漪修正；v20 按需下载 |
 | Offline APK | [v0.9.23](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.23) · App `0.9.23-offline+215` | 同步新增功能并内置完整 v20 图鉴与玩法资料 |
 | Journey Assistant | 主 App 内建 | 结构化资料优先、50 组本地问答与分类道具动效 |
 
