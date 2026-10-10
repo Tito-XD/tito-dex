@@ -431,7 +431,7 @@ abstract final class AppZh {
   static String get extensionSearchHidden => t('extensionSearchHidden', '不显示');
   static String get extensionSearchAsk => t('extensionSearchAsk', '通用问答');
   static String get extensionSearchAskHint =>
-      t('extensionSearchAskHint', '不读取原始存档；可按当前选择的游戏版本查询扩展资料。');
+      t('extensionSearchAskHint', '基于 Exa 搜索和 AI 整理的游戏助手（测试中）');
   static String get emulatorContinueHint => t('emulatorContinueHint', '从模拟器继续');
   static String get partySaveDiffBanner =>
       t('partySaveDiffBanner', '与最新存档不同 · 点击同步');
@@ -1079,9 +1079,11 @@ abstract final class AppZh {
     'searchEmptyHint',
     '可搜索 1–1025 号宝可梦的中文名、英文名、编号、分类或属性。空格分隔可叠加条件，如「四足 棕」。',
   );
-  static String get searchSuggestionTitle => t('searchSuggestionTitle', '试试这些');
+  static String get searchSuggestionTitle => t('searchSuggestionTitle', '搜索建议');
   static String get searchRecent => t('searchRecent', '最近搜索');
   static String get searchRecentClear => t('searchRecentClear', '清空');
+  static String get searchQueriesExpand => t('searchQueriesExpand', '展开');
+  static String get searchQueriesCollapse => t('searchQueriesCollapse', '收起');
   static String get settingsSwitchGame => t('settingsSwitchGame', '更换');
   static String dexFlavorZhReference(String source) =>
       t('dexFlavorZhReference', '中文参考 · 来自$source：', {'source': source});

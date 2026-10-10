@@ -28,6 +28,8 @@ import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_animated_size_switcher.dart';
 import '../theme/tito_buttons.dart';
+import '../theme/tito_motion.dart';
+import '../widgets/search_query_section.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({
@@ -50,6 +52,8 @@ class _SearchPageState extends State<SearchPage> {
   static const _maxRecentQueries = 10;
 
   final _controller = TextEditingController();
+  final _queryFocus = FocusNode();
+  bool _searchHelpActive = false;
   Timer? _debounce;
   bool _searching = false;
   String? _error;
@@ -104,11 +108,17 @@ class _SearchPageState extends State<SearchPage> {
   void dispose() {
     _debounce?.cancel();
     _controller.dispose();
+    _queryFocus.dispose();
     super.dispose();
   }
 
   void _onQueryChanged(String value) {
     _debounce?.cancel();
+    setState(() {
+      _searching = value.trim().isNotEmpty;
+      _error = null;
+      if (!_searching) _results = const [];
+    });
     _debounce = Timer(const Duration(milliseconds: 350), () {
       _runSearch(value);
     });
@@ -132,6 +142,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _clearRecentQueries() async {
+    _queryFocus.requestFocus();
     setState(() => _recentQueries = const []);
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_recentQueriesKey);
@@ -141,8 +152,9 @@ class _SearchPageState extends State<SearchPage> {
     _controller
       ..text = query
       ..selection = TextSelection.collapsed(offset: query.length);
+    _queryFocus.requestFocus();
     _onQueryChanged(query);
-    setState(() {});
+    _rememberRecentQuery(query);
   }
 
   Future<void> _runSearch(String query) async {
@@ -166,14 +178,14 @@ class _SearchPageState extends State<SearchPage> {
       if (!mounted || _controller.text.trim() != trimmed) {
         return;
       }
-      // Recent queries are recorded on submit / result tap only — live
+      // Record explicit submits, chip selections and result taps; live
       // debounced searches would otherwise store half-typed pinyin.
       setState(() {
         _results = results;
         _searching = false;
       });
     } catch (error) {
-      if (!mounted) {
+      if (!mounted || _controller.text.trim() != trimmed) {
         return;
       }
       setState(() {
@@ -230,107 +242,78 @@ class _SearchPageState extends State<SearchPage> {
         _assistantCard(prominent: true),
         const SizedBox(height: 12),
       ],
-      StickerCard(
-        variant: StickerVariant.deep,
+      Focus(
+        canRequestFocus: false,
+        onFocusChange: _setSearchHelpActive,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(AppZh.searchPrompt, style: SecondaryTypography.onGradient.h15),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _controller,
-              onChanged: _onQueryChanged,
-              onSubmitted: _rememberRecentQuery,
-              textInputAction: TextInputAction.search,
-              spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
-              style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-              // Fill, outline, and focus colour come from the theme's
-              // inputDecorationTheme so every field reads the same.
-              decoration: InputDecoration(
-                hintText: AppZh.searchPlaceholder,
-                prefixIcon: Icon(Icons.search_rounded),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 12),
-      Row(
-        children: [
-          Expanded(
-            child: _HubExitTile(
-              title: AppZh.searchHubReference,
-              subtitle: AppZh.searchHubReferenceHint,
-              onTap: () => context.push('/search/reference'),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _HubExitTile(
-              title: AppZh.searchHubBattle,
-              subtitle: AppZh.searchHubBattleHint,
-              onTap: () => context.push('/search/companion'),
-            ),
-          ),
-        ],
-      ),
-      if (_recentQueries.isNotEmpty) ...[
-        const SizedBox(height: 12),
-        StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+            StickerCard(
+              variant: StickerVariant.deep,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Text(
-                      AppZh.searchRecent,
-                      style: SecondaryTypography.onCard.h15,
-                    ),
+                  Text(
+                    AppZh.searchPrompt,
+                    style: SecondaryTypography.onGradient.h15,
                   ),
-                  TextButton(
-                    onPressed: _clearRecentQueries,
-                    style: TextButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  const SizedBox(height: 10),
+                  TextField(
+                    key: const ValueKey('pokemon-search-field'),
+                    controller: _controller,
+                    focusNode: _queryFocus,
+                    onTap: () => _setSearchHelpActive(true),
+                    onChanged: _onQueryChanged,
+                    onSubmitted: _rememberRecentQuery,
+                    textInputAction: TextInputAction.search,
+                    spellCheckConfiguration:
+                        const SpellCheckConfiguration.disabled(),
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
                     ),
-                    child: Text(
-                      AppZh.searchRecentClear,
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
-                        fontWeight: FontWeight.w800,
+                    // Fill, outline, and focus colour come from the theme's
+                    // inputDecorationTheme so every field reads the same.
+                    decoration: InputDecoration(
+                      hintText: AppZh.searchPlaceholder,
+                      prefixIcon: Icon(Icons.search_rounded),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _recentQueries
-                    .map(
-                      (recent) => _SearchQueryChip(
-                        label: recent,
-                        onTap: () => _applyQuery(recent),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ],
-          ),
+            ),
+            _searchHelpDropdown(query),
+          ],
         ),
-      ],
+      ),
+      const SizedBox(height: 12),
+      IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: _HubExitTile(
+                key: const ValueKey('search-reference-entry'),
+                title: AppZh.searchHubReference,
+                subtitle: AppZh.searchHubReferenceHint,
+                onTap: () => context.push('/search/reference'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _HubExitTile(
+                key: const ValueKey('search-battle-entry'),
+                title: AppZh.searchHubBattle,
+                subtitle: AppZh.searchHubBattleHint,
+                onTap: () => context.push('/search/companion'),
+              ),
+            ),
+          ],
+        ),
+      ),
       const SizedBox(height: 16),
       TitoAnimatedSizeSwitcher(
         switchKey: _searchResultsSwitchKey,
@@ -339,9 +322,80 @@ class _SearchPageState extends State<SearchPage> {
     ];
   }
 
+  void _setSearchHelpActive(bool active) {
+    if (_searchHelpActive == active || !mounted) return;
+    setState(() => _searchHelpActive = active);
+  }
+
+  Widget _searchHelpDropdown(String query) {
+    final visible = _searchHelpActive && query.isEmpty;
+    return ExcludeFocus(
+      excluding: !visible,
+      child: IgnorePointer(
+        ignoring: !visible,
+        child: AnimatedSwitcher(
+          duration: TitoMotion.duration(context, TitoMotion.standard),
+          reverseDuration: TitoMotion.duration(context, TitoMotion.fast),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          layoutBuilder: (child, previous) => Stack(
+            alignment: Alignment.topCenter,
+            children: [...previous, if (child != null) child],
+          ),
+          transitionBuilder: (child, animation) => SizeTransition(
+            sizeFactor: animation,
+            alignment: Alignment.topCenter,
+            child: FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, -.08),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            ),
+          ),
+          child: visible
+              ? Padding(
+                  key: const ValueKey('search-help-open'),
+                  // Leave room for the cards' shadows within the reveal clip.
+                  padding: const EdgeInsets.fromLTRB(4, 12, 4, 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (_recentQueries.isNotEmpty) ...[
+                        SearchQuerySection(
+                          key: const ValueKey('search-recent-section'),
+                          title: AppZh.searchRecent,
+                          queries: _recentQueries,
+                          onQuery: _applyQuery,
+                          onClear: _clearRecentQueries,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      SearchQuerySection(
+                        key: const ValueKey('search-suggestion-section'),
+                        title: AppZh.searchSuggestionTitle,
+                        queries: kDexSearchSuggestions,
+                        variant: StickerVariant.sky,
+                        onQuery: _applyQuery,
+                      ),
+                    ],
+                  ),
+                )
+              : const SizedBox(
+                  key: ValueKey('search-help-closed'),
+                  width: double.infinity,
+                ),
+        ),
+      ),
+    );
+  }
+
   Widget _searchResultsBody(BuildContext context, String query) {
     if (query.isEmpty) {
-      return _SearchIdlePlaceholder(onSuggestionTap: _applyQuery);
+      return const SizedBox.shrink();
     }
     if (_searching) {
       return TitoLoadingPanel(
@@ -392,15 +446,18 @@ class _SearchPageState extends State<SearchPage> {
         ),
       );
     }
+    // Outgoing result widgets survive the transition; capture their list
+    // so clearing the field cannot change a still-mounted builder count.
+    final results = _results;
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       clipBehavior: Clip.none,
       padding: const EdgeInsets.only(bottom: 8),
       separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemCount: _results.length,
+      itemCount: results.length,
       itemBuilder: (context, index) {
-        final entry = _results[index];
+        final entry = results[index];
         final status = dexRepository.statusFor(entry.id, _progress);
         return TitoListReveal(
           key: ValueKey<String>('search-result-$query-${entry.id}'),
@@ -457,6 +514,7 @@ class _SearchPageState extends State<SearchPage> {
 
 class _HubExitTile extends StatelessWidget {
   const _HubExitTile({
+    super.key,
     required this.title,
     required this.subtitle,
     required this.onTap,
@@ -502,66 +560,6 @@ class _HubExitTile extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-/// Offline search cannot learn what people want from query logs, so the empty
-/// state has to teach the vocabulary instead: these chips are how a player
-/// discovers that 「传说」 or 「四足」 are searchable at all.
-class _SearchIdlePlaceholder extends StatelessWidget {
-  const _SearchIdlePlaceholder({required this.onSuggestionTap});
-
-  final ValueChanged<String> onSuggestionTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return StickerCard(
-      variant: StickerVariant.sky,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppZh.searchEmptyHint,
-            style: SecondaryTypography.onCard.small12.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            AppZh.searchSuggestionTitle,
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final word in kDexSearchSuggestions)
-                _SearchQueryChip(
-                  label: word,
-                  onTap: () => onSuggestionTap(word),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SearchQueryChip extends StatelessWidget {
-  const _SearchQueryChip({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    // Colours, outline, and radius come from the theme's chipTheme.
-    return ActionChip(onPressed: onTap, label: Text(label));
   }
 }
 

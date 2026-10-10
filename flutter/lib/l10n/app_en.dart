@@ -11,12 +11,14 @@ const kAppEn = <String, String>{
       'Saved level, nature, IVs, EVs, ability and status. Swipe horizontally to compare all six stats.',
   'battleTeamDamageHint':
       'Assigned moves against the current defender. Estimates one hit in this generation; missing special conditions are explained.',
-  'battleTeamNoMoves': 'No valid moves for this game. Tap the member below to choose.',
+  'battleTeamNoMoves':
+      'No valid moves for this game. Tap the member below to choose.',
   'battleTeamMoveMissing': 'Move data unavailable',
   'battleTeamMoveUnsupported':
       'Status, special power or unavailable in this generation; not estimated',
   'battleTeamMemberFailed': 'Member data unavailable; not calculated',
-  'battleTeamItemsExcluded': 'Some held items are unidentified. Confirm them in the member settings.',
+  'battleTeamItemsExcluded':
+      'Some held items are unidentified. Confirm them in the member settings.',
   'battleTeamAnalysis': 'Party analysis',
   'battleDuelAnalysis': 'Attacker / defender',
   'battleTeamScope':
@@ -262,7 +264,7 @@ const kAppEn = <String, String>{
   'extensionSearchHidden': 'Hidden',
   'extensionSearchAsk': 'General Q&A',
   'extensionSearchAskHint':
-      'Does not read the raw save. You can query extra packs for the selected game version.',
+      'Game assistant powered by Exa search and AI summaries (experimental).',
   'emulatorContinueHint': 'Continue from emulator',
   'partySaveDiffBanner': 'Different from the latest save · tap to sync',
   'partySaveDiffDismiss': 'Don’t remind me about this difference',
@@ -624,9 +626,11 @@ const kAppEn = <String, String>{
   'searchPrompt': 'Search Pokémon',
   'searchEmptyHint':
       'Search Pokémon 1–1025 by Chinese name, English name, number, category, or type. Space-separated terms stack, e.g. “quadruped brown”.',
-  'searchSuggestionTitle': 'Try these',
+  'searchSuggestionTitle': 'Search suggestions',
   'searchRecent': 'Recent searches',
   'searchRecentClear': 'Clear',
+  'searchQueriesExpand': 'More',
+  'searchQueriesCollapse': 'Less',
   'settingsSwitchGame': 'Change',
   'dexFlavorZhReference': 'Chinese reference · from {source}:',
   'searchTrending': 'Popular searches',
