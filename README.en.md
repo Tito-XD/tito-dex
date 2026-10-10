@@ -78,7 +78,7 @@ Download **`TitoDex-0.9.22-lite-rg-arm64.apk`** or **`TitoDex-0.9.22-offline-rg-
 
 The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 
-Since v0.9.18, Settings supports updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.22/TitoDex-0.9.22-lite-rg-arm64.apk), [Offline](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.22/TitoDex-0.9.22-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
+Since v0.9.18, Settings supports updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite · 29.44 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.22/TitoDex-0.9.22-lite-rg-arm64.apk), [Offline · 95.57 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.22/TitoDex-0.9.22-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
 
 ## Development
 

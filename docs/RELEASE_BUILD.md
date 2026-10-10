@@ -2,8 +2,8 @@
 
 **Audience:** maintainers packaging `TitoDex-<ver>-lite-rg-arm64.apk` and `TitoDex-<ver>-offline-rg-arm64.apk`.
 
-Published **v0.9.19** is **29,323,945 bytes (29.32 MB) Lite** and
-**95,451,533 bytes (95.45 MB) Offline** (decimal MB). Offline embeds the verified
+Published **v0.9.22** is **29,441,968 bytes (29.44 MB) Lite** and
+**95,572,080 bytes (95.57 MB) Offline** (decimal MB). Offline embeds the verified
 66,129,008-byte v20 archive. Validate ZIP contents, native runtime, metadata,
 signer and archive digest rather than reusing an old fixed-size expectation. If a Lite
 build is only **~7 MB**, the file is truncated or corrupt (missing

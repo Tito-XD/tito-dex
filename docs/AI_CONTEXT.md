@@ -59,7 +59,15 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Trainer's Journal, Solid Plastic and Flat UI use the same selection geometry
   while retaining their existing borders, handheld focus and keyboard activation.
 - Lite source is `0.9.22+212`; Offline uses `0.9.22-offline+213` and verified v20.
-  Build, signature and publication evidence is recorded after artifact validation.
+  Published 2026-10-10T11:47:25Z from `8fff74c7e67bc466c20740eaab07fcaeb017e0c8`.
+  Signed build 38048712841 and publisher 38049407259 passed. Local/cloud tests:
+  795 passed, 2 skipped; static analysis, Web build, 3 Android emulator integration
+  tests on the identical App source tree, and 10 release-security checks passed.
+  Downloaded Release assets passed manifest/ZIP/arm64/signature/16 KB alignment
+  checks. Lite is 29,441,968 bytes; Offline is 95,572,080 bytes. Certificate,
+  bundled fonts/type icons and the 66,129,008-byte v20 archive match v0.9.21.
+  Public APK links returned HTTP 200. Physical signed-upgrade/data acceptance
+  has not been repeated; the website download fallback is maintained separately.
 
 ### v0.9.21: battle workspace and shared surfaces
 
