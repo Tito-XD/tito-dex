@@ -345,6 +345,7 @@ void main() {
             'braveSearch': false,
             'webSearch': true,
             'webSearchProviders': [
+              'exa',
               'tavily',
               'deepseek-native',
               'unexpected-provider',
@@ -368,7 +369,7 @@ void main() {
     expect(status.curatedSourcesEnabled, isTrue);
     expect(status.braveSearchEnabled, isFalse);
     expect(status.webSearchEnabled, isTrue);
-    expect(status.webSearchProviders, ['tavily', 'deepseek-native']);
+    expect(status.webSearchProviders, ['exa', 'tavily', 'deepseek-native']);
     expect(status.sourceProviders, ['pokeapi', 'strategywiki', 'wikidata']);
   });
 
@@ -644,7 +645,7 @@ void main() {
           answerMode: AskTitoDexAnswerMode.curatedSourcesGlm,
           modelUsed: true,
           confidence: 'medium',
-          sourceKinds: ['pokeapi', 'tavily', 'pokeapi'],
+          sourceKinds: ['pokeapi', 'exa', 'tavily', 'pokeapi'],
           sources: [
             ProgressionSource(
               title: 'PokeAPI · 路卡利欧',
@@ -675,7 +676,7 @@ void main() {
 
       expect(find.text(AppZh.askTitoDexRouteCuratedGlm), findsOneWidget);
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
-      expect(find.text('检索 2 路'), findsOneWidget);
+      expect(find.text('检索 3 路'), findsOneWidget);
       expect(find.text('已核验 · 参考 3 个来源'), findsOneWidget);
       expect(find.text('参考 3 个来源'), findsNothing);
       expect(find.text('升级习得'), findsOneWidget);
@@ -713,6 +714,7 @@ void main() {
       expect(find.byKey(const Key('ask-titodex-source-sheet')), findsOneWidget);
       expect(find.text('回答引用 · 3'), findsOneWidget);
       expect(find.text('PokeAPI'), findsOneWidget);
+      expect(find.text('Exa'), findsOneWidget);
       expect(find.text('Tavily'), findsOneWidget);
       expect(find.text('PokeAPI · 路卡利欧'), findsOneWidget);
       expect(find.text('神奇宝贝百科 · 路卡利欧'), findsOneWidget);

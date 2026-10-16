@@ -2,6 +2,7 @@
 
 > 状态：v0.9.0 177/178 保留首次明确同意后才开启的边界，并加入按游戏安装、更新或移除的可选旅程资料包；失败或取消替换时保留旧包。连接、问答记录与游戏版本仍是三个独立入口；本机最近 50 组问答可手动压缩或清空，同游戏最近 6 组用于追问。App 与 Worker 采用只面向当前版本的语义分块流：检索／解析／核验阶段可见，证据检查完成后再按摘要、段落、列表、表格、提醒或澄清候选渐进展开，并由请求 ID 与精确游戏上下文隔离旧回答。引用 URL 只在聚合来源面板内按需展开，实体通过稳定资料 ID 以精灵球／背包／星星／闪电 Chip 直达已有详情。多个百科／攻略站继续合并为一项连接能力，Tavily 与 DeepSeek V4 Flash 保持并行宽范围试用；中文 Tavily 检索先尝试 52Poké，证据为空或未通过核验时再回退其他限定来源。助手与 HGSS 审核种子仍直接内建，旧 Journey Assistant 1.0.0 只保留读取兼容。
 
+> 后续源码：已接入 Exa 优先、Tavily 备用的限定搜索与 App 来源显示。用户尚未注册 Exa；`EXA_WEB_ENABLED=false`，只完成模拟测试与本地构建检查，未真实联调或部署。准备好 `EXA_API_KEY` 后再启用。
 “问 TitoDex”是可选的存档优先卡关助手。主 APK 内建上下文能力和三个 HGSS 审核链路，但整个功能默认关闭；用户必须先在设置中确认联网、AI 检索和最近对话上下文说明，Journey／Search 才会出现入口。关闭时不预留入口位置，也不发起健康检查或问答请求。开启后仍然本地优先，并可再单独关闭在线回答。在线审核库增加了 DPPt、BW/BW2、XY、ORAS、SM/USUM、SWSH、BDSP、传说阿尔宙斯和朱紫的少量关键卡点，但仍不是完整流程攻略，也不会把“能识别版本”误写成“已经解析所有剧情进度”。
 
 > 当前 main 已准备 GLM 5.3 Flash 公共分类、组成与核验路径。Worker 通过
@@ -113,7 +114,7 @@ release gate，并要求审核事实与 hint ID 完全一致。
 - **Dex R2 结构化事实：回答底座与校验层。** Worker 只读现有版本化 Dex bundle 的根 manifest、数值物种详情和固定目录对象，利用宝可梦、进化、属性、能力值、特性、精确版本遭遇、携带物、招式表，以及道具／招式目录。版本遭遇、携带物、版本招式表等明确问题会先确定性组装；V20 中标为 `online-verify` 的命中继续作为本地底稿进入限定来源交叉核验，只有取得真实网页证据才替换底稿，联网为空、超时或模型失败则返回本地底稿并明确标注。开放式培养、攻略、路线或推荐问题则把当前实体的最多 6,000 字符结构化证据与固定来源、Tavily 联网结果一起交给 GLM 5.3 Flash，用 bundle 核对实体、版本和数值，再做第二遍事实支持验证。bundle 命中不等于禁止联网。通用进化条件与招式数值不会覆盖原有的逐版本 PokéAPI 核对路径。对象、路径、大小、实体 ID 与精确游戏 key 全部校验；App 不直连 R2，也不会把朱／紫等成对版本的数据混用。
 - **AI Gateway GLM 5.3 Flash：目标公共默认，当前受上游 WAF 阻塞。** Cloudflare 控制台在 raw slug `zai` 前固定显示 `custom-`，因此 Provider 请求标识就是 `custom-zai`，不能再次叠加前缀。base URL 固定为 `https://api.z.ai/api/paas/v4`，请求路径为 `chat/completions`，模型为 `glm-5.3-flash`，BYOK 别名为 `journey-assistant`。密钥只保存在 AI Gateway Provider Keys／Secrets Store，不进入 Worker、仓库或 App。2026-09-01 的最小 `Hello` smoke 仍被 Z.ai 的阿里云 WAF 以 HTTP 405 阻断；在 Provider 侧放行前保持功能门关闭。唯一命中的本地审核 hint 不调用模型；外部 Provider 失败时先回退 Workers AI Qwen，再回到本地确定性底稿、澄清或 `no_match`。
 - **免 Key 限定来源：审核库未命中时可选。** `CURATED_WEB_ENABLED=true` 时仅查询 PokéAPI、StrategyWiki、Wikidata；不需要新 Cloudflare 资源或第三方 key。现有每设备 20 次/分钟限流继续生效，不另设每天 5 次上限。范围分类、来源请求或生成任何一步失败都保留原本的本地 `no_match`。
-- **Tavily 限定搜索：可选的联网证据层。** 中文问题先发起一组仅允许 52Poké 的查询，并再次校验返回 host；若没有得到可支持答案的证据，开放式培养／攻略／路线／推荐问题才会对其余允许站点发起中英文两组回退查询，窄问题则发起一组混合语言回退。`TAVILY_API_KEY` 必须存为 Worker Secret，且 `TAVILY_WEB_ENABLED=true` 才启用；当前生产配置已在 Secret 就绪后开启。每组 basic search 最多 6 条、短超时、响应字节上限、无重试；额度/网络失败继续其他路径，最终始终输出简体中文。
+- **Exa 优先、Tavily 备用：可选的联网证据层。** `WEB_SEARCH_PRIMARY=exa` 默认优先 Exa；显式设为 `tavily` 可调整顺序。每家都需要 Worker Secret（`EXA_API_KEY` / `TAVILY_API_KEY`）与对应开关，缺失时直接跳过。每个域名／语言池内，主服务无有效结果、超时、响应异常、额度耗尽或限流时尝试备用；账户／网络故障会跳过本问题后续调用，新问题重新尝试。当前 Exa 尚未注册或联调，检入配置保持 `EXA_WEB_ENABLED=false`。Exa 只使用 `/search` 的有界 highlights，忽略 summary、text 和生成答案；Tavily 保留普通 basic 与攻略 advanced 模式。每次最多 6 条、5 秒、64 KiB、无重试；整个搜索共用 10 秒期限。中文先查 52Poké，证据不能支持答案时再查其余允许站点；宽问题的中英文池并行，窄问题使用混合词。非空结果仍需原有事实支持与版本核验；不会因为模型拒绝而再用备用服务重查同一个 52Poké 池。两家命中同一 URL 只计一次，独立证据按网站划分。切换依据 API 的额度／预算错误，免费余额与付费余额不能由此区分；只用免费额度需要在服务账号里限制消费与自动充值。
 - **DeepSeek V4 Flash 原生搜索：宽范围试用，与 Tavily 并行。** Worker 固定调用 `custom-deepseek-anthropic` 的 `anthropic/v1/messages` 与 `deepseek-v4-flash`，并显式选择 BYOK 别名 `TitoDex`，缺失时不会回退到 `default`。密钥只保存在 BYOK/Secrets Store，Gateway 身份与 Run token 只保存在加密 Worker Secrets。已确认原生搜索会实际执行，但当前响应常不含 `cited_text`；因此 Worker 会重新校验每个来源域名，有片段时交给 GLM 5.3 Flash 复核，没有片段时在 `EXPERIMENTAL_BROAD_ANSWERS=true` 下明确标为低置信度试用答案。若 Tavily／固定来源的主回答也成功，会额外调用一次 GLM 5.3 Flash，只判断 DeepSeek 是否对核心事实形成独立印证且没有地点、数值或版本冲突；只有通过才显示 `GLM 5.3 Flash × DeepSeek 交叉核对`，正文仍保留主证据链。任何失败仍可由 Tavily + GLM 5.3 Flash 或本地确定性结果接管。
 - **不使用 Agents SDK / Durable Objects / Queues / Workflows。** 当前是短请求、无会话状态、事实白名单的检索分类，普通 Worker 已足够。
 
@@ -132,12 +133,11 @@ AI Search 只信五个自定义 metadata 字段：`hint_id` text、`audited` boo
 显示通用 `answered`、来源名称与本次实际执行路径。限定来源查询逻辑本身只更新
 Worker 即可生效；若要看到连接状态卡、伙伴等待动画及细分路径标签，则需要安装
 包含该 UI 的主 APK。PokéAPI、StrategyWiki 与 Wikidata 的公开读取接口都不需要
-在 Cloudflare Dashboard 新建资源或保存 Secret。Tavily 不需要 Cloudflare 新资源，但需要将
-`TAVILY_API_KEY` 保存为现有 Worker 的加密 Secret，然后再单独开启 `TAVILY_WEB_ENABLED`。
+在 Cloudflare Dashboard 新建资源或保存 Secret。Exa 与 Tavily 都不需要新的 Cloudflare 资源；各自的 API Key 保存为现有 Worker 的加密 Secret，然后单独开启对应的 `EXA_WEB_ENABLED` / `TAVILY_WEB_ENABLED`。
 
 进入“问 TitoDex”时，App 会读取 Worker 的 `/health`，显示 Worker、AI Gateway
 GLM 5.3 Flash、AI Search 与限定来源的配置状态。通用 `webSearch` 和
-`webSearchProviders` 会分别显示已配置的 `tavily` 与 `deepseek-native`。旧客户端的
+`webSearchProviders` 会按配置优先级显示已启用并有合法密钥格式的 `exa`、`tavily`，以及 `deepseek-native`。旧客户端的
 `braveSearch: false` 仅保留兼容。后续源码的状态弹窗逐项列出 Worker、GLM 5.3 Flash、AI Search、
 Dex bundle、合并后的“多个百科来源”和两条联网路径，并显示本机问答数量；完整可能来源及权利说明统一放在 Settings Credits。这个
 状态只代表部署配置和 Worker 当前可达，不伪称模型额度或第三方来源一定成功；每条

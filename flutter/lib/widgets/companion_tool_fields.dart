@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -178,15 +180,9 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
     widget.onChanged(updated);
   }
 
-  String get _selectionLabel {
-    if (widget.selected.isEmpty) {
-      return '未选择';
-    }
-    return widget.selected.map(typeNameZh).join(' / ');
-  }
-
   @override
   Widget build(BuildContext context) {
+    final colors = widget.selected.map(typeTileColor).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -199,48 +195,87 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
         const SizedBox(height: 8),
         Material(
           color: Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: () => setState(() => _expanded = !_expanded),
             borderRadius: BorderRadius.circular(10),
             child: Ink(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              key: const ValueKey('type-picker-selection'),
+              padding: EdgeInsets.zero,
               decoration: BoxDecoration(
-                color: TitoColors.card,
+                color: colors.isEmpty
+                    ? TitoColors.card
+                    : colors.length == 1
+                    ? colors.first
+                    : null,
+                gradient: colors.length > 1
+                    ? LinearGradient(
+                        colors: [
+                          colors.first,
+                          colors.first,
+                          colors.last,
+                          colors.last,
+                        ],
+                        stops: const [0, 0.5, 0.5, 1],
+                      )
+                    : null,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: TitoColors.ink, width: 2),
               ),
-              child: Row(
+              child: Stack(
                 children: [
-                  if (widget.selected.isEmpty)
-                    Icon(
-                      Icons.category_rounded,
-                      size: 20,
-                      color: TitoColors.mutedInk,
-                    )
-                  else
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        for (final type in widget.selected) ...[
-                          TypeIconImage(typeEn: type, size: 20),
-                          const SizedBox(width: 4),
-                        ],
-                      ],
-                    ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _selectionLabel,
-                      style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
+                  Row(
+                    children: [
+                      for (final type
+                          in widget.selected.isEmpty
+                              ? <String?>[null]
+                              : widget.selected)
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 12,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (type == null)
+                                  const Icon(
+                                    Icons.category_rounded,
+                                    size: 20,
+                                    color: TitoColors.mutedInk,
+                                  )
+                                else
+                                  TypeIconImage(typeEn: type, size: 20),
+                                const SizedBox(height: 4),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    type == null ? '未选择' : typeNameZh(type),
+                                    style: SecondaryTypography.onCard.body14
+                                        .copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          height: 1.2,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                  Icon(
-                    _expanded
-                        ? Icons.expand_less_rounded
-                        : Icons.expand_more_rounded,
-                    color: TitoColors.ink,
+                  Positioned(
+                    top: 5,
+                    right: 5,
+                    child: Icon(
+                      _expanded
+                          ? Icons.expand_less_rounded
+                          : Icons.expand_more_rounded,
+                      size: 14,
+                      color: TitoColors.ink,
+                    ),
                   ),
                 ],
               ),
@@ -249,38 +284,103 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
         ),
         if (_expanded) ...[
           const SizedBox(height: 8),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 6,
-              mainAxisSpacing: 6,
-              crossAxisSpacing: 6,
-              childAspectRatio: 1,
-            ),
-            itemCount: typeGridOrder.length,
-            itemBuilder: (context, index) {
-              final type = typeGridOrder[index];
-              final active = widget.selected.contains(type);
-              return Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => _toggleType(type),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      color: typeTileColor(type),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 240 ? 4 : 3;
+              final tileWidth =
+                  (constraints.maxWidth - 6 * (columns - 1)) / columns;
+              // Prefer square tiles; allow extra height for readable scaled text
+              // and a usable touch target in the narrow two-card layout.
+              final tileHeight = math.max(
+                tileWidth,
+                math.max(
+                  48.0,
+                  32 + MediaQuery.textScalerOf(context).scale(12) * 1.2,
+                ),
+              );
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  mainAxisSpacing: 6,
+                  crossAxisSpacing: 6,
+                  mainAxisExtent: tileHeight,
+                ),
+                itemCount: typeGridOrder.length,
+                itemBuilder: (context, index) {
+                  final type = typeGridOrder[index];
+                  final active = widget.selected.contains(type);
+                  return Semantics(
+                    label: typeNameZh(type),
+                    selected: active,
+                    button: true,
+                    excludeSemantics: true,
+                    child: Material(
+                      color: Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: active ? TitoColors.ink : TitoColors.ink.withValues(alpha: 0.35),
-                        width: active ? 3 : 2,
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: () => _toggleType(type),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Ink(
+                          key: ValueKey('type-picker-option-$type'),
+                          decoration: BoxDecoration(
+                            color: typeTileColor(type),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: active
+                                  ? TitoColors.ink
+                                  : TitoColors.ink.withValues(alpha: 0.35),
+                              width: active ? 3 : 2,
+                            ),
+                          ),
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TypeIconImage(typeEn: type, size: 20),
+                                      const SizedBox(height: 4),
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          typeNameZh(type),
+                                          style: SecondaryTypography
+                                              .onCard
+                                              .small12
+                                              .copyWith(
+                                                fontWeight: FontWeight.w800,
+                                                height: 1.2,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              if (active)
+                                const Positioned(
+                                  top: 3,
+                                  right: 3,
+                                  child: Icon(
+                                    Icons.check_circle,
+                                    size: 12,
+                                    color: TitoColors.ink,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                    child: Center(
-                      child: TypeIconImage(typeEn: type, size: 22),
-                    ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           ),

@@ -39,6 +39,7 @@ import {
 } from './game_mechanics';
 import { isGeneralPokemonFranchiseQuestion } from './pokemon_question_scope';
 import { recentConversationForQuestion } from './conversation_context';
+import { validSearchKey } from './web_search_common';
 import {
   descriptorForPath,
   descriptorObjectKey,
@@ -108,9 +109,12 @@ export default {
     }
     if (url.pathname === '/health' && request.method === 'GET') {
       const tavilyConfigured = isTavilyConfigured(env);
+      const exaConfigured = isExaConfigured(env);
       const deepSeekNativeConfigured = isDeepSeekNativeConfigured(env);
+      const searchOrder = env.WEB_SEARCH_PRIMARY === 'tavily'
+        ? ['tavily', 'exa'] : ['exa', 'tavily'];
       const webSearchProviders = [
-        ...(tavilyConfigured ? ['tavily'] : []),
+        ...searchOrder.filter((provider) => provider === 'exa' ? exaConfigured : tavilyConfigured),
         ...(deepSeekNativeConfigured ? ['deepseek-native'] : []),
       ];
       return json({
@@ -258,7 +262,7 @@ export default {
       let curatedSourcesUsed = false;
       if (response.status !== 'answered' && !clarificationLocked && env.AI) {
         observer?.stage('verifying');
-        // Curated/Tavily and DeepSeek native search run together. A failed
+        // Curated web search and DeepSeek native search run together. A failed
         // support pass no longer makes the second path start after the App's
         // request timeout; the more strongly verified result wins when both
         // finish successfully.
@@ -279,6 +283,10 @@ export default {
                 ...(isTavilyConfigured(env)
                   ? { tavilyApiKey: getTavilyApiKey(env) }
                   : {}),
+                ...(isExaConfigured(env)
+                  ? { exaApiKey: getExaApiKey(env) }
+                  : {}),
+                primarySearchProvider: env.WEB_SEARCH_PRIMARY === 'tavily' ? 'tavily' : 'exa',
                 relaxedEvidence: env.EXPERIMENTAL_BROAD_ANSWERS === 'true',
               },
             ).catch(() => null)
@@ -1472,7 +1480,18 @@ function getTavilyApiKey(env: Env): string | undefined {
 function isTavilyConfigured(env: Env): boolean {
   return env.CURATED_WEB_ENABLED === 'true' &&
     env.TAVILY_WEB_ENABLED === 'true' &&
-    getTavilyApiKey(env) !== undefined;
+    validSearchKey(getTavilyApiKey(env) ?? '');
+}
+
+function getExaApiKey(env: Env): string | undefined {
+  if (!('EXA_API_KEY' in env)) return undefined;
+  const value = env.EXA_API_KEY;
+  return typeof value === 'string' && value.trim() ? value : undefined;
+}
+
+function isExaConfigured(env: Env): boolean {
+  return env.CURATED_WEB_ENABLED === 'true' &&
+    env.EXA_WEB_ENABLED === 'true' && validSearchKey(getExaApiKey(env) ?? '');
 }
 
 function deepSeekNativeConfig(env: Env): DeepSeekNativeSearchConfig {

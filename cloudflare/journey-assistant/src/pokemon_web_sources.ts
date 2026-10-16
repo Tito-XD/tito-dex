@@ -1,5 +1,5 @@
 /**
- * Server-owned Pokémon research boundary shared by Tavily and DeepSeek.
+ * Server-owned Pokémon research boundary shared by Exa, Tavily and DeepSeek.
  *
  * Search snippets are transient evidence only: they are never written to R2,
  * AI Search, the APK, or logs. The list intentionally spans official pages,

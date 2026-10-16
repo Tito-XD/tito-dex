@@ -3543,6 +3543,7 @@ String _answerModeLabel(AskTitoDexAnswerMode mode) => switch (mode) {
 };
 
 String _sourceKindLabel(String value) => switch (value) {
+  'exa' => 'Exa',
   'pokeapi' => 'PokeAPI',
   'strategywiki' => 'StrategyWiki',
   'wikidata' => 'Wikidata',
@@ -3553,6 +3554,7 @@ String _sourceKindLabel(String value) => switch (value) {
 };
 
 String _webSearchProviderLabel(String value) => switch (value) {
+  'exa' => 'Exa',
   'tavily' => 'Tavily',
   'deepseek-native' => 'DeepSeek 原生',
   'brave' => 'Brave',

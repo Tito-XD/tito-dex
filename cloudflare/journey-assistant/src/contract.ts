@@ -140,6 +140,7 @@ export type AssistantResponse = {
     | 'strategywiki'
     | 'wikidata'
     | 'tavily'
+    | 'exa'
     | 'deepseek-native'
   )[];
 };

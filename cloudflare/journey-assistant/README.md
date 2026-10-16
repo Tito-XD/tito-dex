@@ -32,7 +32,7 @@ The request path is deliberately fail-safe:
    strict Pokémon-game scope classifier may query only PokéAPI, StrategyWiki,
    and Wikidata. GLM 5.3 Flash composes a labelled, cited, unreviewed answer solely from
    the bounded results.
-7. For Chinese questions, Tavily first runs one `basic` search whose request
+7. For Chinese questions, the configured search providers first retrieve evidence whose request
    and accepted-result boundary is only `wiki.52poke.com`. If that evidence is
    empty or fails GLM 5.3 Flash support verification, broad advice opens independent
    English/Chinese searches over the remaining server-owned allowlist; narrow
@@ -68,56 +68,78 @@ no daily five-request cap.
   with timeouts, and treated as untrusted prompt-injection input.
 - 52Poké remains in the manual fact-check/source-lock workflow for future
   reviewed R2 facts. The Worker never directly fetches its page prose and never
-  adds it to AI Search; only a transient Tavily citation snippet may reach the
+  adds it to AI Search; only a transient Exa/Tavily retrieval snippet may reach the
   verifier when that optional route is enabled.
 
 Every live-source answer is visibly labelled `未经 TitoDex 人工审核`. A source
 failure, invalid model result, quota exhaustion, or scope rejection returns the
 original deterministic `no_match` response. Live answers never write to R2.
 
-## Optional Tavily allowlist search
+## Optional Exa primary / Tavily fallback search
 
-Tavily is a retrieval adapter, not an answer provider. It is never called while
-a local audited hint or exact Dex-bundle fact already answers the question.
-Chinese questions first run a 52Poké-only request alongside fixed-source
-collection. If the primary evidence cannot produce a supported answer, broad
-advice runs two bounded fallback language pools and narrow questions run one
-mixed fallback request. The fallback domain set excludes 52Poké because it was
-already attempted.
+Both services retrieve evidence; the existing composer and verifier decide
+whether it supports an answer. Neither is called when a local audited hint or
+exact Dex-bundle fact already answers the question.
 
-- Install `TAVILY_API_KEY` as a Worker secret; never place it in
-  `wrangler.jsonc`, source, an APK, documentation examples, or logs.
-- After the secret exists, set `TAVILY_WEB_ENABLED=true` in the private
-  deployment configuration. Both conditions are required.
-- Each request uses `search_depth=basic`, no Tavily-generated answer, no raw
-  page content, six results maximum, a short timeout, a bounded response, and
-  no retry. A broad Chinese miss makes one 52Poké request followed by at most
-  two concurrent fallback-language requests.
-- The fixed allowlist includes Pokémon.com, Bulbapedia, Serebii, StrategyWiki,
-  PokéAPI, Pokémon Database, 52Poké wiki, Smogon, Marriland, GameFAQs, Game8,
-  IGN, Nintendo Life, and Eurogamer. Returned URLs are revalidated against the
-  same exact hostnames before snippets can reach GLM 5.3 Flash.
-- Tavily snippets are transient and are never stored, indexed, or packaged.
-  52Poké remains excluded from direct page fetching; without separate
-  permission its content also remains excluded from R2/AI Search and APK data.
+- `WEB_SEARCH_PRIMARY=exa` selects Exa first. `tavily` explicitly reverses the
+  order. A missing/disabled provider is skipped. Exa remains disabled in the
+  checked-in configuration until a real key and live retrieval are verified.
+- Store `EXA_API_KEY` and `TAVILY_API_KEY` only as Worker secrets. Each also
+  needs its corresponding `EXA_WEB_ENABLED` / `TAVILY_WEB_ENABLED` flag and
+  `CURATED_WEB_ENABLED=true`. Health requires a valid key shape plus these
+  flags; it does not probe the account balance.
+- In each language/domain pool, the primary is tried first. Empty or rejected
+  results, timeout, malformed data, account errors, rate limiting and quota
+  exhaustion fall through to the other provider. Non-empty retrieved evidence
+  still needs the existing support checks. If the 52Poké evidence cannot
+  support an answer, research proceeds to the remaining domains; it does not
+  rerun the same 52Poké pool in the backup solely because composition failed.
+- Exa uses `/search`, `type=auto`, six results and bounded `highlights` only.
+  It ignores generated summaries, answer output and page text. Tavily retains
+  basic retrieval, or advanced retrieval for strategy questions, with no
+  generated answer or raw page text. Each call has a five-second maximum,
+  a 64 KiB response limit and no retry. Search across both stages shares a
+  ten-second wall-clock deadline, including any rejected preferred-source pass.
+- Chinese retrieval first isolates `wiki.52poke.com`. A missing or unsupported
+  answer opens the remaining allowlisted domains: one mixed query for narrow
+  questions, concurrent English/Chinese pools for broad advice. Returned URLs
+  must use HTTPS and exactly match the server-owned domain list.
+- Exa HTTP 402 and Tavily HTTP 432/433 indicate credit/budget exhaustion;
+  HTTP 429 is rate limiting. These and other provider failures skip further
+  calls to that provider during the same user question. Already-started language
+  requests can still finish. The next question tries the configured primary
+  again, allowing a replenished quota to recover without a shared counter.
+- Logs contain provider/stage/status/count only, never keys, queries, snippets
+  or upstream error bodies. Retrieved evidence is not stored, indexed or
+  packaged. A URL returned by both engines counts once; independent evidence
+  groups are based on websites, not search-engine names.
 
-The secret can be installed interactively from the Worker directory:
+Local development can use a git-ignored `.dev.vars` file in this directory with
+`EXA_API_KEY=<your key>`; keep the value out of chat, command arguments and logs.
+For production, install the key interactively, then enable Exa only after a
+successful live check:
 
 ```bash
-npx wrangler secret put TAVILY_API_KEY
+npx wrangler secret put EXA_API_KEY
 ```
 
-This command prompts for the value without writing it to the repository. Do
-not run it during ordinary source verification, and do not enable the flag
-until the intended deployment has the secret.
+The failover reacts to API status; it does not distinguish free credits from
+paid balance. Free-only usage must be enforced by the account's spending cap
+and disabled automatic recharge. No account, payment setting or deployment
+was changed by the source integration.
+
+Official API references: [Exa Search](https://exa.ai/docs/reference/search),
+[Exa error codes](https://exa.ai/docs/admin/error-codes),
+[Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search).
 
 ## Client-visible status and execution trace
 
 `GET /health` returns only sanitized capability flags: Worker reachability,
 AI Gateway GLM 5.3 Flash configuration, Dex-bundle/AI Search/curated-source switches, the three
 fixed source provider names, generic `webSearch` plus
-`webSearchProviders` containing `tavily` only when its flag and secret are
-present, and `deepseek-native` only after its server flag is enabled following
+`webSearchProviders` containing `exa` and/or `tavily` in configured priority
+order only when their flags and secrets are present, and `deepseek-native`
+only after its server flag is enabled following
 a successful custom-provider smoke test. Explicit `braveSearch: false` remains
 for older clients. Health never returns
 an Account ID, binding identifier, production origin, model credential, or
@@ -135,7 +157,7 @@ Every `/v1/ask` response also carries a privacy-safe trace:
   match;
 - `modelUsed` and `aiSearchUsed`: what this request actually used, not merely
   what the deployment has configured;
-- `sourceKinds`: `pokeapi`, `strategywiki`, `wikidata`, `tavily`, or
+- `sourceKinds`: `pokeapi`, `strategywiki`, `wikidata`, `exa`, `tavily`, or
   `deepseek-native` only when that route actually supports the returned answer.
 
 Clients may opt into progressive rendering with

@@ -55,6 +55,10 @@
     // The production secret is installed in Worker Secrets Store. Failures
     // remain optional and fall through to the deterministic answer.
     "TAVILY_WEB_ENABLED": "true",
+    // Prepare Exa as the primary. Enable only after EXA_API_KEY is installed
+    // and live retrieval has been verified; absent/disabled Exa uses Tavily.
+    "EXA_WEB_ENABLED": "false",
+    "WEB_SEARCH_PRIMARY": "exa",
     // Trial-only broader answers: keep the Pokemon-only/source-domain boundary
     // but downgrade failed second-pass verification instead of returning empty.
     "EXPERIMENTAL_BROAD_ANSWERS": "true",

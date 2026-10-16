@@ -118,6 +118,24 @@ describe('journey assistant Worker contract', () => {
     expect(JSON.stringify(value)).not.toContain('https://');
   });
 
+  it.each([
+    { enabled: 'false', key: 'e'.repeat(32), providers: ['tavily'] },
+    { enabled: 'true', key: '', providers: ['tavily'] },
+    { enabled: 'true', key: 'invalid', providers: ['tavily'] },
+    { enabled: 'true', key: 'e'.repeat(32), providers: ['exa', 'tavily'] },
+  ])('reports Exa only with an enabled flag and valid key ($enabled/$providers)', async ({ enabled, key, providers }) => {
+    const fakeEnv = curatedDexEnv(vi.fn());
+    Object.assign(fakeEnv, {
+      TAVILY_WEB_ENABLED: 'true', TAVILY_API_KEY: 't'.repeat(32),
+      EXA_WEB_ENABLED: enabled, EXA_API_KEY: key, WEB_SEARCH_PRIMARY: 'exa',
+    });
+    const response = await worker.fetch(new Request('https://assistant.test/health'), fakeEnv);
+    const value = await response.json();
+    expect(value).toMatchObject({ capabilities: { webSearchProviders: providers } });
+    expect(JSON.stringify(value)).not.toContain('e'.repeat(32));
+    expect(JSON.stringify(value)).not.toContain('t'.repeat(32));
+  });
+
   it('answers an unsupported selected-game Mega request without model or web fallback', async () => {
     const response = await post(body({
       question: '怎么 mega 进化路卡利欧',
