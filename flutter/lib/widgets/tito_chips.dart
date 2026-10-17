@@ -412,14 +412,14 @@ class TitoRoundKey extends StatelessWidget {
           stops: [0, 0.38, 0.78, 1],
         ),
         boxShadow: [
-          BoxShadow(color: Color(0xB3FFFFFF), spreadRadius: 6),
-          BoxShadow(color: Color(0x6BFFFFFF), spreadRadius: 5),
           BoxShadow(
             color: Color(0x8C0A1422),
             blurRadius: 13,
             spreadRadius: -2,
             offset: Offset(0, 10),
           ),
+          BoxShadow(color: Color(0xB3FFFFFF), spreadRadius: 6),
+          BoxShadow(color: Color(0x6BFFFFFF), spreadRadius: 5),
         ],
       );
       face = Stack(

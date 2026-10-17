@@ -437,21 +437,46 @@ class TitoSkin extends ThemeExtension<TitoSkin> {
 
   /// Display numerals / big headings with the theme's tracking. Flat UI
   /// uses heavier, tighter numerals.
+  ///
+  /// A null [color] inherits the ambient [DefaultTextStyle] — inside a
+  /// [StickerCard] hero that is the role tint's ink, so the same call works
+  /// on light and dark heroes. Pass [pageInk] for text sitting on the page.
   TextStyle display(double fontSize, {Color? color, FontWeight? weight}) =>
-      TitoTypography.style(
+      _skinText(
         fontSize: fontSize,
         fontWeight: weight ?? (isJournal ? FontWeight.w700 : FontWeight.w800),
-        color: color ?? pageInk,
+        color: color,
         height: 0.95,
         letterSpacing: fontSize * displayTracking,
       );
 
-  /// Section / card heading with the theme's tracking.
-  TextStyle heading(double fontSize, {Color? color}) => TitoTypography.style(
+  /// Section / card heading with the theme's tracking. A null [color]
+  /// inherits the ambient [DefaultTextStyle] like [display].
+  TextStyle heading(double fontSize, {Color? color}) => _skinText(
     fontSize: fontSize,
     fontWeight: FontWeight.w800,
-    color: color ?? ink,
+    color: color,
     letterSpacing: fontSize * headingTracking,
+  );
+
+  static TextStyle _skinText({
+    required double fontSize,
+    required FontWeight fontWeight,
+    Color? color,
+    double? height,
+    double? letterSpacing,
+  }) => TextStyle(
+    fontFamily: TitoTypography.fontFamily,
+    fontFamilyFallback: const [
+      'Noto Sans CJK SC',
+      'Noto Sans SC',
+      'sans-serif',
+    ],
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    color: color,
+    height: height,
+    letterSpacing: letterSpacing,
   );
 
   @override

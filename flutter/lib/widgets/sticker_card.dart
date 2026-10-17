@@ -68,8 +68,8 @@ class StickerCard extends StatelessWidget {
     return ListenableBuilder(
       listenable: retroStyle,
       builder: (context, _) => switch (skin.family) {
-        TitoThemeFamily.trainerJournal => _journal(skin),
-        TitoThemeFamily.solidPlastic => _plastic(skin),
+        TitoThemeFamily.trainerJournal => _journal(context, skin),
+        TitoThemeFamily.solidPlastic => _plastic(context, skin),
         TitoThemeFamily.flatUi => _flat(context, skin),
       },
     );
@@ -81,21 +81,35 @@ class StickerCard extends StatelessWidget {
       ? skin.radiusMd
       : skin.radiusLg;
 
-  Widget _content(TitoHeroTint? tint) {
-    final padded = Padding(padding: padding, child: child);
-    if (tint == null) {
-      return padded;
+  Widget _content(
+    BuildContext context,
+    TitoHeroTint? tint, {
+    bool inkSurface = true,
+  }) {
+    Widget body = Padding(padding: padding, child: child);
+    if (tint != null) {
+      body = DefaultTextStyle.merge(
+        style: TextStyle(color: tint.ink),
+        child: IconTheme.merge(
+          data: IconThemeData(color: tint.ink),
+          child: body,
+        ),
+      );
     }
-    return DefaultTextStyle.merge(
-      style: TextStyle(color: tint.ink),
-      child: IconTheme.merge(
-        data: IconThemeData(color: tint.ink),
-        child: padded,
-      ),
+    if (!inkSurface) {
+      return body;
+    }
+    // ListTile / InkWell children paint ink on the nearest Material; this
+    // keeps it above the decorated fill. Material would otherwise reset the
+    // ambient text style to bodyMedium.
+    return Material(
+      type: MaterialType.transparency,
+      textStyle: DefaultTextStyle.of(context).style,
+      child: body,
     );
   }
 
-  Widget _journal(TitoSkin skin) {
+  Widget _journal(BuildContext context, TitoSkin skin) {
     final tint = _hero ? skin.heroTint(heroRole) : null;
     final fill =
         tint?.top ??
@@ -118,7 +132,7 @@ class StickerCard extends StatelessWidget {
         ),
         boxShadow: skin.cardShadow(small: _dense, paperEdge: light && !_dense),
       ),
-      child: _content(tint),
+      child: _content(context, tint),
     );
     if (!_hero || !decorate) {
       return card;
@@ -150,7 +164,7 @@ class StickerCard extends StatelessWidget {
     );
   }
 
-  Widget _plastic(TitoSkin skin) {
+  Widget _plastic(BuildContext context, TitoSkin skin) {
     final radius = _radius(skin);
     if (_hero) {
       final tint = skin.heroTint(heroRole);
@@ -160,7 +174,7 @@ class StickerCard extends StatelessWidget {
         opacity: 0.97,
         radius: radius,
         boxShadow: skin.cardShadow(),
-        child: _content(tint),
+        child: _content(context, tint),
       );
     }
     final (tint, opacity) = switch (variant) {
@@ -175,7 +189,7 @@ class StickerCard extends StatelessWidget {
       opacity: _dense ? 1 : opacity,
       radius: radius,
       boxShadow: skin.cardShadow(small: _dense),
-      child: _content(null),
+      child: _content(context, null),
     );
   }
 
@@ -205,7 +219,7 @@ class StickerCard extends StatelessWidget {
             ? BorderSide.none
             : BorderSide(color: scheme.outlineVariant, width: 1.5),
       ),
-      child: _content(tint),
+      child: _content(context, tint, inkSurface: false),
     );
   }
 }
