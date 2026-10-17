@@ -234,9 +234,14 @@ void main() {
           return false;
         }
         final decoration = widget.decoration;
+        // Trainer's Journal draws the ring as a yellow double halo outside
+        // the box (spread shadows) so it never reflows the card.
         return decoration is BoxDecoration &&
-            decoration.border != null &&
-            decoration.border!.top.color == TitoColors.softYellow;
+            (decoration.boxShadow ?? const []).any(
+              (shadow) =>
+                  shadow.color == TitoColors.softYellow &&
+                  shadow.spreadRadius > 0,
+            );
       }),
     );
     expect(ringFinder, findsWidgets);

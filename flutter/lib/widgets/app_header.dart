@@ -5,13 +5,12 @@ import '../features/game/game_catalog.dart';
 import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
-import 'handheld_input.dart';
 import 'handheld_status_icons.dart';
-import 'liquid_glass.dart';
+import 'tito_chips.dart';
 
 class AppHeader extends StatelessWidget {
   const AppHeader({
@@ -32,16 +31,15 @@ class AppHeader extends StatelessWidget {
     final compact = DeviceLayout.isCompact(context);
     final square = DeviceLayout.useSquareDashboard(context);
     final barHeight = DeviceLayout.headerBarHeight(context);
-    final scheme = Theme.of(context).colorScheme;
+    final skin = TitoSkin.of(context);
+    final titleSize = DeviceLayout.headerTitleSize(context);
 
     return Padding(
       padding: EdgeInsets.only(bottom: square ? 2 : (compact ? 4 : 8)),
       child: SizedBox(
         height: barHeight,
         child: Material(
-          color: appVisualStyle.usesFlatUi
-              ? scheme.surface
-              : Colors.transparent,
+          color: Colors.transparent,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -51,11 +49,10 @@ class AppHeader extends StatelessWidget {
                   child: Text(
                     AppZh.displayTitleForTrainer(trainerName ?? ''),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: appVisualStyle.usesFlatUi
-                          ? scheme.onSurface
-                          : TitoColors.card,
-                      fontSize: DeviceLayout.headerTitleSize(context),
-                      letterSpacing: -0.3,
+                      color: skin.pageInk,
+                      fontSize: titleSize,
+                      fontWeight: skin.isFlat ? FontWeight.w800 : null,
+                      letterSpacing: titleSize * skin.headingTracking,
                     ),
                   ),
                 ),
@@ -106,7 +103,7 @@ class _GameBadgeButton extends StatelessWidget {
     final asset = edition.iconAsset;
     final accent = edition.accentColor;
     final darkAccent = accent.computeLuminance() < 0.4;
-    final scheme = Theme.of(context).colorScheme;
+    final skin = TitoSkin.of(context);
 
     final content = asset != null
         ? Padding(
@@ -124,42 +121,14 @@ class _GameBadgeButton extends StatelessWidget {
           )
         : _letterContent(size, accent, darkAccent);
 
-    if (appVisualStyle.usesSolidPlastic) {
-      return LiquidGlassRoundButton(
-        size: size,
-        semanticLabel: '$semanticLabel · ${edition.labelZh}',
-        onTap: onTap,
-        tint: asset != null ? TitoColors.card : accent,
-        opacity: asset != null ? 0.92 : 0.95,
-        child: content,
-      );
-    }
-
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: Semantics(
-        button: onTap != null,
-        label: '$semanticLabel · ${edition.labelZh}',
-        child: Material(
-          color: asset != null
-              ? (appVisualStyle.usesFlatUi
-                    ? scheme.primaryContainer
-                    : TitoColors.card)
-              : accent,
-          shape: CircleBorder(
-            side: appVisualStyle.usesFlatUi
-                ? BorderSide.none
-                : const BorderSide(color: TitoColors.ink, width: 2),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: SizedBox(width: size, height: size, child: content),
-          ),
-        ),
-      ),
+    return TitoRoundKey(
+      size: size,
+      semanticLabel: '$semanticLabel · ${edition.labelZh}',
+      onTap: onTap,
+      fill: asset != null
+          ? (skin.isFlat ? TitoColors.flatSurfaceContainerHigh : null)
+          : accent,
+      child: content,
     );
   }
 
@@ -198,40 +167,11 @@ class _HeaderIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = DeviceLayout.headerIconSize(context);
-    final iconSize = size * 0.62;
-    final scheme = Theme.of(context).colorScheme;
-
-    if (appVisualStyle.usesSolidPlastic) {
-      return LiquidGlassRoundButton(
-        size: size,
-        semanticLabel: label,
-        onTap: onTap,
-        child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-      );
-    }
-
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: IconButton(
-        tooltip: label,
-        onPressed: onTap,
-        padding: EdgeInsets.zero,
-        constraints: BoxConstraints.tightFor(width: size, height: size),
-        style: IconButton.styleFrom(
-          backgroundColor: appVisualStyle.usesFlatUi
-              ? scheme.secondaryContainer
-              : TitoColors.card,
-          foregroundColor: appVisualStyle.usesFlatUi
-              ? scheme.onSecondaryContainer
-              : TitoColors.deepBlue,
-          side: appVisualStyle.usesFlatUi
-              ? BorderSide.none
-              : const BorderSide(color: TitoColors.ink, width: 2),
-          shape: const CircleBorder(),
-        ),
-        icon: Icon(icon, size: iconSize),
-      ),
+    return TitoRoundKey(
+      size: size,
+      semanticLabel: label,
+      onTap: onTap,
+      child: Icon(icon, size: size * 0.62),
     );
   }
 }

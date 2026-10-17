@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
-import '../theme/tito_colors.dart';
-import 'liquid_glass.dart';
+import '../theme/tito_skin.dart';
+import 'tito_paper.dart';
 
 /// Opaque Material surface matching [DeviceShell] so route transitions never
 /// flash through a transparent or mismatched background.
@@ -13,35 +12,13 @@ class TitoPageContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final flatUi = appVisualStyle.usesFlatUi;
-    if (appVisualStyle.usesSolidPlastic) {
-      return Scaffold(
-        backgroundColor: TitoColors.glassBackgroundBottom,
-        body: BackdropGroup(
-          child: LiquidGlassBackground(child: SafeArea(child: child)),
-        ),
-      );
-    }
+    final skin = TitoSkin.of(context);
+    // Edge-to-edge shell: the surface paints behind the system bars so
+    // predictive back retracts the whole screen; content remains safe.
+    final page = TitoPageBackground(child: SafeArea(child: child));
     return Scaffold(
-      backgroundColor: flatUi ? scheme.surface : TitoColors.slateBlue,
-      // Edge-to-edge shell: the surface paints behind the system bars so
-      // predictive back retracts the whole screen; content remains safe.
-      body: flatUi
-          ? ColoredBox(
-              color: scheme.surface,
-              child: SafeArea(child: child),
-            )
-          : DecoratedBox(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF5D728A), TitoColors.slateBlue],
-                ),
-              ),
-              child: SafeArea(child: child),
-            ),
+      backgroundColor: skin.pageBase,
+      body: skin.isPlastic ? BackdropGroup(child: page) : page,
     );
   }
 }

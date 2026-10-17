@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 
 /// Retro form language shared across Settings, team editing, and the battle
 /// tools (v0.6.7 preview): sticker toggle switches, floating group labels,
-/// engraved input fills, and pill toggles with a state dot.
+/// engraved input fills, and pill toggles with a state dot. Outlines and
+/// drops follow [TitoSkin.controlSide] / [TitoSkin.chipShadow].
 
-/// Hand-drawn style toggle: ink-bordered capsule, mint when on, with a
-/// chunky knob that flips sides. Replaces Material's Switch inside the
-/// sticker UI so controls share the card language.
+/// Hand-drawn style toggle: outlined capsule, mint when on, with a chunky
+/// knob that flips sides. Replaces Material's Switch inside the sticker UI
+/// so controls share the card language.
 class StickerSwitch extends StatelessWidget {
   const StickerSwitch({super.key, required this.value, this.onChanged});
 
@@ -18,7 +21,14 @@ class StickerSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     final enabled = onChanged != null;
+    final side = skin.controlSide;
+    final trackOn = skin.isFlat ? TitoColors.deepBlue : TitoColors.mint;
+    final trackOff = skin.isFlat
+        ? TitoColors.flatSurfaceContainerHigh
+        : TitoColors.cardWarm;
+    final knobOn = skin.isFlat ? TitoColors.softYellow : TitoColors.deepBlue;
     return Semantics(
       toggled: value,
       button: true,
@@ -32,30 +42,28 @@ class StickerSwitch extends StatelessWidget {
             curve: Curves.easeOut,
             width: 46,
             height: 27,
-            padding: const EdgeInsets.all(1),
+            padding: EdgeInsets.all(skin.isFlat ? 3 : 1),
             decoration: BoxDecoration(
-              color: value ? TitoColors.mint : TitoColors.cardWarm,
+              color: value ? trackOn : trackOff,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: TitoColors.ink,
-                width: TitoBorders.card,
-              ),
-              boxShadow: TitoShadows.stickerSmall,
+              border: side == BorderSide.none
+                  ? null
+                  : Border.fromBorderSide(side),
+              boxShadow: skin.chipShadow,
             ),
             child: AnimatedAlign(
               duration: const Duration(milliseconds: 120),
               curve: Curves.easeOut,
               alignment: value ? Alignment.centerRight : Alignment.centerLeft,
               child: Container(
-                width: 19,
-                height: 19,
+                width: skin.isFlat ? 21 : 19,
+                height: skin.isFlat ? 21 : 19,
                 decoration: BoxDecoration(
-                  color: value ? TitoColors.deepBlue : TitoColors.card,
+                  color: value ? knobOn : TitoColors.card,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: TitoColors.ink,
-                    width: TitoBorders.element,
-                  ),
+                  border: side == BorderSide.none
+                      ? null
+                      : Border.fromBorderSide(side),
                 ),
               ),
             ),
@@ -74,6 +82,8 @@ class StickerGroupLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = skin.controlSide;
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
@@ -81,17 +91,16 @@ class StickerGroupLabel extends StatelessWidget {
         decoration: BoxDecoration(
           color: TitoColors.softYellow,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: TitoColors.ink,
-            width: TitoBorders.element,
-          ),
-          boxShadow: TitoShadows.stickerSmall,
+          border: side == BorderSide.none ? null : Border.fromBorderSide(side),
+          boxShadow: skin.chipShadow,
         ),
         child: Text(
           text,
           style: SecondaryTypography.onCard.small12.copyWith(
             fontWeight: FontWeight.w800,
-            color: const Color(0xFF6A4A05),
+            color: skin.isFlat
+                ? TitoColors.flatOnSurface
+                : const Color(0xFF6A4A05),
           ),
         ),
       ),
@@ -100,7 +109,7 @@ class StickerGroupLabel extends StatelessWidget {
 }
 
 /// Small colored plate behind a row/tile icon — gives each entry its own
-/// accent without recoloring the icon itself.
+/// accent without recoloring the icon itself. Flat UI uses circular chips.
 class StickerIconPlate extends StatelessWidget {
   const StickerIconPlate({
     super.key,
@@ -117,13 +126,16 @@ class StickerIconPlate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = skin.controlSide;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(size * 0.32),
-        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+        shape: skin.isFlat ? BoxShape.circle : BoxShape.rectangle,
+        borderRadius: skin.isFlat ? null : BorderRadius.circular(size * 0.32),
+        border: side == BorderSide.none ? null : Border.fromBorderSide(side),
       ),
       alignment: Alignment.center,
       child: Icon(icon, size: size * 0.55, color: iconColor ?? TitoColors.ink),
@@ -137,6 +149,13 @@ class StickerRowDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final color = skin.isJournal
+        ? skin.outline!.withValues(alpha: 0.45)
+        : TitoColors.mutedInk.withValues(alpha: 0.3);
+    if (skin.isFlat) {
+      return Container(height: 2, color: TitoColors.flatSurface);
+    }
     return LayoutBuilder(
       builder: (context, constraints) {
         const dashWidth = 6.0;
@@ -148,11 +167,7 @@ class StickerRowDivider extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               for (var i = 0; i < count; i++)
-                Container(
-                  width: dashWidth,
-                  height: 2,
-                  color: TitoColors.mutedInk.withValues(alpha: 0.3),
-                ),
+                Container(width: dashWidth, height: 1.5, color: color),
             ],
           ),
         );
@@ -169,11 +184,19 @@ InputDecoration retroInsetDecoration({
   String? helperText,
   Widget? prefixIcon,
 }) {
-  OutlineInputBorder border(Color color, [double width = 2]) =>
-      OutlineInputBorder(
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        borderSide: BorderSide(color: color, width: width),
-      );
+  final skin = TitoSkin.forStyle(appVisualStyle.style);
+  OutlineInputBorder border(BorderSide side) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(TitoRadii.sm),
+    borderSide: side,
+  );
+  final rest = skin.isFlat
+      ? BorderSide.none
+      : BorderSide(
+          color: skin.isPlastic
+              ? TitoColors.deepBlue.withValues(alpha: 0.3)
+              : skin.outline!,
+          width: skin.isPlastic ? 1.1 : 1.4,
+        );
   return InputDecoration(
     labelText: labelText,
     hintText: hintText,
@@ -181,10 +204,19 @@ InputDecoration retroInsetDecoration({
     prefixIcon: prefixIcon,
     isDense: true,
     filled: true,
-    fillColor: TitoColors.cardWarm,
-    border: border(TitoColors.ink),
-    enabledBorder: border(TitoColors.ink),
-    focusedBorder: border(TitoColors.coral),
+    fillColor: skin.isFlat
+        ? TitoColors.flatSurfaceContainerHigh
+        : skin.isPlastic
+        ? Colors.white.withValues(alpha: 0.78)
+        : TitoColors.cardWarm,
+    border: border(rest),
+    enabledBorder: border(rest),
+    focusedBorder: border(
+      BorderSide(
+        color: skin.isFlat ? TitoColors.flatOnSurface : TitoColors.coral,
+        width: skin.isFlat ? 2.5 : 2,
+      ),
+    ),
   );
 }
 
@@ -204,6 +236,14 @@ class StickerPillToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = skin.controlSide;
+    final border = side == BorderSide.none ? null : Border.fromBorderSide(side);
+    final onFill = skin.isFlat ? TitoColors.deepBlue : TitoColors.mint;
+    final offFill = skin.isFlat
+        ? TitoColors.flatSurfaceContainerHigh
+        : TitoColors.cardWarm;
+    final onInk = skin.isFlat ? TitoColors.card : const Color(0xFF08402F);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => onChanged(!value),
@@ -212,13 +252,10 @@ class StickerPillToggle extends StatelessWidget {
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: value ? TitoColors.mint : TitoColors.cardWarm,
+          color: value ? onFill : offFill,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: TitoColors.ink,
-            width: TitoBorders.element,
-          ),
-          boxShadow: TitoShadows.stickerSmall,
+          border: border,
+          boxShadow: skin.chipShadow,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -227,12 +264,13 @@ class StickerPillToggle extends StatelessWidget {
               width: 10,
               height: 10,
               decoration: BoxDecoration(
-                color: value ? TitoColors.deepBlue : TitoColors.card,
+                color: value
+                    ? (skin.isFlat
+                          ? TitoColors.softYellow
+                          : TitoColors.deepBlue)
+                    : TitoColors.card,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: TitoColors.ink,
-                  width: TitoBorders.element,
-                ),
+                border: border,
               ),
             ),
             const SizedBox(width: 6),
@@ -240,7 +278,7 @@ class StickerPillToggle extends StatelessWidget {
               label,
               style: SecondaryTypography.onCard.small12.copyWith(
                 fontWeight: FontWeight.w800,
-                color: value ? const Color(0xFF08402F) : TitoColors.mutedInk,
+                color: value ? onInk : TitoColors.mutedInk,
               ),
             ),
           ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
+import '../widgets/tito_paper.dart';
 
 /// Tag for the single home action that expands into its first-level page.
 abstract final class TitoHomeActionHero {
@@ -843,8 +844,8 @@ class _DexFlightVisual {
           end: Alignment.bottomCenter,
           colors: [Color(0xFF5D728A), TitoColors.slateBlue],
         ),
-        outlineColor: TitoColors.ink,
-        borderWidth: TitoBorders.card,
+        outlineColor: TitoColors.journalOutline,
+        borderWidth: 1.4,
         startRadius: TitoRadii.md,
         shadowColor: TitoColors.deepBlue,
         shadowOpacity: 0.24,
@@ -892,31 +893,35 @@ class _DexFlightVisual {
   }
 }
 
-/// Bottom sheets retain Flutter Material's standard Android sheet behavior.
+/// Skinned bottom sheet with Flutter Material's standard Android behavior.
+///
+/// Shape, fill and barrier come from the theme's `bottomSheetTheme`; the
+/// body sits on [TitoRuledPaper] (ruled paper in Trainer's Journal, milky
+/// shell in Solid Plastic, plain surface in Flat UI). Pass `ruled: false`
+/// for sheets whose content is a dense grid that already has its own cells.
 Future<T?> showTitoModalBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
   bool isScrollControlled = false,
+  bool ruled = true,
 }) {
   return showModalBottomSheet<T>(
     context: context,
     showDragHandle: true,
     isScrollControlled: isScrollControlled,
-    backgroundColor: TitoColors.card,
-    barrierColor: TitoColors.ink.withValues(alpha: 0.45),
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.lg)),
-      side: BorderSide(color: TitoColors.ink, width: 2),
-    ),
     // viewInsets keeps content above the system keyboard (iOS/phones — RG
     // handhelds never show one); SafeArea(top: false) clears the iPhone home
     // indicator. Sheets that already wrap themselves in SafeArea are fine:
     // nested SafeAreas consume the padding only once.
-    builder: (sheetContext) => Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+    builder: (sheetContext) => TitoRuledPaper(
+      ruled: ruled,
+      lineOffset: 7,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+        ),
+        child: SafeArea(top: false, child: builder(sheetContext)),
       ),
-      child: SafeArea(top: false, child: builder(sheetContext)),
     ),
   );
 }

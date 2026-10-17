@@ -36,7 +36,7 @@ void main() {
     expect(restored.enabled, isFalse);
   });
 
-  testWidgets('StickerCard switches between elevated and outlined Material', (
+  testWidgets('Flat StickerCard switches between solid and outlined block', (
     tester,
   ) async {
     Material cardMaterial() => tester.widget<Material>(
@@ -48,11 +48,12 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: buildTitoTheme(),
+        theme: buildTitoTheme(AppVisualStyle.flatUi),
         home: const Scaffold(body: StickerCard(child: Text('x'))),
       ),
     );
-    expect(cardMaterial().elevation, 1);
+    // Flat UI is shadowless in both modes: retro on is a solid colour block.
+    expect(cardMaterial().elevation, 0);
     expect(
       (cardMaterial().shape! as RoundedRectangleBorder).side,
       BorderSide.none,

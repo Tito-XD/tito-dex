@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 
 /// Applies immersive UI on RG-like aspect ratios; regular status/nav bars elsewhere.
 class SystemUiCoordinator extends StatefulWidget {
@@ -39,19 +39,10 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
     }
     _lastSize = size;
     _lastStyle = style;
-    _applySystemUi(
-      size,
-      style: style,
-      flatSurface: Theme.of(context).colorScheme.surface,
-    );
+    _applySystemUi(size, skin: TitoSkin.forStyle(style));
   }
 
-  void _applySystemUi(
-    Size size, {
-    required AppVisualStyle style,
-    required Color flatSurface,
-  }) {
-    final flatUi = style == AppVisualStyle.flatUi;
+  void _applySystemUi(Size size, {required TitoSkin skin}) {
     if (!DeviceLayout.isNativeTarget) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       return;
@@ -73,16 +64,16 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: flatUi ? Brightness.dark : Brightness.light,
-        statusBarBrightness: flatUi ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: flatUi
-            ? flatSurface
-            : style == AppVisualStyle.solidPlastic
-            ? TitoColors.glassBackgroundTop
-            : TitoColors.deepBlue,
-        systemNavigationBarIconBrightness: flatUi
+        statusBarIconBrightness: skin.pageIsDark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: skin.pageIsDark
             ? Brightness.dark
             : Brightness.light,
+        systemNavigationBarColor: skin.systemBarColor,
+        systemNavigationBarIconBrightness: skin.pageIsDark
+            ? Brightness.light
+            : Brightness.dark,
       ),
     );
   }

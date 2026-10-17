@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
-import 'liquid_glass.dart';
+import '../theme/tito_skin.dart';
+import 'tito_paper.dart';
 
 class DeviceShell extends StatelessWidget {
   const DeviceShell({super.key, required this.child});
@@ -15,31 +15,21 @@ class DeviceShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
     final handheldChrome = DeviceLayout.useHandheldChrome(context);
-    final scheme = Theme.of(context).colorScheme;
-    final flatUi = appVisualStyle.usesFlatUi;
-    final solidPlastic = appVisualStyle.usesSolidPlastic;
+    final skin = TitoSkin.of(context);
+    final iconBrightness = skin.pageIsDark ? Brightness.light : Brightness.dark;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: (flatUi ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
-          .copyWith(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: flatUi
-                ? Brightness.dark
-                : Brightness.light,
-            systemNavigationBarColor: flatUi
-                ? scheme.surface
-                : solidPlastic
-                ? TitoColors.glassBackgroundTop
-                : TitoColors.deepBlue,
-            systemNavigationBarIconBrightness: flatUi
-                ? Brightness.dark
-                : Brightness.light,
-            systemNavigationBarDividerColor: flatUi
-                ? scheme.surface
-                : solidPlastic
-                ? TitoColors.glassBackgroundTop
-                : TitoColors.deepBlue,
-          ),
+      value:
+          (skin.pageIsDark
+                  ? SystemUiOverlayStyle.light
+                  : SystemUiOverlayStyle.dark)
+              .copyWith(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: iconBrightness,
+                systemNavigationBarColor: skin.systemBarColor,
+                systemNavigationBarIconBrightness: iconBrightness,
+                systemNavigationBarDividerColor: skin.systemBarColor,
+              ),
       child: MediaQuery(
         data: mq.copyWith(textScaler: DeviceLayout.clampedTextScaler(context)),
         child: handheldChrome
@@ -104,30 +94,7 @@ class _ThemeBackdrop extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    if (appVisualStyle.usesSolidPlastic) {
-      return LiquidGlassBackground(child: child);
-    }
-    if (appVisualStyle.usesFlatUi) {
-      return ColoredBox(
-        color: Theme.of(context).colorScheme.surface,
-        child: child,
-      );
-    }
-    return ColoredBox(
-      color: TitoColors.deepBlue,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF5D728A), TitoColors.slateBlue],
-          ),
-        ),
-        child: child,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => TitoPageBackground(child: child);
 }
 
 /// Legacy alias — kept for references.

@@ -51,19 +51,27 @@ abstract final class TrainerJournalShadows {
   static const List<BoxShadow> stickerSmall = [
     BoxShadow(color: Color(0x2818283B), offset: Offset(0, 3)),
   ];
+
+  /// Paper-thickness line painted above the hard drop on light paper cards.
+  static const BoxShadow paperEdge = BoxShadow(
+    color: Color(0xFFE4DFD3),
+    offset: Offset(0, 2),
+  );
 }
 
-/// Concentrated moulded depth for Solid Plastic surfaces.
+/// Concentrated moulded depth for Solid Plastic surfaces: a deep, slightly
+/// tucked drop plus a tight contact shadow, like an injection-moulded shell
+/// sitting on the device.
 abstract final class SolidPlasticShadows {
   static const List<BoxShadow> sticker = [
     BoxShadow(
-      color: Color(0x3313263D),
-      blurRadius: 16,
-      spreadRadius: -3,
-      offset: Offset(0, 8),
+      color: Color(0x5413263D),
+      blurRadius: 15,
+      spreadRadius: -4,
+      offset: Offset(0, 9),
     ),
     BoxShadow(
-      color: Color(0x1813263D),
+      color: Color(0x2E13263D),
       blurRadius: 3,
       spreadRadius: -1,
       offset: Offset(0, 2),
@@ -130,6 +138,14 @@ abstract final class TitoColors {
   static const glassCyan = Color(0xFFB9DFE7);
   static const glassLavender = Color(0xFFD7CDEA);
   static const glassMint = Color(0xFFBFE2D4);
+
+  /// Trainer's Journal paper, ink and thin slate pencil outline.
+  static const journalPaper = Color(0xFFFFFAF0);
+  static const journalInk = Color(0xFF36475B);
+  static const journalOutline = Color(0xFF7C8999);
+
+  /// Solid Plastic ink on its milky shells.
+  static const plasticInk = Color(0xFF20334A);
 }
 
 abstract final class TitoRadii {

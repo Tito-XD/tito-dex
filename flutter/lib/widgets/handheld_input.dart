@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../navigation/back_navigation.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 
 /// D-pad / gamepad focus traversal and A·B actions for RG handhelds.
 class HandheldInputShell extends StatelessWidget {
@@ -101,8 +102,64 @@ class HandheldPressed extends InheritedWidget {
       pressed != oldWidget.pressed;
 }
 
+/// Theme-aware D-pad focus ring (see [TitoSkin.focusRing]). Use it directly
+/// for custom focus visuals that cannot be wrapped by
+/// [HandheldFocusDecorator].
+class TitoFocusRing extends StatelessWidget {
+  const TitoFocusRing({
+    super.key,
+    required this.child,
+    required this.focused,
+    this.borderRadius = const BorderRadius.all(Radius.circular(TitoRadii.md)),
+  });
+
+  final Widget child;
+  final bool focused;
+  final BorderRadius borderRadius;
+
+  @override
+  Widget build(BuildContext context) => _HandheldFocusRing(
+    focused: focused,
+    borderRadius: borderRadius,
+    child: child,
+  );
+}
+
+/// Keeps one stable widget tree whether or not focus is shown, so toggling
+/// the ring never remounts (and resets) the focused child.
+class _HandheldFocusRing extends StatelessWidget {
+  const _HandheldFocusRing({
+    required this.focused,
+    required this.borderRadius,
+    required this.child,
+  });
+
+  final bool focused;
+  final BorderRadius borderRadius;
+  final Widget child;
+
+  static const _none = BoxDecoration();
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final wash = focused ? skin.focusWash : null;
+    return DecoratedBox(
+      decoration: focused ? skin.focusRing(borderRadius) : _none,
+      child: DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: wash == null
+            ? _none
+            : BoxDecoration(color: wash, borderRadius: borderRadius),
+        child: child,
+      ),
+    );
+  }
+}
+
 /// Visible focus ring for D-pad navigation on cream tiles.
-class HandheldFocusDecorator extends StatefulWidget {  const HandheldFocusDecorator({
+class HandheldFocusDecorator extends StatefulWidget {
+  const HandheldFocusDecorator({
     super.key,
     required this.child,
     required this.onActivate,
@@ -158,25 +215,9 @@ class _HandheldFocusDecoratorState extends State<HandheldFocusDecorator> {
         },
         child: HandheldPressed(
           pressed: _keyHeld,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: widget.borderRadius,
-              border: _focused
-                  ? Border.all(
-                      color: TitoColors.softYellow,
-                      width: TitoBorders.card,
-                    )
-                  : null,
-              boxShadow: _focused
-                  ? const [
-                      BoxShadow(
-                        color: Color(0x66FFE08A),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : null,
-            ),
+          child: _HandheldFocusRing(
+            focused: _focused,
+            borderRadius: widget.borderRadius,
             child: widget.child,
           ),
         ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'app_visual_style.dart';
 import 'tito_colors.dart';
+import 'tito_skin.dart';
 import 'tito_typography.dart';
 
 /// Fixed logical-pixel typography for secondary routes (Team, Journey, Dex, …).
@@ -27,14 +27,10 @@ abstract final class SecondaryTypography {
   static const onGradient = SecondaryPageTypography();
   static const onCard = _SecondaryOnCard();
 
-  /// Text directly on the current app shell. Material pages use on-surface
-  /// ink; the classic gradient keeps its light foreground.
+  /// Text directly on the current page background ([TitoSkin.pageInk]):
+  /// cream on the Journal / Solid Plastic shells, ink on Flat UI.
   static SecondaryPageTypography onPage(BuildContext context) =>
-      SecondaryPageTypography(
-        color: appVisualStyle.usesFlatUi
-            ? Theme.of(context).colorScheme.onSurface
-            : TitoColors.card,
-      );
+      SecondaryPageTypography(color: TitoSkin.of(context).pageInk);
 
   /// Handheld secondary-page size remap: 10→12, 11→14, 12→14, 13→15.
   static TextStyle remap(TextStyle style) {

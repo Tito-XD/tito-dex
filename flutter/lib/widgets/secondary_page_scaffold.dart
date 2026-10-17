@@ -3,12 +3,11 @@ import 'package:go_router/go_router.dart';
 
 import '../l10n/app_zh.dart';
 import '../navigation/back_navigation.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'handheld_input.dart';
-import 'liquid_glass.dart';
+import 'tito_chips.dart';
 
 /// Standard shell for N3 secondary routes with shared top navigation.
 class SecondaryPageScaffold extends StatelessWidget {
@@ -72,13 +71,10 @@ class SecondaryPageSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Text(
       text,
       style: SecondaryTypography.onCard.body14.copyWith(
-        color: appVisualStyle.usesFlatUi
-            ? scheme.onSurfaceVariant
-            : TitoColors.card,
+        color: TitoSkin.of(context).pageMutedInk,
       ),
     );
   }
@@ -149,7 +145,8 @@ class _BackTitleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rMd(context);
-    final scheme = Theme.of(context).colorScheme;
+    final skin = TitoSkin.of(context);
+    final titleStyle = SecondaryTypography.onGradient.title;
     // Solid Plastic intentionally shares this plain back-title row: the glossy
     // title pill was removed so secondary headers stay matte like the rest of
     // the theme's surfaces.
@@ -170,9 +167,7 @@ class _BackTitleButton extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.arrow_back_rounded,
-                    color: appVisualStyle.usesFlatUi
-                        ? scheme.primary
-                        : TitoColors.card,
+                    color: skin.pageInk,
                     size: iconSize,
                   ),
                   SizedBox(width: iconSize * 0.15),
@@ -181,11 +176,11 @@ class _BackTitleButton extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onGradient.title.copyWith(
-                        color: appVisualStyle.usesFlatUi
-                            ? scheme.onSurface
-                            : TitoColors.card,
-                        letterSpacing: -0.5,
+                      style: titleStyle.copyWith(
+                        color: skin.pageInk,
+                        letterSpacing: skin.isFlat
+                            ? titleStyle.fontSize! * skin.headingTracking
+                            : -0.5,
                       ),
                     ),
                   ),
@@ -216,31 +211,11 @@ class _SecondaryHeaderIconButton extends StatelessWidget {
     // Same glyph ratio as the home header's settings button (app_header.dart)
     // so the gear reads at one size on every title bar.
     final iconSize = size * 0.62;
-    final scheme = Theme.of(context).colorScheme;
-
-    if (appVisualStyle.usesSolidPlastic) {
-      return LiquidGlassRoundButton(
-        size: size,
-        semanticLabel: label,
-        onTap: onTap,
-        child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-      );
-    }
-
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: IconButton.filledTonal(
-        tooltip: label,
-        onPressed: onTap,
-        padding: EdgeInsets.zero,
-        constraints: BoxConstraints.tightFor(width: size, height: size),
-        style: IconButton.styleFrom(
-          backgroundColor: scheme.secondaryContainer,
-          foregroundColor: scheme.onSecondaryContainer,
-        ),
-        icon: Icon(icon, size: iconSize),
-      ),
+    return TitoRoundKey(
+      size: size,
+      semanticLabel: label,
+      onTap: onTap,
+      child: Icon(icon, size: iconSize),
     );
   }
 }

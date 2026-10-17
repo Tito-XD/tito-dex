@@ -18,6 +18,21 @@ extension TitoThemeFamilyLabel on TitoThemeFamily {
       (TitoThemeFamily.flatUi, false) => 'Flat UI',
     };
   }
+
+  /// One-line material description shown under the theme name.
+  String taglineFor(Locale locale) {
+    final chinese = locale.languageCode.toLowerCase() == 'zh';
+    return switch ((this, chinese)) {
+      (TitoThemeFamily.trainerJournal, true) => '纸贴纸 · 胶带 · 印章',
+      (TitoThemeFamily.trainerJournal, false) =>
+        'Paper stickers · tape · stamps',
+      (TitoThemeFamily.solidPlastic, true) => '半透外壳 · 压铸按键',
+      (TitoThemeFamily.solidPlastic, false) =>
+        'Translucent shell · die-cast keys',
+      (TitoThemeFamily.flatUi, true) => '色块 · 大字 · 干脆',
+      (TitoThemeFamily.flatUi, false) => 'Colour blocks · big type · crisp',
+    };
+  }
 }
 
 /// App-wide visual language. This is deliberately independent from motion
@@ -38,6 +53,8 @@ extension AppVisualStyleLabel on AppVisualStyle {
   };
 
   String labelFor(Locale locale) => family.labelFor(locale);
+
+  String taglineFor(Locale locale) => family.taglineFor(locale);
 }
 
 class AppVisualStylePreference extends ChangeNotifier {
