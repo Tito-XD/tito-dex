@@ -5,6 +5,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'sticker_card.dart';
 
 class JourneyTimeline extends StatelessWidget {
@@ -15,6 +16,8 @@ class JourneyTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final outline = skin.outline;
     return StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +28,7 @@ class JourneyTimeline extends StatelessWidget {
             Text(
               AppZh.journeyTimelineEmpty,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: skin.mutedInk,
               ),
             )
           else
@@ -40,14 +43,22 @@ class JourneyTimeline extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: TitoColors.softYellow,
-                borderRadius: BorderRadius.circular(TitoRadii.sm),
-                border: Border.all(color: TitoColors.ink, width: 2),
+                color: skin.isFlat ? skin.chipFill : TitoColors.softYellow,
+                borderRadius: BorderRadius.circular(skin.radiusSm),
+                border: outline == null
+                    ? null
+                    : Border.all(
+                        color: skin.isPlastic
+                            ? skin.ink.withValues(alpha: 0.28)
+                            : outline,
+                        width: skin.outlineWidth,
+                      ),
               ),
               child: Text(
                 '${AppZh.nextPrefix}${localizeReminder(nextReminder)}',
                 style: SecondaryTypography.onCard.body14.copyWith(
                   fontWeight: FontWeight.w700,
+                  color: skin.ink,
                 ),
               ),
             ),
@@ -66,6 +77,8 @@ class _TimelineEntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final outline = skin.outline;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -80,13 +93,19 @@ class _TimelineEntryTile extends StatelessWidget {
                   height: 12,
                   margin: const EdgeInsets.only(top: 4),
                   decoration: BoxDecoration(
-                    color: TitoColors.coral,
+                    color: skin.isFlat ? skin.primaryFill : TitoColors.coral,
                     shape: BoxShape.circle,
-                    border: Border.all(color: TitoColors.ink, width: 2),
+                    border: outline == null
+                        ? null
+                        : Border.all(color: outline, width: skin.outlineWidth),
                   ),
                 ),
                 if (!isLast)
-                  Container(width: 2, height: 34, color: TitoColors.slateBlue),
+                  Container(
+                    width: 2,
+                    height: 34,
+                    color: outline ?? skin.mutedInk,
+                  ),
               ],
             ),
           ),
@@ -104,7 +123,7 @@ class _TimelineEntryTile extends StatelessWidget {
                         entry.at!,
                         style: SecondaryTypography.onCard.small12.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: TitoColors.mutedInk,
+                          color: skin.mutedInk,
                         ),
                       ),
                     ),
@@ -112,6 +131,7 @@ class _TimelineEntryTile extends StatelessWidget {
                     localizeTimelineEntry(entry.text),
                     style: SecondaryTypography.onCard.body14.copyWith(
                       fontWeight: FontWeight.w700,
+                      color: skin.ink,
                     ),
                   ),
                 ],

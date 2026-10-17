@@ -9,9 +9,10 @@ import '../features/journey/journey_pack_models.dart';
 import '../features/journey/journey_pack_repository.dart';
 import '../features/journey/progression_hints.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_chips.dart';
 
 class JourneyPackManagerPage extends StatefulWidget {
   const JourneyPackManagerPage({
@@ -134,8 +135,8 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
       title: 'Journey 资料包',
       subtitle: '按游戏安装，需要时再下载',
       children: [
-        StickerCard(
-          variant: StickerVariant.sky,
+        StickerCard.hero(
+          role: TitoHeroRole.shelf,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -165,7 +166,7 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
           child: Text(
             '资料包只扩展问 TitoDex 的攻略上下文，保存在 App 私有目录。不会上传存档，也不会替换图鉴数据。',
             style: SecondaryTypography.onCard.body14.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoSkin.of(context).mutedInk,
             ),
           ),
         ),
@@ -175,9 +176,7 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
             Expanded(
               child: Text(
                 '可用资料包',
-                style: SecondaryTypography.onCard.h15.copyWith(
-                  color: TitoColors.card,
-                ),
+                style: SecondaryTypography.onPage(context).h15,
               ),
             ),
             TextButton.icon(
@@ -268,7 +267,7 @@ class _JourneyPackCard extends StatelessWidget {
     final installed = availability == JourneyPackAvailability.installed;
     final update = availability == JourneyPackAvailability.updateAvailable;
     final incompatible = availability == JourneyPackAvailability.incompatible;
-    return StickerCard(
+    return StickerCard.dense(
       key: Key('journey-pack-${descriptor.gameFamily}'),
       variant: currentGame ? StickerVariant.softYellow : StickerVariant.cream,
       child: Column(
@@ -282,7 +281,8 @@ class _JourneyPackCard extends StatelessWidget {
                   style: SecondaryTypography.onCard.h15,
                 ),
               ),
-              if (currentGame) const Chip(label: Text('当前游戏')),
+              if (currentGame)
+                const TitoChip(label: '当前游戏', selected: true, dense: true),
             ],
           ),
           if (descriptor.descriptionZh case final description?) ...[
@@ -293,7 +293,7 @@ class _JourneyPackCard extends StatelessWidget {
           Text(
             '${descriptor.entryCount} 条 · ${(descriptor.sizeBytes / 1024).toStringAsFixed(0)} KB · v${descriptor.version}',
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoSkin.of(context).mutedInk,
             ),
           ),
           if (busy) ...[
@@ -327,10 +327,12 @@ class _JourneyPackCard extends StatelessWidget {
                   icon: const Icon(Icons.delete_outline_rounded),
                   label: const Text('删除'),
                 ),
-              if (installed) const Chip(label: Text('已安装')),
-              if (incompatible) const Chip(label: Text('需要新版图鉴包')),
+              if (installed)
+                const TitoChip(label: '已安装', selected: true, dense: true),
+              if (incompatible)
+                const TitoChip(label: '需要新版图鉴包', dense: true),
               if (availability == JourneyPackAvailability.corrupt)
-                const Chip(label: Text('本地文件损坏，请重新安装')),
+                const TitoChip(label: '本地文件损坏，请重新安装', dense: true),
             ],
           ),
         ],

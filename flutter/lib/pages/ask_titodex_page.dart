@@ -21,9 +21,11 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../navigation/tito_route_work.dart';
 import '../theme/device_layout.dart';
+import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/assistant_surface.dart';
 import '../widgets/ask_titodex_loading.dart';
 import '../widgets/retro_forms.dart';
@@ -32,10 +34,24 @@ import '../widgets/secondary_page_scaffold.dart';
 typedef AskTitoDexSourceOpener = Future<bool> Function(Uri uri);
 
 const _assistantPaper = Color(0xFFFFFBF2);
-const _assistantCanvas = Color(0xFFF5F6F3);
 const _assistantSkeleton = Color(0xFFDCE5E5);
 const _assistantStatusRadius = 32.0;
 const _assistantContextChipRadius = 16.0;
+
+Border? _askBorder(TitoSkin skin) {
+  final outline = skin.outline;
+  if (outline == null || skin.outlineWidth <= 0) return null;
+  return Border.all(
+    color: skin.isPlastic ? skin.ink.withValues(alpha: 0.28) : outline,
+    width: skin.outlineWidth,
+  );
+}
+
+BorderSide _askSide(TitoSkin skin) {
+  final border = _askBorder(skin);
+  if (border == null) return BorderSide.none;
+  return border.top;
+}
 const _semanticRevealFrame = Duration(milliseconds: 20);
 const _semanticRevealStepLimit = 112;
 const _semanticCursorHold = Duration(milliseconds: 96);
@@ -809,11 +825,11 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                     key: const Key('ask-titodex-answer-viewport'),
                     clipBehavior: Clip.antiAlias,
                     decoration: BoxDecoration(
-                      color: _assistantCanvas.withValues(alpha: 0.94),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: TitoColors.deepBlue.withValues(alpha: 0.12),
+                      color: TitoSkin.of(context).paperDense,
+                      borderRadius: BorderRadius.circular(
+                        TitoSkin.of(context).radiusLg,
                       ),
+                      border: _askBorder(TitoSkin.of(context)),
                     ),
                     child: NotificationListener<ScrollNotification>(
                       onNotification: _handleAnswerScrollNotification,
@@ -1179,7 +1195,7 @@ class _StatusDot extends StatelessWidget {
     decoration: BoxDecoration(
       color: color,
       shape: BoxShape.circle,
-      border: Border.all(color: TitoColors.deepBlue, width: 1.25),
+      border: _askBorder(TitoSkin.of(context)),
     ),
     child: checking
         ? const Padding(
@@ -1379,11 +1395,11 @@ class _HistoryManagerSheet extends StatelessWidget {
                         final entry = newestFirst[index];
                         return DecoratedBox(
                           decoration: BoxDecoration(
-                            color: TitoColors.cardWarm,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: TitoColors.deepBlue.withValues(alpha: 0.2),
+                            color: TitoSkin.of(context).paperDense,
+                            borderRadius: BorderRadius.circular(
+                              TitoSkin.of(context).radiusMd,
                             ),
+                            border: _askBorder(TitoSkin.of(context)),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(11, 8, 11, 8),
@@ -1481,8 +1497,8 @@ class _ContextChip extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      backgroundColor: TitoColors.cardWarm,
-      side: BorderSide(color: TitoColors.ink.withValues(alpha: 0.55), width: 1),
+      backgroundColor: TitoSkin.of(context).paper,
+      side: _askSide(TitoSkin.of(context)),
       avatar: Icon(icon, size: 14),
       label: Text(
         label,
@@ -1543,7 +1559,11 @@ class _QuestionBubble extends StatelessWidget {
         constraints: BoxConstraints(
           maxWidth: MediaQuery.sizeOf(context).width * 0.78,
         ),
-        child: DecoratedBox(
+        child: ListenableBuilder(
+          listenable: retroStyle,
+          builder: (context, child) {
+            final skin = TitoSkin.of(context);
+            return DecoratedBox(
           decoration: BoxDecoration(
             color: TitoColors.softYellow,
             borderRadius: const BorderRadius.only(
@@ -1552,18 +1572,12 @@ class _QuestionBubble extends StatelessWidget {
               bottomLeft: Radius.circular(14),
               bottomRight: Radius.circular(4),
             ),
-            border: Border.all(
-              color: TitoColors.ink.withValues(alpha: 0.3),
-              width: 1.25,
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x1F18283B),
-                offset: Offset(0, 4),
-                blurRadius: 9,
-              ),
-            ],
+            border: _askBorder(skin),
+            boxShadow: skin.cardShadow(small: true),
           ),
+          child: child,
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
             child: Column(
@@ -1573,7 +1587,7 @@ class _QuestionBubble extends StatelessWidget {
                   Text(
                     _assistantGameLabel(game!),
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.deepBlue,
+                      color: TitoSkin.of(context).ink,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -1583,7 +1597,7 @@ class _QuestionBubble extends StatelessWidget {
                   question,
                   key: const Key('ask-titodex-question-bubble'),
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    color: TitoColors.ink,
+                    color: TitoSkin.of(context).ink,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -1798,7 +1812,7 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
         },
         child: AssistantSurface(
           key: const Key('ask-titodex-active-answer-surface'),
-          color: _assistantPaper,
+          color: TitoSkin.of(context).paper,
           padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
           radius: 18,
           borderColor: TitoColors.deepBlue.withValues(alpha: 0.24),
@@ -2241,9 +2255,7 @@ class _AnswerTextPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(
-          color: borderColor ?? TitoColors.deepBlue.withValues(alpha: 0.12),
-        ),
+        border: _askBorder(TitoSkin.of(context)),
       ),
       child: content,
     );
@@ -2319,7 +2331,7 @@ class _AnswerTableBlock extends StatelessWidget {
       (count, row) => row.length > count ? row.length : count,
     );
     final compact = SecondaryTypography.onCard.small12.copyWith(
-      color: TitoColors.ink,
+      color: TitoSkin.of(context).ink,
       height: 1.3,
     );
     return Column(
@@ -2342,7 +2354,11 @@ class _AnswerTableBlock extends StatelessWidget {
             child: Table(
               defaultColumnWidth: const IntrinsicColumnWidth(),
               border: TableBorder.all(
-                color: TitoColors.deepBlue.withValues(alpha: 0.2),
+                color: TitoSkin.of(context).outline ??
+                    TitoSkin.of(context).mutedInk.withValues(alpha: 0.35),
+                width: TitoSkin.of(context).outlineWidth == 0
+                    ? 1
+                    : TitoSkin.of(context).outlineWidth,
               ),
               children: [
                 for (var rowIndex = 0; rowIndex < rows.length; rowIndex++)
@@ -2489,16 +2505,17 @@ class _AssistantMarkdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     final body = SecondaryTypography.onCard.body14.copyWith(
       height: 1.45,
-      color: TitoColors.ink,
+      color: skin.ink,
     );
     final compact = SecondaryTypography.onCard.small12.copyWith(
       height: 1.35,
-      color: TitoColors.ink,
+      color: skin.ink,
     );
     final heading = SecondaryTypography.onCard.h15.copyWith(
-      color: TitoColors.deepBlue,
+      color: skin.ink,
       fontWeight: FontWeight.w900,
     );
     final headingPadding = const EdgeInsets.only(top: 7, bottom: 4);
@@ -2520,7 +2537,7 @@ class _AssistantMarkdown extends StatelessWidget {
         h2: heading,
         h2Padding: headingPadding,
         h3: body.copyWith(
-          color: TitoColors.deepBlue,
+          color: skin.ink,
           fontWeight: FontWeight.w900,
         ),
         h3Padding: headingPadding,
@@ -2533,7 +2550,7 @@ class _AssistantMarkdown extends StatelessWidget {
         strong: body.copyWith(fontWeight: FontWeight.w900),
         em: body.copyWith(fontStyle: FontStyle.italic),
         a: body.copyWith(
-          color: TitoColors.deepBlue,
+          color: skin.accentInkOnLight,
           decoration: TextDecoration.none,
         ),
         code: compact.copyWith(
@@ -2545,14 +2562,15 @@ class _AssistantMarkdown extends StatelessWidget {
         listBullet: body.copyWith(fontWeight: FontWeight.w900),
         listBulletPadding: const EdgeInsets.only(right: 6),
         tableHead: compact.copyWith(
-          color: TitoColors.deepBlue,
+          color: skin.ink,
           fontWeight: FontWeight.w900,
         ),
         tableBody: compact,
         tableHeadAlign: TextAlign.left,
         tablePadding: const EdgeInsets.symmetric(vertical: 4),
         tableBorder: TableBorder.all(
-          color: TitoColors.deepBlue.withValues(alpha: 0.25),
+          color: skin.outline ?? skin.mutedInk.withValues(alpha: 0.35),
+          width: skin.outlineWidth == 0 ? 1 : skin.outlineWidth,
         ),
         tableColumnWidth: const IntrinsicColumnWidth(),
         tableScrollbarThumbVisibility: true,
@@ -2563,7 +2581,7 @@ class _AssistantMarkdown extends StatelessWidget {
         tableHeadCellsDecoration: BoxDecoration(
           color: TitoColors.skyBlue.withValues(alpha: 0.22),
         ),
-        blockquote: body.copyWith(color: TitoColors.mutedInk),
+        blockquote: body.copyWith(color: skin.mutedInk),
         blockquotePadding: const EdgeInsets.fromLTRB(10, 6, 8, 6),
         blockquoteDecoration: BoxDecoration(
           color: TitoColors.skyBlue.withValues(alpha: 0.16),
@@ -2721,10 +2739,7 @@ class _StatusPill extends StatelessWidget {
             ? TitoColors.skyBlue.withValues(alpha: 0.38)
             : TitoColors.cardWarm,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: TitoColors.ink.withValues(alpha: 0.62),
-          width: 1,
-        ),
+        border: _askBorder(TitoSkin.of(context)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -2771,7 +2786,7 @@ class _AnswerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AssistantSurface(
       key: const Key('ask-titodex-answer-card'),
-      color: _assistantPaper,
+      color: TitoSkin.of(context).paper,
       radius: 18,
       child: _AnswerCardContent(
         question: question,
@@ -3034,7 +3049,7 @@ class _AnswerEvidenceSummary extends StatelessWidget {
             decoration: BoxDecoration(
               color: TitoColors.skyBlue.withValues(alpha: 0.28),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: TitoColors.ink.withValues(alpha: 0.45)),
+              border: _askBorder(TitoSkin.of(context)),
             ),
             child: Row(
               children: [
@@ -3182,14 +3197,14 @@ class _SourceReferenceTile extends StatelessWidget {
         : _sourceHost(uri);
     final accessedAt = _sourceAccessDate(source.accessedAt);
     return Material(
-      color: TitoColors.card,
+      color: TitoSkin.of(context).paper,
       borderRadius: BorderRadius.circular(12),
       child: ListTile(
         key: ValueKey('ask-titodex-source-$index'),
         enabled: uri != null,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: TitoColors.ink.withValues(alpha: 0.38)),
+          side: _askSide(TitoSkin.of(context)),
         ),
         leading: SizedBox(
           width: 30,

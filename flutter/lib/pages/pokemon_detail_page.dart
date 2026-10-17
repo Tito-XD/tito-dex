@@ -15,9 +15,12 @@ import '../features/game/game_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../navigation/tito_route_work.dart';
 import '../theme/device_layout.dart';
+import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
+import '../theme/tito_skin.dart';
+import '../widgets/type_badge.dart';
 import '../theme/error_text.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
@@ -588,7 +591,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       child: Text(
         AppZh.dexApiNote,
         style: SecondaryTypography.onCard.small12.copyWith(
-          color: TitoColors.mutedInk,
+          color: TitoSkin.of(context).mutedInk,
           height: 1.4,
         ),
       ),
@@ -683,18 +686,28 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           decoration: InputDecoration(
             labelText: AppZh.dexObtainExactVersion,
             filled: true,
-            fillColor: TitoColors.card,
+            fillColor: TitoSkin.of(context).paper,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+              borderRadius: BorderRadius.circular(
+                TitoSkin.of(context).radiusMd,
+              ),
+              borderSide: dexSkinSide(context),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+              borderRadius: BorderRadius.circular(
+                TitoSkin.of(context).radiusMd,
+              ),
+              borderSide: dexSkinSide(context),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(
+                TitoSkin.of(context).radiusMd,
+              ),
+              borderSide: dexSkinSide(context),
             ),
           ),
           items: [
@@ -731,7 +744,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           child: Text(
             AppZh.dexObtainEmptyVersion,
             style: SecondaryTypography.onCard.body14.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoSkin.of(context).mutedInk,
             ),
           ),
         ),
@@ -990,51 +1003,46 @@ class _MoveMethodFilterBar extends StatelessWidget {
             child: () {
               final isEmpty = emptyMethods.contains(entry);
               final isSelected = selected == entry;
-              final radius = BorderRadius.circular(TitoRadii.sm);
-              final restingColor = isEmpty
-                  ? TitoColors.card.withValues(alpha: 0.55)
-                  : TitoColors.card;
-              final restingTextColor = isEmpty
-                  ? TitoColors.mutedInk
-                  : TitoColors.ink;
+              final skin = TitoSkin.of(context);
+              final radius = BorderRadius.circular(999);
+              final restingInk = isEmpty ? skin.mutedInk : skin.ink;
               return _DetailSelectionMotion(
                 motionKey: ValueKey('move-filter-motion-${entry.index}'),
                 selected: isSelected,
-                builder: (context, selection) => HandheldFocusDecorator(
-                  onActivate: () => onSelected(entry),
-                  child: StickerPressable(
+                builder: (context, selection) => ListenableBuilder(
+                  listenable: retroStyle,
+                  builder: (context, _) => HandheldFocusDecorator(
+                    onActivate: () => onSelected(entry),
                     borderRadius: radius,
-                    child: Material(
-                      color: Color.lerp(
-                        restingColor,
-                        TitoColors.coral,
-                        selection,
-                      ),
+                    child: StickerPressable(
                       borderRadius: radius,
-                      child: InkWell(
-                        onTap: () => onSelected(entry),
+                      ownShadow: false,
+                      child: Material(
+                        color: Colors.transparent,
+                        elevation: 0,
                         borderRadius: radius,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 7),
-                          decoration: BoxDecoration(
-                            borderRadius: radius,
-                            border: Border.all(
-                              color: isEmpty
-                                  ? TitoColors.ink.withValues(alpha: 0.4)
-                                  : TitoColors.ink,
-                              width: TitoBorders.element,
+                        child: InkWell(
+                          onTap: () => onSelected(entry),
+                          borderRadius: radius,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 7),
+                            decoration: dexSkinChipDecoration(
+                              context,
+                              selected: isEmpty ? 0 : selection,
                             ),
-                          ),
-                          child: Text(
-                            _labels[entry]!,
-                            textAlign: TextAlign.center,
-                            style: SecondaryTypography.onCard.small12.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: Color.lerp(
-                                restingTextColor,
-                                const Color(0xFF4A1B0C),
-                                selection,
-                              ),
+                            child: Text(
+                              _labels[entry]!,
+                              textAlign: TextAlign.center,
+                              style: SecondaryTypography.onCard.small12
+                                  .copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: isEmpty
+                                        ? restingInk
+                                        : dexSkinChipInk(
+                                            context,
+                                            selected: selection,
+                                          ),
+                                  ),
                             ),
                           ),
                         ),
@@ -1104,7 +1112,7 @@ class _ErrorBody extends StatelessWidget {
               Text(
                 copy.$2,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoSkin.of(context).mutedInk,
                   height: 1.45,
                 ),
               ),
@@ -1139,20 +1147,20 @@ class _DetailBottomTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // v0.6.7 sticker tabs (detail template): four mini sticker cards,
-    // active one goes coral; the press sinks like every other sticker.
+    final skin = TitoSkin.of(context);
+    final topSide = dexSkinSide(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-      decoration: const BoxDecoration(
-        color: TitoColors.card,
-        border: Border(top: BorderSide(color: TitoColors.ink, width: 2)),
+      decoration: BoxDecoration(
+        color: skin.paper,
+        border: topSide == BorderSide.none ? null : Border(top: topSide),
       ),
       child: SafeArea(
         top: false,
         child: Row(
           children: List.generate(_labels.length, (index) {
             final selected = index == currentIndex;
-            final radius = BorderRadius.circular(TitoRadii.sm);
+            final radius = BorderRadius.circular(999);
             return Expanded(
               child: Padding(
                 padding: EdgeInsets.only(
@@ -1161,41 +1169,39 @@ class _DetailBottomTabs extends StatelessWidget {
                 child: _DetailSelectionMotion(
                   motionKey: ValueKey('detail-tab-motion-$index'),
                   selected: selected,
-                  builder: (context, selection) => HandheldFocusDecorator(
-                    onActivate: () => onSelected(index),
-                    child: StickerPressable(
+                  builder: (context, selection) => ListenableBuilder(
+                    listenable: retroStyle,
+                    builder: (context, _) => HandheldFocusDecorator(
+                      onActivate: () => onSelected(index),
                       borderRadius: radius,
-                      child: Material(
-                        color: Color.lerp(
-                          TitoColors.card,
-                          TitoColors.coral,
-                          selection,
-                        ),
+                      child: StickerPressable(
                         borderRadius: radius,
-                        child: InkWell(
+                        ownShadow: false,
+                        child: Material(
+                          color: Colors.transparent,
+                          elevation: 0,
                           borderRadius: radius,
-                          onTap: () => onSelected(index),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: radius,
-                              border: Border.all(
-                                color: TitoColors.ink,
-                                width: TitoBorders.element,
+                          child: InkWell(
+                            borderRadius: radius,
+                            onTap: () => onSelected(index),
+                            child: Container(
+                              decoration: dexSkinChipDecoration(
+                                context,
+                                selected: selection,
                               ),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 9),
-                            child: Text(
-                              _labels[index],
-                              textAlign: TextAlign.center,
-                              style: SecondaryTypography.onCard.small12
-                                  .copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: Color.lerp(
-                                      TitoColors.mutedInk,
-                                      const Color(0xFF4A1B0C),
-                                      selection,
+                              padding: const EdgeInsets.symmetric(vertical: 9),
+                              child: Text(
+                                _labels[index],
+                                textAlign: TextAlign.center,
+                                style: SecondaryTypography.onCard.small12
+                                    .copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: dexSkinChipInk(
+                                        context,
+                                        selected: selection,
+                                      ),
                                     ),
-                                  ),
+                              ),
                             ),
                           ),
                         ),

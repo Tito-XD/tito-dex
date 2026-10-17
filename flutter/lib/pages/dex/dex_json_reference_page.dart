@@ -6,7 +6,9 @@ import '../../features/dex/item_game_data.dart';
 import '../../features/dex/reference_game_scope.dart';
 import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
+import '../../features/dex/type_chart.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/tito_skin.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/dex_reference_detail.dart';
 import '../../widgets/type_badge.dart';
@@ -166,15 +168,59 @@ Widget? _referenceLeading(Map<String, dynamic> entry, DexReferenceKind kind) {
     case DexReferenceKind.move:
       final type = entry['type'] as String?;
       if (type == null || type.isEmpty) return null;
-      return TypeIconImage(typeEn: type, size: 28);
+      return _ReferenceTypePlate(type: type);
     case DexReferenceKind.ability:
-      return const Icon(
-        Icons.auto_awesome_rounded,
-        size: 28,
-        color: TitoColors.ink,
-      );
+      return const _ReferenceAbilityPlate();
     default:
       return null;
+  }
+}
+
+class _ReferenceTypePlate extends StatelessWidget {
+  const _ReferenceTypePlate({required this.type});
+
+  final String type;
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final icon = TypeIconImage(typeEn: type, size: skin.isFlat ? 18 : 28);
+    if (!skin.isFlat) return icon;
+    return Container(
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: typeTileColor(type),
+        shape: BoxShape.circle,
+      ),
+      child: icon,
+    );
+  }
+}
+
+class _ReferenceAbilityPlate extends StatelessWidget {
+  const _ReferenceAbilityPlate();
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final icon = Icon(
+      Icons.auto_awesome_rounded,
+      size: skin.isFlat ? 18 : 28,
+      color: skin.ink,
+    );
+    if (!skin.isFlat) return icon;
+    return Container(
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: TitoColors.skyBlue,
+        shape: BoxShape.circle,
+      ),
+      child: icon,
+    );
   }
 }
 

@@ -12,7 +12,7 @@ import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/secondary_typography.dart';
-import '../../theme/tito_colors.dart';
+import '../../theme/tito_skin.dart';
 import '../../widgets/companion_tool_fields.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
@@ -296,8 +296,13 @@ class _StatCalcPageState extends State<StatCalcPage> {
                 ],
               ),
               const SizedBox(height: 12),
-              StickerCard(
-                variant: StickerVariant.mint,
+              Builder(
+                builder: (context) {
+                  final tint = TitoSkin.of(
+                    context,
+                  ).heroTint(TitoHeroRole.action);
+                  return StickerCard.hero(
+                role: TitoHeroRole.action,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -306,17 +311,20 @@ class _StatCalcPageState extends State<StatCalcPage> {
                       style: SecondaryTypography.onCard.h15,
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      '${_stat.labelZh}：$result',
-                      style: SecondaryTypography.onCard.h15.copyWith(
-                        fontWeight: FontWeight.w900,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '${_stat.labelZh}：$result',
+                        maxLines: 1,
+                        style: TitoSkin.of(context).display(28),
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       AppZh.companionStatResultHint,
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: tint.mutedInk,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -331,6 +339,8 @@ class _StatCalcPageState extends State<StatCalcPage> {
                     ],
                   ],
                 ),
+              );
+                },
               ),
             ],
           ),

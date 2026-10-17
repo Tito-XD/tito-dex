@@ -6,8 +6,10 @@ import '../features/dex/version_availability.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
+import 'type_badge.dart';
 
 class HeldItemReference {
   const HeldItemReference({
@@ -374,9 +376,19 @@ class _VersionPlanBody extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(TitoRadii.sm),
-              border: Border.all(color: TitoColors.ink, width: 2),
+              color: Color.alphaBlend(
+                color.withValues(alpha: 0.55),
+                TitoSkin.of(context).paper,
+              ),
+              borderRadius: BorderRadius.circular(
+                TitoSkin.of(context).radiusSm,
+              ),
+              border: () {
+                final side = dexSkinSide(context);
+                return side == BorderSide.none
+                    ? null
+                    : Border.fromBorderSide(side);
+              }(),
             ),
             child: Row(
               children: [
@@ -554,18 +566,21 @@ class _InfoPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 1.5),
+        border: side == BorderSide.none ? null : Border.fromBorderSide(side),
       ),
       child: Text(
         label,
         style: SecondaryTypography.onCard.small12.copyWith(
           fontWeight: FontWeight.w800,
           height: 1.1,
+          color: skin.ink,
         ),
       ),
     );

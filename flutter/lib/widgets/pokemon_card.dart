@@ -6,6 +6,7 @@ import '../features/dex/version_availability.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'handheld_input.dart';
@@ -103,10 +104,11 @@ class PokemonMiniCard extends StatelessWidget {
       DexEncounterStatus.seen => StickerVariant.sky,
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
+    final skin = TitoSkin.of(context);
     final activate = onTap ?? () => context.push('/dex/${summary.id}');
     final padding = compact ? 6.0 : 10.0;
     final checkSize = compact ? 14.0 : 18.0;
-    final radius = DeviceLayout.rLg(context);
+    final radius = skin.radiusMd;
     return HandheldFocusDecorator(
       onActivate: activate,
       borderRadius: BorderRadius.circular(radius),
@@ -121,14 +123,11 @@ class PokemonMiniCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              StickerCard(
+              _DexMiniCardShell(
                 variant: variant,
-                padding: EdgeInsets.fromLTRB(
-                  padding,
-                  padding,
-                  padding,
-                  padding,
-                ),
+                status: status,
+                padding: padding,
+                radius: radius,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -155,7 +154,7 @@ class PokemonMiniCard extends StatelessWidget {
                       style: TitoTypography.style(
                         fontSize: compact ? 10 : 12,
                         fontWeight: FontWeight.w700,
-                        color: TitoColors.mutedInk,
+                        color: skin.mutedInk,
                         height: 1.1,
                       ),
                     ),
@@ -169,6 +168,7 @@ class PokemonMiniCard extends StatelessWidget {
                         fontSize: compact ? 12 : 14,
                         fontWeight: FontWeight.w800,
                         height: 1.2,
+                        color: skin.ink,
                       ),
                     ),
                     SizedBox(height: compact ? 3 : 4),
@@ -197,6 +197,36 @@ class PokemonMiniCard extends StatelessWidget {
   }
 }
 
+/// Dense dex cell. Flat uncaught tiles use a darker outlined block so they
+/// separate from the page; every other status stays on [StickerCard.dense].
+class _DexMiniCardShell extends StatelessWidget {
+  const _DexMiniCardShell({
+    required this.variant,
+    required this.status,
+    required this.padding,
+    required this.radius,
+    required this.child,
+  });
+
+  final StickerVariant variant;
+  final DexEncounterStatus status;
+  final double padding;
+  final double radius;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final insets = EdgeInsets.fromLTRB(padding, padding, padding, padding);
+    if (TitoSkin.of(context).isFlat && status == DexEncounterStatus.unknown) {
+      return DecoratedBox(
+        decoration: dexFlatSeparatedDecoration(context, radius: radius),
+        child: Padding(padding: insets, child: child),
+      );
+    }
+    return StickerCard.dense(variant: variant, padding: insets, child: child);
+  }
+}
+
 class TypeChipRow extends StatelessWidget {
   const TypeChipRow({
     super.key,
@@ -214,6 +244,8 @@ class TypeChipRow extends StatelessWidget {
     if (types.isEmpty) {
       return Text(AppZh.dexNone, style: context.tito.cardMuted);
     }
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
 
     return Wrap(
       spacing: 6,
@@ -235,9 +267,14 @@ class TypeChipRow extends StatelessWidget {
               TypeChipTone.neutral => TitoColors.skyBlue,
             },
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: TitoColors.ink, width: 2),
+            border: side == BorderSide.none
+                ? null
+                : Border.fromBorderSide(side),
           ),
-          child: Text(types[index], style: context.tito.chip),
+          child: Text(
+            types[index],
+            style: context.tito.chip.copyWith(color: skin.ink),
+          ),
         );
       }),
     );
@@ -255,13 +292,14 @@ class _EvolutionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final compact = DeviceLayout.useSquareDashboard(context);
+    final skin = TitoSkin.of(context);
 
     return HandheldFocusDecorator(
       onActivate: () => context.push('/dex/${node.id}'),
-      borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+      borderRadius: BorderRadius.circular(skin.radiusMd),
       child: GestureDetector(
         onTap: () => context.push('/dex/${node.id}'),
-        child: StickerCard(
+        child: StickerCard.dense(
           variant: highlighted ? StickerVariant.mint : StickerVariant.cream,
           padding: EdgeInsets.all(compact ? 8 : 12),
           child: SizedBox(
@@ -316,7 +354,7 @@ class EvolutionChainVerticalView extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _EvolutionCard(node: node, highlighted: node.id == highlightId),
-          const Icon(Icons.arrow_downward_rounded, color: TitoColors.ink),
+          Icon(Icons.arrow_downward_rounded, color: TitoSkin.of(context).ink),
           _EvolutionTriggerLabel(node: child),
           _buildNode(context, child),
         ],
@@ -327,7 +365,7 @@ class EvolutionChainVerticalView extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _EvolutionCard(node: node, highlighted: node.id == highlightId),
-        const Icon(Icons.arrow_downward_rounded, color: TitoColors.ink),
+        Icon(Icons.arrow_downward_rounded, color: TitoSkin.of(context).ink),
         const SizedBox(height: 4),
         _ChildrenRow(children: node.children, highlightId: highlightId),
       ],
@@ -349,17 +387,20 @@ class _ChildrenRow extends StatelessWidget {
         children: [
           for (var i = 0; i < children.length; i++) ...[
             if (i > 0)
-              const Padding(
-                padding: EdgeInsets.only(top: 40),
-                child: Icon(Icons.arrow_forward_rounded, color: TitoColors.ink),
+              Padding(
+                padding: const EdgeInsets.only(top: 40),
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  color: TitoSkin.of(context).ink,
+                ),
               ),
             Flexible(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.arrow_downward_rounded,
-                    color: TitoColors.ink,
+                    color: TitoSkin.of(context).ink,
                   ),
                   _EvolutionTriggerLabel(node: children[i]),
                   _childCard(context, children[i]),
@@ -410,33 +451,37 @@ class _EvolutionTriggerLabel extends StatelessWidget {
     // A link-trade-only step can never be done alone on one cartridge —
     // mark the pill so the lock is visible at a glance.
     final tradeLocked = evolutionRequiresTrade(node);
+    final skin = TitoSkin.of(context);
+    final side = tradeLocked
+        ? const BorderSide(color: TitoColors.coral, width: 1.5)
+        : dexSkinSide(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: TitoColors.card,
+          color: skin.isFlat && tradeLocked ? TitoColors.coral : skin.chipFill,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: tradeLocked ? TitoColors.coral : TitoColors.ink,
-            width: 1.5,
-          ),
+          border: side == BorderSide.none ? null : Border.fromBorderSide(side),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (tradeLocked) ...[
-              const Icon(
+              Icon(
                 Icons.swap_horiz_rounded,
                 size: 12,
-                color: TitoColors.coral,
+                color: skin.isFlat ? skin.ink : TitoColors.coral,
               ),
               const SizedBox(width: 3),
             ],
             Text(
               label,
               textAlign: TextAlign.center,
-              style: context.tito.caption.copyWith(fontWeight: FontWeight.w800),
+              style: context.tito.caption.copyWith(
+                fontWeight: FontWeight.w800,
+                color: skin.ink,
+              ),
             ),
           ],
         ),

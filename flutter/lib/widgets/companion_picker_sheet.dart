@@ -14,9 +14,22 @@ import '../navigation/tito_page_transition.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_pressable.dart';
+
+BorderSide _pickerSide(TitoSkin skin, {bool strong = false}) {
+  if (skin.outline == null || skin.outlineWidth <= 0) {
+    return strong ? BorderSide(color: skin.ink, width: 2) : BorderSide.none;
+  }
+  return BorderSide(
+    color: strong
+        ? skin.ink
+        : (skin.isPlastic ? skin.ink.withValues(alpha: 0.28) : skin.outline!),
+    width: strong ? skin.outlineWidth + 0.8 : skin.outlineWidth,
+  );
+}
 
 /// Pick the standby companion from the full national dex. The selection is
 /// saved to [companionRepository]; only its animated sprite is fetched later,
@@ -376,11 +389,12 @@ class _CompanionMediaLoadingDialogState
     final anyFailed =
         _gif == _MediaLoadState.failed || _cry == _MediaLoadState.failed;
 
+    final skin = TitoSkin.of(context);
     return AlertDialog(
-      backgroundColor: TitoColors.card,
+      backgroundColor: skin.sheetFill,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(TitoRadii.md),
-        side: const BorderSide(color: TitoColors.ink, width: 2),
+        borderRadius: BorderRadius.circular(skin.radiusLg),
+        side: _pickerSide(skin),
       ),
       title: Text(
         AppZh.companionMediaTitle(widget.summary.nameZh),
@@ -464,22 +478,22 @@ class _CompanionPickTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(skin.radiusMd);
     return StickerPressable(
-      borderRadius: BorderRadius.circular(TitoRadii.md),
+      borderRadius: radius,
       ownShadow: false,
       child: Material(
-        color: TitoColors.cream,
-        borderRadius: BorderRadius.circular(TitoRadii.md),
+        color: skin.paperDense,
+        elevation: 0,
+        borderRadius: radius,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(TitoRadii.md),
+          borderRadius: radius,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(
-                color: TitoColors.ink.withValues(alpha: 0.35),
-                width: 2,
-              ),
+              borderRadius: radius,
+              border: Border.fromBorderSide(_pickerSide(skin)),
             ),
             padding: const EdgeInsets.all(6),
             child: Column(
@@ -500,6 +514,7 @@ class _CompanionPickTile extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: SecondaryTypography.onCard.small12.copyWith(
                     fontWeight: FontWeight.w800,
+                    color: skin.ink,
                   ),
                 ),
               ],
@@ -736,11 +751,8 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                           : null,
                       showCheckmark: false,
                       selectedColor: TitoColors.softYellow,
-                      backgroundColor: TitoColors.card,
-                      side: const BorderSide(
-                        color: TitoColors.ink,
-                        width: TitoBorders.element,
-                      ),
+                      backgroundColor: TitoSkin.of(context).paper,
+                      side: _pickerSide(TitoSkin.of(context)),
                       avatar: const Icon(Icons.auto_awesome_rounded, size: 16),
                       label: const Text('闪光'),
                     ),
@@ -804,19 +816,21 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 72,
-                      height: 72,
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: TitoColors.cream,
-                        borderRadius: BorderRadius.circular(TitoRadii.md),
-                        border: Border.all(
-                          color: TitoColors.ink,
-                          width: TitoBorders.element,
-                        ),
-                      ),
-                      child: FallbackSpriteImage(sources: previewSources),
+                    Builder(
+                      builder: (context) {
+                        final skin = TitoSkin.of(context);
+                        return Container(
+                          width: 72,
+                          height: 72,
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: skin.paperDense,
+                            borderRadius: BorderRadius.circular(skin.radiusMd),
+                            border: Border.fromBorderSide(_pickerSide(skin)),
+                          ),
+                          child: FallbackSpriteImage(sources: previewSources),
+                        );
+                      },
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -925,17 +939,17 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                         ? () => _confirm(selectedForm, media)
                         : null,
                     style: FilledButton.styleFrom(
-                      backgroundColor: TitoColors.coral,
-                      foregroundColor: TitoColors.card,
+                      backgroundColor: TitoSkin.of(context).primaryFill,
+                      foregroundColor: TitoSkin.of(context).onPrimaryFill,
                       disabledBackgroundColor: TitoColors.card.withValues(
                         alpha: 0.5,
                       ),
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(TitoRadii.md),
-                        side: const BorderSide(
-                          color: TitoColors.ink,
-                          width: TitoBorders.element,
+                        borderRadius: BorderRadius.circular(
+                          TitoSkin.of(context).radiusMd,
                         ),
+                        side: _pickerSide(TitoSkin.of(context)),
                       ),
                     ),
                     child: const Text('确定'),
@@ -974,25 +988,23 @@ class _CompanionFormTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(skin.radiusMd);
     final summary = form.summaryFor(species);
     return StickerPressable(
-      borderRadius: BorderRadius.circular(TitoRadii.md),
+      borderRadius: radius,
       ownShadow: false,
       child: Material(
-        color: selected
-            ? TitoColors.softYellow.withValues(alpha: 0.22)
-            : TitoColors.cream,
-        borderRadius: BorderRadius.circular(TitoRadii.md),
+        color: selected ? TitoColors.softYellow : skin.paperDense,
+        elevation: 0,
+        borderRadius: radius,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(TitoRadii.md),
+          borderRadius: radius,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(
-                color: selected ? TitoColors.softYellow : TitoColors.ink,
-                width: TitoBorders.element,
-              ),
+              borderRadius: radius,
+              border: Border.fromBorderSide(_pickerSide(skin, strong: selected)),
             ),
             padding: const EdgeInsets.all(6),
             child: Column(
@@ -1015,6 +1027,7 @@ class _CompanionFormTile extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: SecondaryTypography.onCard.small12.copyWith(
                     fontWeight: FontWeight.w800,
+                    color: skin.ink,
                   ),
                 ),
               ],

@@ -6,8 +6,10 @@ import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
+import 'tito_chips.dart';
 
 enum TrainerCardDensity { standard, dense, micro }
 
@@ -54,7 +56,7 @@ class TrainerCard extends StatelessWidget {
         ? const EdgeInsets.all(16)
         : DeviceLayout.cardPadding(context);
 
-    return StickerCard(
+    return StickerCard.hero(
       padding: padding,
       child: SizedBox(
         height: metrics.cardHeight,
@@ -139,16 +141,14 @@ class _TrainerCardBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final greetingStyle = TitoTypography.style(
-      fontSize: metrics.greetingFontSize,
-      fontWeight: FontWeight.w800,
-      height: 1.05,
-    );
-    final nameStyle = TitoTypography.style(
-      fontSize: metrics.nameFontSize,
-      fontWeight: FontWeight.w900,
-      height: 1.05,
-    );
+    final skin = TitoSkin.of(context);
+    final now = DateTime.now();
+    final greetingStyle = skin
+        .heading(metrics.greetingFontSize)
+        .copyWith(height: 1.05);
+    final nameStyle = skin
+        .heading(metrics.nameFontSize)
+        .copyWith(height: 1.05, fontWeight: FontWeight.w900);
 
     final trainerName = journey.trainerName.isNotEmpty
         ? journey.trainerName
@@ -160,7 +160,7 @@ class _TrainerCardBody extends StatelessWidget {
       placeholder: avatarPlaceholder,
     );
     final greeting = Text(
-      AppZh.timeGreeting(DateTime.now()),
+      AppZh.timeGreeting(now),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: greetingStyle,
@@ -171,11 +171,22 @@ class _TrainerCardBody extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       style: nameStyle,
     );
+    final stamp = TitoStampChip(
+      label: '${now.month}·${now.day}',
+      onPage: false,
+      fontSize: metrics.greetingFontSize < 22 ? 10 : 11,
+    );
     final textColumn = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        greeting,
+        Row(
+          children: [
+            Expanded(child: greeting),
+            const SizedBox(width: 6),
+            stamp,
+          ],
+        ),
         SizedBox(height: metrics.textGap),
         nameLine,
       ],
@@ -225,10 +236,11 @@ class _TrainerAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (placeholder) {
       return _avatarContainer(
+        context,
         child: Icon(
           Icons.person_rounded,
           size: size * 0.45,
-          color: TitoColors.mutedInk,
+          color: TitoSkin.of(context).mutedInk,
         ),
         hasImage: false,
       );
@@ -256,14 +268,19 @@ class _TrainerAvatar extends StatelessWidget {
             style: TitoTypography.style(
               fontSize: size * 0.42,
               fontWeight: FontWeight.w900,
-              color: TitoColors.deepBlue,
+              color: TitoSkin.of(context).ink,
             ),
           );
 
-    return _avatarContainer(child: child, hasImage: hasImage);
+    return _avatarContainer(context, child: child, hasImage: hasImage);
   }
 
-  Widget _avatarContainer({required Widget child, required bool hasImage}) {
+  Widget _avatarContainer(
+    BuildContext context, {
+    required Widget child,
+    required bool hasImage,
+  }) {
+    final skin = TitoSkin.of(context);
     return Container(
       width: size,
       height: size,
@@ -276,7 +293,9 @@ class _TrainerAvatar extends StatelessWidget {
                 colors: [TitoColors.softYellow, TitoColors.coral],
               ),
         shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+        border: skin.outline == null
+            ? null
+            : Border.all(color: skin.outline!, width: skin.outlineWidth),
       ),
       alignment: Alignment.center,
       clipBehavior: Clip.antiAlias,

@@ -16,6 +16,7 @@ import '../../theme/error_text.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/tito_skin.dart';
 import '../../widgets/companion_tool_fields.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
@@ -780,8 +781,10 @@ class _DamageResultCard extends StatelessWidget {
         : '${minPct.round()}–${maxPct.round()}%';
     final damageFraction = (maxPct / 100).clamp(0.0, 1.0);
 
-    return StickerCard(
-      variant: StickerVariant.deep,
+    final skin = TitoSkin.of(context);
+    final tint = skin.heroTint(TitoHeroRole.journey);
+    return StickerCard.hero(
+      role: TitoHeroRole.journey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -789,7 +792,7 @@ class _DamageResultCard extends StatelessWidget {
             AppZh.companionDamageResultTitle,
             style: SecondaryTypography.onGradient.small12.copyWith(
               fontWeight: FontWeight.w800,
-              color: TitoColors.skyBlue,
+              color: tint.mutedInk,
             ),
           ),
           const SizedBox(height: 10),
@@ -797,13 +800,14 @@ class _DamageResultCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(
-                bigPercent,
-                style: SecondaryTypography.onGradient.h15.copyWith(
-                  fontSize: 34,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 34 * -0.03,
-                  color: TitoColors.softYellow,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  bigPercent,
+                  style: skin.display(
+                    34,
+                    color: skin.accentInkOn(tint.top),
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -828,7 +832,12 @@ class _DamageResultCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: TitoColors.ink, width: 2),
+                  border: skin.isFlat
+                      ? null
+                      : Border.all(
+                          color: Colors.white.withValues(alpha: 0.55),
+                          width: skin.outlineWidth,
+                        ),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Stack(

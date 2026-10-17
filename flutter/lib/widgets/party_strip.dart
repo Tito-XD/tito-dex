@@ -13,10 +13,12 @@ import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_card.dart';
+import 'tito_paper.dart';
 
 class PartyStrip extends StatelessWidget {
   const PartyStrip({
@@ -41,20 +43,25 @@ class PartyStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = square
-        ? context.titoHome.cardSectionTitle
-        : context.titoHome.cardTitle;
+    final titleSize =
+        (square
+                ? context.titoHome.cardSectionTitle
+                : context.titoHome.cardTitle)
+            .fontSize ??
+        16;
+    final skin = TitoSkin.of(context);
 
     final padding = (compact || square)
         ? DeviceLayout.cardPadding(context)
         : null;
 
-    return StickerCard(
+    return StickerCard.hero(
+      role: TitoHeroRole.shelf,
       padding: padding ?? const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(AppZh.currentParty, style: titleStyle),
+          Text(AppZh.currentParty, style: skin.heading(titleSize)),
           SizedBox(height: square ? 4 : (compact ? 8 : 10)),
           if (gridMode)
             Expanded(
@@ -137,7 +144,7 @@ class _PartyGridMember extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.titoHome.captionStrong,
+                style: _partyNameStyle(context),
               ),
             ),
           ],
@@ -169,7 +176,7 @@ class _EmptyPartyGridSlot extends StatelessWidget {
               child: Icon(
                 Icons.catching_pokemon_rounded,
                 size: spriteSize * 0.7,
-                color: TitoColors.mutedInk.withValues(alpha: 0.38),
+                color: _partyMuted(context).withValues(alpha: 0.45),
               ),
             ),
             SizedBox(width: gap),
@@ -186,7 +193,7 @@ class _PartyTextPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lineColor = TitoColors.mutedInk.withValues(alpha: 0.2);
+    final lineColor = _partyMuted(context).withValues(alpha: 0.22);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,15 +290,11 @@ class _PartyGridCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = member.nickname ?? localizeSpecies(member.species);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.52),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(color: TitoColors.ink, width: 2),
-      ),
+    return _PartySlotFrame(
+      empty: false,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final nameStyle = context.titoHome.captionStrong;
+          final nameStyle = _partyNameStyle(context);
           final nameH = (nameStyle.fontSize ?? 11) * 1.4;
           final spriteSize = math.max(
             16.0,
@@ -336,18 +339,60 @@ class _EmptyPartyGridCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.28),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(
-          color: TitoColors.ink.withValues(alpha: 0.45),
-          width: 2,
-        ),
-      ),
-      child: const Center(child: _EmptyPartySlot()),
+    return const _PartySlotFrame(
+      empty: true,
+      child: Center(child: _EmptyPartySlot()),
     );
   }
+}
+
+/// Filled slots keep a thin skin outline. Empty slots use a dashed frame
+/// wherever the theme draws an outline, so the six-slot grid stays readable
+/// inside the shelf hero.
+class _PartySlotFrame extends StatelessWidget {
+  const _PartySlotFrame({required this.empty, required this.child});
+
+  final bool empty;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final radius = skin.radiusSm;
+    final fill = skin.isFlat
+        ? (empty ? skin.sheetFill.withValues(alpha: 0.72) : skin.sheetFill)
+        : skin.isJournal
+        ? TitoColors.card.withValues(alpha: empty ? 0.28 : 0.66)
+        : Colors.white.withValues(alpha: empty ? 0.32 : 0.62);
+    final outlined = skin.outline != null;
+    final box = DecoratedBox(
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(radius),
+        border: !outlined || empty
+            ? null
+            : Border.all(color: skin.outline!, width: skin.outlineWidth),
+      ),
+      child: child,
+    );
+    if (!empty || !outlined) {
+      return box;
+    }
+    return TitoDashedFrame(
+      color: skin.outline!.withValues(alpha: 0.55),
+      radius: radius,
+      strokeWidth: skin.isJournal ? 1.15 : skin.outlineWidth,
+      child: box,
+    );
+  }
+}
+
+TextStyle _partyNameStyle(BuildContext context) {
+  return context.titoHome.captionStrong.copyWith(color: _partyMuted(context));
+}
+
+Color _partyMuted(BuildContext context) {
+  return TitoSkin.of(context).heroTint(TitoHeroRole.shelf).mutedInk;
 }
 
 /// Sprite with the level pinned to its bottom-right corner as a badge —
@@ -399,20 +444,24 @@ class _PartyLevelBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     final fontSize = (spriteSize * 0.24).clamp(7.5, 10.0);
+    final flat = skin.isFlat;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 3.5, vertical: 0.5),
       decoration: BoxDecoration(
-        color: TitoColors.softYellow,
+        color: flat ? TitoColors.deepBlue : TitoColors.softYellow,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 1.5),
+        border: skin.outline == null
+            ? null
+            : Border.all(color: skin.outline!, width: skin.outlineWidth),
       ),
       child: Text(
         '${AppZh.level}$level',
-        style: TitoTypography.style(
-          fontSize: fontSize,
-          fontWeight: FontWeight.w800,
-          color: TitoColors.ink,
+        style: skin.display(
+          fontSize,
+          color: flat ? TitoColors.card : skin.ink,
+          weight: FontWeight.w800,
         ),
       ),
     );
@@ -426,7 +475,7 @@ class _EmptyPartySlot extends StatelessWidget {
   Widget build(BuildContext context) {
     return Icon(
       Icons.add_circle_outline_rounded,
-      color: TitoColors.mutedInk.withValues(alpha: 0.65),
+      color: _partyMuted(context).withValues(alpha: 0.7),
       size: 16,
     );
   }
@@ -473,10 +522,10 @@ class _PartyMemberAvatar extends StatelessWidget {
                   fit: BoxFit.contain,
                 );
               }
-              return _letterFallback(label, size);
+              return _letterFallback(context, label, size);
             },
           )
-        : _letterFallback(label, size);
+        : _letterFallback(context, label, size);
 
     if (isShiny) {
       sprite = GestureDetector(
@@ -497,35 +546,44 @@ class _PartyMemberAvatar extends StatelessWidget {
     }
 
     if (!framed) {
-      return SizedBox(width: size, height: size, child: sprite);
+      return SizedBox(
+        width: size,
+        height: size,
+        child: ClipRect(child: sprite),
+      );
     }
 
     return ListenableBuilder(
       listenable: retroStyle,
-      builder: (context, child) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: TitoColors.cream,
-          shape: BoxShape.circle,
-          border: Border.all(color: TitoColors.ink, width: 2),
-          boxShadow: retroStyle.enabled ? TitoShadows.stickerSmall : null,
-        ),
-        clipBehavior: Clip.antiAlias,
-        alignment: Alignment.center,
-        child: child,
-      ),
+      builder: (context, child) {
+        final skin = TitoSkin.of(context);
+        return Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: skin.paper,
+            shape: BoxShape.circle,
+            border: skin.outline == null
+                ? null
+                : Border.all(color: skin.outline!, width: skin.outlineWidth),
+            boxShadow: skin.cardShadow(small: true),
+          ),
+          clipBehavior: Clip.antiAlias,
+          alignment: Alignment.center,
+          child: child,
+        );
+      },
       child: sprite,
     );
   }
 
-  Widget _letterFallback(String label, double size) {
+  Widget _letterFallback(BuildContext context, String label, double size) {
     return Text(
       label.isNotEmpty ? label[0].toUpperCase() : '?',
       style: TitoTypography.style(
         fontSize: size * 0.42,
         fontWeight: FontWeight.w800,
-        color: TitoColors.deepBlue,
+        color: TitoSkin.of(context).ink,
       ),
     );
   }

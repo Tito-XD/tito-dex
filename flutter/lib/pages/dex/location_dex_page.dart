@@ -12,6 +12,7 @@ import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/tito_skin.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
 import '../../widgets/tito_loading_panel.dart';
@@ -71,7 +72,7 @@ class _LocationDexPageState extends State<LocationDexPage> {
           child: Text(
             AppZh.locationDexHint,
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoSkin.of(context).mutedInk,
             ),
           ),
         ),
@@ -171,54 +172,47 @@ class _LocationAreaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final caught = area.caughtCount(caughtIds);
-    return Material(
-      color: TitoColors.card,
-      borderRadius: BorderRadius.circular(TitoRadii.sm),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        onTap: () => _showAreaSheet(context),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(TitoRadii.sm),
-            border: Border.all(color: TitoColors.ink, width: 1.5),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      area.labelZh,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+    final skin = TitoSkin.of(context);
+    return GestureDetector(
+      onTap: () => _showAreaSheet(context),
+      child: StickerCard.dense(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    area.labelZh,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: skin.ink,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      AppZh.locationDexCompletion(caught, area.speciesCount),
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
-                      ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    AppZh.locationDexCompletion(caught, area.speciesCount),
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: skin.mutedInk,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Icon(
-                caught == area.speciesCount
-                    ? Icons.check_circle_rounded
-                    : Icons.chevron_right_rounded,
-                size: 20,
-                color: caught == area.speciesCount
-                    ? TitoColors.deepBlue
-                    : TitoColors.mutedInk,
-              ),
-            ],
-          ),
+            ),
+            Icon(
+              caught == area.speciesCount
+                  ? Icons.check_circle_rounded
+                  : Icons.chevron_right_rounded,
+              size: 20,
+              color: caught == area.speciesCount
+                  ? skin.accentInkOn(skin.paper)
+                  : skin.mutedInk,
+            ),
+          ],
         ),
       ),
     );

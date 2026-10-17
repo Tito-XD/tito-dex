@@ -8,7 +8,7 @@ import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'sticker_card.dart';
 
 class TeamSummaryCard extends StatefulWidget {
@@ -79,7 +79,12 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
 
   @override
   Widget build(BuildContext context) {
-    final body14 = SecondaryTypography.onCard.body14;
+    final skin = TitoSkin.of(context);
+    final body14 = SecondaryTypography.onCard.body14.copyWith(color: skin.ink);
+    final muted = body14.copyWith(
+      color: skin.mutedInk,
+      fontWeight: FontWeight.w600,
+    );
 
     return ListenableBuilder(
       listenable: gameEditionRepository,
@@ -91,21 +96,18 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  AppZh.teamSummaryTitle,
-                  style: SecondaryTypography.onCard.h15,
-                ),
+                Text(AppZh.teamSummaryTitle, style: skin.heading(15)),
                 const SizedBox(height: 8),
                 if (widget.party.isEmpty)
-                  Text(
-                    AppZh.teamEmptySlot,
-                    style: body14.copyWith(color: TitoColors.mutedInk),
-                  )
+                  Text(AppZh.teamEmptySlot, style: muted)
                 else if (_loading && _data == null)
-                  const SizedBox(
+                  SizedBox(
                     height: 20,
                     width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: skin.ink,
+                    ),
                   )
                 else if (_data != null) ...[
                   Text(
@@ -123,7 +125,7 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
                     const SizedBox(height: 4),
                     Text(
                       _data!.weaknessLine,
-                      style: body14.copyWith(color: TitoColors.mutedInk),
+                      style: muted,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -132,7 +134,7 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
                     const SizedBox(height: 4),
                     Text(
                       _data!.sharedWeaknessLine,
-                      style: body14.copyWith(color: TitoColors.mutedInk),
+                      style: muted,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),

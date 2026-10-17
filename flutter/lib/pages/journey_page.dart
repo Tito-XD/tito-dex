@@ -7,7 +7,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_buttons.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/journey_timeline.dart';
 import '../widgets/journey_assistant_panel.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -57,15 +57,20 @@ class JourneyPage extends StatelessWidget {
           ),
           const SizedBox(height: 14),
         ],
-        StickerCard(
-          variant: StickerVariant.deep,
+        Builder(
+          builder: (context) {
+            final muted = TitoSkin.of(
+              context,
+            ).heroTint(TitoHeroRole.journey).mutedInk;
+            return StickerCard.hero(
+          role: TitoHeroRole.journey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 AppZh.settingsLocation,
                 style: SecondaryTypography.onGradient.small12.copyWith(
-                  color: TitoColors.skyBlue,
+                  color: muted,
                   letterSpacing: 0.8,
                   fontWeight: FontWeight.w700,
                 ),
@@ -95,11 +100,13 @@ class JourneyPage extends StatelessWidget {
               ),
             ],
           ),
+        );
+          },
         ),
         const SizedBox(height: 14),
         Text(
           AppZh.journeyAssistantTitle,
-          style: SecondaryTypography.onCard.h15,
+          style: SecondaryTypography.onPage(context).h15,
         ),
         const SizedBox(height: 8),
         JourneyAssistantPanel(
@@ -115,7 +122,7 @@ class JourneyPage extends StatelessWidget {
                 Text(
                   AppZh.askTitoDexEntryHint,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoSkin.of(context).mutedInk,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -252,14 +259,16 @@ class _StatRow extends StatelessWidget {
           Text(
             label,
             style: SecondaryTypography.onCard.team12.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoSkin.of(context).mutedInk,
             ),
           ),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: SecondaryTypography.onCard.meta14,
+              style: SecondaryTypography.onCard.meta14.copyWith(
+                color: TitoSkin.of(context).ink,
+              ),
             ),
           ),
         ],
@@ -276,11 +285,13 @@ class _SummaryMeta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tint = TitoSkin.of(context).heroTint(TitoHeroRole.journey);
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: TitoColors.deepBlue.withValues(alpha: 0.28),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(color: TitoColors.skyBlue, width: 1.2),
+        color: tint.ink.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(
+          TitoSkin.of(context).radiusSm,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -289,8 +300,10 @@ class _SummaryMeta extends StatelessWidget {
           children: [
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: SecondaryTypography.onGradient.small12.copyWith(
-                color: TitoColors.skyBlue,
+                color: tint.mutedInk,
                 fontWeight: FontWeight.w700,
               ),
             ),

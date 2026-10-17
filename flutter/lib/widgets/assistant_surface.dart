@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'liquid_glass.dart';
 
-/// Flat UI surface used by the assistant conversation.
+/// Conversation surface for Ask TitoDex.
+///
+/// The shell follows [TitoSkin]: a hard sticker drop on Journal, a static
+/// moulded shell on Solid Plastic (no backdrop blur), and a flat colour
+/// block with no elevation. [borderColor] and [borderWidth] stay on the
+/// widget so existing callers and tests can still read them; the painted
+/// edge comes from the skin.
 class AssistantSurface extends StatelessWidget {
   const AssistantSurface({
     super.key,
@@ -28,42 +34,56 @@ class AssistantSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final skin = TitoSkin.of(context);
     final borderRadius = BorderRadius.circular(radius);
-    final outline = borderColor ?? scheme.outlineVariant;
-    if (appVisualStyle.usesSolidPlastic) {
-      return ListenableBuilder(
-        listenable: retroStyle,
-        builder: (context, content) => LiquidGlassSurface(
-          tint: color ?? TitoColors.card,
-          opacity: 0.92,
-          radius: radius,
-          borderColor: borderColor ?? TitoColors.ink.withValues(alpha: 0.28),
-          borderWidth: borderWidth,
-          padding: padding,
-          boxShadow: shadow && retroStyle.enabled
-              ? SolidPlasticShadows.stickerSmall
-              : null,
-          child: content!,
-        ),
-        child: child,
-      );
-    }
     return ListenableBuilder(
       listenable: retroStyle,
-      builder: (context, content) => Material(
-        type: MaterialType.card,
-        color: color ?? scheme.surfaceContainerLow,
-        elevation: shadow && retroStyle.enabled ? 1 : 0,
-        shadowColor: scheme.shadow,
-        surfaceTintColor: scheme.surfaceTint,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: borderRadius,
-          side: BorderSide(color: outline, width: borderWidth),
-        ),
-        child: content,
-      ),
+      builder: (context, content) {
+        final drop = shadow
+            ? skin.cardShadow(small: true, paperEdge: true)
+            : null;
+        if (skin.isPlastic) {
+          return LiquidGlassSurface(
+            tint: color ?? skin.paper,
+            opacity: 0.98,
+            radius: radius,
+            blurBackdrop: false,
+            borderColor: skin.outline,
+            borderWidth: skin.outlineWidth,
+            padding: padding,
+            boxShadow: drop,
+            child: content!,
+          );
+        }
+        final scheme = Theme.of(context).colorScheme;
+        final side = skin.isFlat
+            ? (retroStyle.enabled
+                  ? BorderSide.none
+                  : BorderSide(color: scheme.outlineVariant, width: 1.5))
+            : BorderSide(
+                color: skin.outline ?? skin.ink,
+                width: skin.outlineWidth,
+              );
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            boxShadow: drop,
+          ),
+          child: Material(
+            type: MaterialType.card,
+            color: color ?? skin.paper,
+            elevation: 0,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: borderRadius,
+              side: side,
+            ),
+            child: content,
+          ),
+        );
+      },
       child: Padding(padding: padding, child: child),
     );
   }

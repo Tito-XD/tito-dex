@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../features/dex/dex_search_terms.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 
 /// Pokémon HOME-style mark for one Pokédex body style (体形).
 ///
@@ -16,19 +16,24 @@ class DexShapeIcon extends StatelessWidget {
     super.key,
     required this.slug,
     this.size = 26,
-    this.color = TitoColors.ink,
+    this.color,
   });
 
   final String slug;
   final double size;
-  final Color color;
+
+  /// Defaults to the skin ink when omitted.
+  final Color? color;
 
   @override
   Widget build(BuildContext context) => SizedBox(
     width: size,
     height: size,
     child: CustomPaint(
-      painter: _DexShapePainter(slug: slug, color: color),
+      painter: _DexShapePainter(
+        slug: slug,
+        color: color ?? TitoSkin.of(context).ink,
+      ),
     ),
   );
 }
@@ -417,12 +422,14 @@ class DexSizeIcon extends StatelessWidget {
     super.key,
     required this.bucket,
     this.size = 26,
-    this.color = TitoColors.ink,
+    this.color,
   });
 
   final DexSizeBucket bucket;
   final double size;
-  final Color color;
+
+  /// Defaults to the skin ink when omitted.
+  final Color? color;
 
   /// Disc radius inside the 24×24 canvas, tiny → huge.
   static const _radii = <DexSizeBucket, double>{
@@ -438,7 +445,10 @@ class DexSizeIcon extends StatelessWidget {
     width: size,
     height: size,
     child: CustomPaint(
-      painter: _DexSizePainter(radius: _radii[bucket] ?? 5.8, color: color),
+      painter: _DexSizePainter(
+        radius: _radii[bucket] ?? 5.8,
+        color: color ?? TitoSkin.of(context).ink,
+      ),
     ),
   );
 }

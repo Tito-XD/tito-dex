@@ -6,6 +6,8 @@ import '../config/app_config.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
+import 'retro_forms.dart';
 import 'settings_expandable_section.dart';
 
 /// Tier A integration: local deterministic helpers plus reference links, with
@@ -44,24 +46,32 @@ class _SleepToolsSectionState extends State<SleepToolsSection> {
         children: [
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.bedtime_rounded),
+            leading: StickerIconPlate(
+              icon: Icons.bedtime_rounded,
+              color: TitoColors.softYellow,
+              iconColor: TitoSkin.of(context).ink,
+            ),
             title: Text(
               AppZh.sleepToolsOpen,
               style: SecondaryTypography.onCard.body14.copyWith(
                 fontWeight: FontWeight.w800,
+                color: TitoSkin.of(context).ink,
               ),
             ),
             subtitle: Text(
               AppZh.sleepToolsOpenHint,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoSkin.of(context).mutedInk,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            trailing: const Icon(Icons.chevron_right_rounded),
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: TitoSkin.of(context).mutedInk,
+            ),
             onTap: () => context.push('/search/sleep-tools'),
           ),
-          const Divider(),
+          const StickerRowDivider(),
           for (final link in config.sleepToolsLinks)
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -74,7 +84,7 @@ class _SleepToolsSectionState extends State<SleepToolsSection> {
               subtitle: Text(
                 link.url,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoSkin.of(context).mutedInk,
                 ),
               ),
               trailing: const Icon(Icons.content_copy_rounded, size: 18),

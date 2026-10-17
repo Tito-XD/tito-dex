@@ -12,6 +12,7 @@ import '../../navigation/tito_route_work.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/tito_skin.dart';
 import '../../widgets/dex_reference_detail.dart';
 import '../../widgets/handheld_input.dart';
 import '../../widgets/secondary_page_scaffold.dart';
@@ -341,16 +342,21 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
         title: widget.title,
         subtitle: widget.subtitle,
         children: [
-          StickerCard(
+          StickerCard.dense(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: TextField(
               controller: _queryController,
+              style: TextStyle(color: TitoSkin.of(context).ink),
               decoration: InputDecoration(
                 hintText: AppZh.dexReferenceSearchHint,
-                prefixIcon: const Icon(Icons.search_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+                prefixIcon: Icon(
+                  Icons.search_rounded,
+                  color: TitoSkin.of(context).mutedInk,
                 ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                isDense: true,
               ),
             ),
           ),
@@ -417,11 +423,11 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                   child: HandheldFocusDecorator(
                     onActivate: () => _openDetail(context, entry),
                     borderRadius: BorderRadius.circular(
-                      DeviceLayout.rMd(context),
+                      TitoSkin.of(context).radiusMd,
                     ),
                     child: StickerPressable(
                       borderRadius: BorderRadius.circular(
-                        DeviceLayout.rMd(context),
+                        TitoSkin.of(context).radiusMd,
                       ),
                       ownShadow: false,
                       child: Material(
@@ -429,9 +435,9 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                         child: InkWell(
                           onTap: () => _openDetail(context, entry),
                           borderRadius: BorderRadius.circular(
-                            DeviceLayout.rMd(context),
+                            TitoSkin.of(context).radiusMd,
                           ),
-                          child: StickerCard(
+                          child: StickerCard.dense(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 10,
@@ -453,6 +459,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                                         style: SecondaryTypography.onCard.body14
                                             .copyWith(
                                               fontWeight: FontWeight.w800,
+                                              color: TitoSkin.of(context).ink,
                                             ),
                                       ),
                                       const SizedBox(height: 4),
@@ -462,7 +469,9 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                                             .onCard
                                             .small12
                                             .copyWith(
-                                              color: TitoColors.mutedInk,
+                                              color: TitoSkin.of(
+                                                context,
+                                              ).mutedInk,
                                             ),
                                       ),
                                       if (initialScopeNotice != null) ...[
@@ -562,7 +571,7 @@ void showMoveDetailSheet(
                     Icon(
                       moveCategoryIcon(move.category),
                       size: 18,
-                      color: TitoColors.ink,
+                      color: TitoSkin.of(context).ink,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -719,12 +728,13 @@ class _GridItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     return HandheldFocusDecorator(
       onActivate: onTap,
-      borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+      borderRadius: BorderRadius.circular(skin.radiusMd),
       child: GestureDetector(
         onTap: onTap,
-        child: StickerCard(
+        child: StickerCard.dense(
           padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -740,6 +750,7 @@ class _GridItemCard extends StatelessWidget {
                   style: SecondaryTypography.onCard.body14.copyWith(
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
+                    color: skin.ink,
                   ),
                 ),
               ),
@@ -800,14 +811,18 @@ class _CategoryFilterChips extends StatelessWidget {
               style: const TextStyle(fontSize: 11),
             ),
             onSelected: (_) => onSelected(sel ? null : cat),
-            backgroundColor: TitoColors.card,
-            selectedColor: TitoColors.mint,
-            checkmarkColor: TitoColors.deepBlue,
-            side: BorderSide(
+            elevation: 0,
+            backgroundColor: TitoSkin.of(context).chipFill,
+            selectedColor: TitoSkin.of(context).chipSelectedFill,
+            checkmarkColor: TitoSkin.of(context).onChipSelected,
+            labelStyle: TextStyle(
+              fontSize: 11,
               color: sel
-                  ? TitoColors.mint
-                  : TitoColors.ink.withValues(alpha: 0.2),
+                  ? TitoSkin.of(context).onChipSelected
+                  : TitoSkin.of(context).ink,
+              fontWeight: FontWeight.w800,
             ),
+            side: dexSkinSide(context),
           );
         },
       ),

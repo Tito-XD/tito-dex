@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/tito_paper.dart';
 
 /// Tag for the single home action that expands into its first-level page.
@@ -836,24 +836,27 @@ class _DexFlightVisual {
   final Color? specularColor;
 
   static _DexFlightVisual resolve(BuildContext context) {
+    final skin = TitoSkin.of(context);
     final scheme = Theme.of(context).colorScheme;
-    return switch (appVisualStyle.style) {
-      AppVisualStyle.classic => const _DexFlightVisual(
-        surfaceGradient: LinearGradient(
+    if (skin.isJournal) {
+      return _DexFlightVisual(
+        surfaceGradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [Color(0xFF5D728A), TitoColors.slateBlue],
         ),
-        outlineColor: TitoColors.journalOutline,
-        borderWidth: 1.4,
-        startRadius: TitoRadii.md,
+        outlineColor: skin.outline!,
+        borderWidth: skin.outlineWidth,
+        startRadius: skin.radiusMd,
         shadowColor: TitoColors.deepBlue,
         shadowOpacity: 0.24,
         shadowBlur: 0,
         shadowSpread: 0,
-        shadowOffset: Offset(0, 5),
-      ),
-      AppVisualStyle.solidPlastic => _DexFlightVisual(
+        shadowOffset: const Offset(0, 5),
+      );
+    }
+    if (skin.isPlastic) {
+      return _DexFlightVisual(
         surfaceGradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -864,32 +867,32 @@ class _DexFlightVisual {
             TitoColors.glassBackgroundBottom,
           ],
         ),
-        outlineColor: Colors.white.withValues(alpha: 0.72),
-        borderWidth: TitoBorders.glass,
-        startRadius: TitoRadii.md,
+        outlineColor: skin.outline!,
+        borderWidth: skin.outlineWidth,
+        startRadius: skin.radiusMd,
         shadowColor: TitoColors.deepBlue,
         shadowOpacity: 0.22,
         shadowBlur: 18,
         shadowSpread: -4,
         shadowOffset: const Offset(0, 8),
         specularColor: Colors.white.withValues(alpha: 0.82),
+      );
+    }
+    return _DexFlightVisual(
+      surfaceGradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [scheme.surfaceContainerHigh, scheme.surface],
       ),
-      AppVisualStyle.flatUi => _DexFlightVisual(
-        surfaceGradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [scheme.surfaceContainerHigh, scheme.surface],
-        ),
-        outlineColor: scheme.outlineVariant,
-        borderWidth: TitoBorders.element,
-        startRadius: TitoRadii.md,
-        shadowColor: scheme.shadow,
-        shadowOpacity: 0.16,
-        shadowBlur: 8,
-        shadowSpread: -2,
-        shadowOffset: const Offset(0, 3),
-      ),
-    };
+      outlineColor: skin.pageInk,
+      borderWidth: skin.outlineWidth,
+      startRadius: skin.radiusMd,
+      shadowColor: scheme.shadow,
+      shadowOpacity: 0,
+      shadowBlur: 0,
+      shadowSpread: 0,
+      shadowOffset: Offset.zero,
+    );
   }
 }
 

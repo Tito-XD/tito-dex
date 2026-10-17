@@ -5,7 +5,9 @@ import '../features/journey/journey_assistant.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'dex_sprite_image.dart';
+import 'retro_forms.dart';
 import 'sticker_card.dart';
 import 'tito_loading_panel.dart';
 
@@ -218,11 +220,24 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     return Row(
       children: [
-        Icon(icon, size: 21, color: TitoColors.deepBlue),
+        StickerIconPlate(
+          icon: icon,
+          color: TitoColors.softYellow,
+          size: 28,
+          iconColor: skin.ink,
+        ),
         const SizedBox(width: 8),
-        Expanded(child: Text(title, style: SecondaryTypography.onCard.h15)),
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: SecondaryTypography.onCard.h15.copyWith(color: skin.ink),
+          ),
+        ),
         if (trailing != null)
           Flexible(
             child: Text(
@@ -230,7 +245,7 @@ class _SectionTitle extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: skin.mutedInk,
               ),
             ),
           ),

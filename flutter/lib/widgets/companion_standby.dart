@@ -20,6 +20,7 @@ import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
 import 'companion_picker_sheet.dart';
 import 'fallback_sprite_image.dart';
@@ -517,10 +518,17 @@ class _CompanionStandbyState extends State<CompanionStandby>
                     decoration: BoxDecoration(
                       color: TitoColors.softYellow,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: TitoColors.ink,
-                        width: TitoBorders.element,
-                      ),
+                      border: () {
+                        final skin = TitoSkin.of(context);
+                        final outline = skin.outline;
+                        if (outline == null || skin.outlineWidth <= 0) {
+                          return null;
+                        }
+                        return Border.all(
+                          color: outline,
+                          width: skin.outlineWidth,
+                        );
+                      }(),
                     ),
                     child: const Icon(
                       Icons.favorite_rounded,
@@ -568,26 +576,40 @@ class _QuoteBubble extends StatelessWidget {
         child: AnimatedOpacity(
           opacity: visible ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 160),
-          child: Container(
-            constraints: BoxConstraints(maxWidth: maxWidth),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: TitoColors.card,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: TitoColors.ink, width: 2),
-              boxShadow: retroStyle.enabled ? TitoShadows.stickerSmall : null,
-            ),
-            child: Text(
-              quote ?? '',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TitoTypography.style(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: TitoColors.deepBlue,
-              ),
-            ),
+          child: ListenableBuilder(
+            listenable: retroStyle,
+            builder: (context, _) {
+              final skin = TitoSkin.of(context);
+              final outline = skin.outline;
+              return Container(
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: skin.paper,
+                  borderRadius: BorderRadius.circular(skin.radiusMd),
+                  border: outline == null
+                      ? null
+                      : Border.all(
+                          color: skin.isPlastic
+                              ? skin.ink.withValues(alpha: 0.28)
+                              : outline,
+                          width: skin.outlineWidth,
+                        ),
+                  boxShadow: skin.cardShadow(small: true),
+                ),
+                child: Text(
+                  quote ?? '',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TitoTypography.style(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: skin.ink,
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

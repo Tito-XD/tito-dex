@@ -119,7 +119,10 @@ void main() {
           (widget) => widget is TypeIconImage && widget.typeEn == type,
         );
         final rect = tester.getRect(icon);
-        expect(rect.size, const Size(20, 20));
+        // Skin outline widths are not dyadic, so a global rect can miss
+        // Size(20, 20) by a single ulp. The icon is still the 20px asset.
+        expect(rect.width, closeTo(20, 0.05));
+        expect(rect.height, closeTo(20, 0.05));
         expect(
           rect.center.dx,
           closeTo(content.left + content.width * (i + 0.5) / 2, 0.1),

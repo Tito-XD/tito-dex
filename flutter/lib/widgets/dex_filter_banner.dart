@@ -45,7 +45,7 @@ class DexFilterBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StickerCard(
+    return StickerCard.dense(
       variant: StickerVariant.sky,
       child: Row(
         children: [

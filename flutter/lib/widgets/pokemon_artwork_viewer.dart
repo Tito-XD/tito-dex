@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'dex_sprite_image.dart';
+import 'type_badge.dart';
 
 String pokemonArtworkHeroTag(PokemonSummary summary) =>
     'pokemon-artwork-${summary.id}-${summary.spriteResourceId ?? summary.id}';
@@ -581,9 +583,14 @@ class _SpritePickerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = selected || animatedSelected
-        ? TitoColors.softYellow
-        : TitoColors.card.withValues(alpha: 0.35);
+    final skin = TitoSkin.of(context);
+    final active = selected || animatedSelected;
+    final radius = BorderRadius.circular(
+      skin.isFlat ? skin.radiusMd : skin.radiusSm,
+    );
+    final side = active && !skin.isFlat
+        ? BorderSide(color: TitoColors.softYellow, width: skin.outlineWidth)
+        : dexSkinSide(context);
 
     return SizedBox(
       width: 72,
@@ -591,15 +598,20 @@ class _SpritePickerTile extends StatelessWidget {
         children: [
           Expanded(
             child: Material(
-              color: TitoColors.ink.withValues(alpha: 0.35),
-              borderRadius: BorderRadius.circular(10),
+              color: active && skin.isFlat
+                  ? TitoColors.softYellow
+                  : skin.paperDense,
+              elevation: 0,
+              borderRadius: radius,
               child: InkWell(
                 onTap: onSelectStatic,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: radius,
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: borderColor, width: 2),
+                    borderRadius: radius,
+                    border: side == BorderSide.none
+                        ? null
+                        : Border.fromBorderSide(side),
                   ),
                   padding: const EdgeInsets.all(4),
                   child: Stack(
@@ -624,12 +636,10 @@ class _SpritePickerTile extends StatelessWidget {
                               height: 28,
                             ),
                             style: IconButton.styleFrom(
-                              backgroundColor: TitoColors.ink.withValues(
-                                alpha: 0.88,
-                              ),
+                              backgroundColor: skin.ink,
                               foregroundColor: showingBack
                                   ? TitoColors.softYellow
-                                  : TitoColors.card,
+                                  : skin.paper,
                             ),
                             icon: const Icon(
                               Icons.swap_horiz_rounded,

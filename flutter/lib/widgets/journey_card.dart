@@ -5,7 +5,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
@@ -34,112 +34,122 @@ class JourneyCard extends StatelessWidget {
     // mismatched gutters / squeezed look on square dashboards).
     final padding = DeviceLayout.cardPadding(context);
     final location = localizeLocation(journey.location);
+    final skin = TitoSkin.of(context);
+    final tint = skin.heroTint(TitoHeroRole.journey);
+    final radius = BorderRadius.circular(skin.radiusHero);
     // Dense shrinks the glyph size only — keep Nunito's natural line height
     // or the stacked meta rows read as squeezed against the card's center.
     TextStyle denseStyle(TextStyle style) =>
         style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85);
     final expandedDenseMeta =
         dense && DeviceLayout.sizeOf(context).height >= 480;
+    final overline =
+        (dense
+                ? denseStyle(context.titoHome.onDeepOverline)
+                : context.titoHome.onDeepOverline)
+            .copyWith(color: tint.mutedInk);
+    final headingSize =
+        (dense
+                ? denseStyle(context.titoHome.onDeepHeading)
+                : context.titoHome.onDeepHeading)
+            .fontSize ??
+        18;
 
     return Semantics(
       button: true,
       label: AppZh.journeyOpenDetail,
       child: HandheldFocusDecorator(
         onActivate: onOpenDetail,
-        borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+        borderRadius: radius,
         child: StickerPressable(
-          borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+          borderRadius: radius,
           ownShadow: false,
-          child: StickerCard(
-            variant: StickerVariant.deep,
+          child: StickerCard.hero(
+            role: TitoHeroRole.journey,
             padding: EdgeInsets.zero,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onOpenDetail,
-                borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
-                child: Padding(
-                  padding: padding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    // The square layout stretches this card to fill the column —
-                    // keep the text block vertically centered instead of top-stuck.
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppZh.journeyCardTitle.toUpperCase(),
-                                  style: dense
-                                      ? denseStyle(
-                                          context.titoHome.onDeepOverline,
-                                        )
-                                      : context.titoHome.onDeepOverline,
+            child: InkWell(
+              onTap: onOpenDetail,
+              borderRadius: radius,
+              child: Padding(
+                padding: padding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  // The square layout stretches this card to fill the column —
+                  // keep the text block vertically centered instead of top-stuck.
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppZh.journeyCardTitle.toUpperCase(),
+                                style: overline,
+                              ),
+                              SizedBox(height: dense ? 5 : (compact ? 6 : 8)),
+                              Text(
+                                location,
+                                style: skin.heading(
+                                  headingSize,
+                                  color: tint.ink,
                                 ),
-                                SizedBox(height: dense ? 5 : (compact ? 6 : 8)),
-                                Text(
-                                  location,
-                                  style: dense
-                                      ? denseStyle(context.titoHome.onDeepHeading)
-                                      : context.titoHome.onDeepHeading,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: TitoColors.card,
-                            size: dense
-                                ? DeviceLayout.dim(context, 28.0)
-                                : (compact ? 28 : 32),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: tint.ink,
+                          size: dense
+                              ? DeviceLayout.dim(context, 28.0)
+                              : (compact ? 28 : 32),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: dense ? 6 : (compact ? 8 : 10)),
+                    // Normal RG panels have useful vertical room but a narrow
+                    // half-screen width. Keep badges on their own line and
+                    // time + assistant status below. The minimum 360px
+                    // dashboard falls back to one line.
+                    if (dense)
+                      _AssistantDenseMeta(
+                        journey: journey,
+                        future:
+                            assistantFuture ??
+                            journeyAssistantRepository.loadPreview(journey),
+                        style: denseStyle(context.titoHome.onDeepMetaLabel)
+                            .copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: tint.mutedInk,
+                            ),
+                        expanded: expandedDenseMeta,
+                      )
+                    else
+                      Row(
+                        children: [
+                          _Meta(
+                            label: AppZh.labelBadges,
+                            value: journey.badgeProgressLabel,
+                            dense: dense,
+                          ),
+                          _Meta(
+                            label: AppZh.labelPlayTime,
+                            value: journey.playTime,
+                            dense: dense,
+                          ),
+                          _AssistantMeta(
+                            future:
+                                assistantFuture ??
+                                journeyAssistantRepository.loadPreview(journey),
                           ),
                         ],
                       ),
-                      SizedBox(height: dense ? 6 : (compact ? 8 : 10)),
-                      // Normal RG panels have useful vertical room but a narrow
-                      // half-screen width. Keep badges on their own line and
-                      // time + assistant status below. The minimum 360px
-                      // dashboard falls back to one line.
-                      if (dense)
-                        _AssistantDenseMeta(
-                          journey: journey,
-                          future:
-                              assistantFuture ??
-                              journeyAssistantRepository.loadPreview(journey),
-                          style: denseStyle(
-                            context.titoHome.onDeepMetaLabel,
-                          ).copyWith(fontWeight: FontWeight.w800),
-                          expanded: expandedDenseMeta,
-                        )
-                      else
-                        Row(
-                          children: [
-                            _Meta(
-                              label: AppZh.labelBadges,
-                              value: journey.badgeProgressLabel,
-                              dense: dense,
-                            ),
-                            _Meta(
-                              label: AppZh.labelPlayTime,
-                              value: journey.playTime,
-                              dense: dense,
-                            ),
-                            _AssistantMeta(
-                              future:
-                                  assistantFuture ??
-                                  journeyAssistantRepository.loadPreview(journey),
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -231,18 +241,21 @@ class _MetaContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tint = TitoSkin.of(context).heroTint(TitoHeroRole.journey);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: context.titoHome.onDeepMetaLabel,
+          style: context.titoHome.onDeepMetaLabel.copyWith(
+            color: tint.mutedInk,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         Text(
           value,
-          style: context.titoHome.onDeepMetaValue,
+          style: _journeyValueStyle(context),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -263,23 +276,24 @@ class _Meta extends StatelessWidget {
     TextStyle denseStyle(TextStyle style) =>
         style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85);
 
+    final tint = TitoSkin.of(context).heroTint(TitoHeroRole.journey);
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: dense
-                ? denseStyle(context.titoHome.onDeepMetaLabel)
-                : context.titoHome.onDeepMetaLabel,
+            style:
+                (dense
+                        ? denseStyle(context.titoHome.onDeepMetaLabel)
+                        : context.titoHome.onDeepMetaLabel)
+                    .copyWith(color: tint.mutedInk),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
             value,
-            style: dense
-                ? denseStyle(context.titoHome.onDeepMetaValue)
-                : context.titoHome.onDeepMetaValue,
+            style: _journeyValueStyle(context, dense: dense),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -287,4 +301,12 @@ class _Meta extends StatelessWidget {
       ),
     );
   }
+}
+
+TextStyle _journeyValueStyle(BuildContext context, {bool dense = false}) {
+  final skin = TitoSkin.of(context);
+  final tint = skin.heroTint(TitoHeroRole.journey);
+  final base = context.titoHome.onDeepMetaValue;
+  final size = (base.fontSize ?? 14) * (dense ? 0.85 : 1);
+  return skin.display(size, color: tint.ink);
 }

@@ -4,8 +4,9 @@ import '../features/launcher/emulator_launcher.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../l10n/app_zh.dart';
 import '../navigation/tito_page_transition.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
+import 'retro_forms.dart';
 import 'tito_skeleton.dart';
 
 Future<EmulatorAppChoice?> showEmulatorPickerSheet(
@@ -208,10 +209,9 @@ class _EmulatorPickerList extends StatelessWidget {
         TextField(
           onChanged: onQueryChanged,
           textInputAction: TextInputAction.search,
-          decoration: InputDecoration(
+          decoration: retroInsetDecoration(
             hintText: AppZh.continueSheetSearchHint,
             prefixIcon: const Icon(Icons.search_rounded),
-            isDense: true,
           ),
         ),
         const SizedBox(height: 12),
@@ -244,7 +244,7 @@ class _AppSectionHeader extends StatelessWidget {
     return Text(
       title,
       style: context.titoHome.captionStrong.copyWith(
-        color: TitoColors.mutedInk,
+        color: TitoSkin.of(context).mutedInk,
       ),
     );
   }
@@ -257,11 +257,25 @@ class _AppChoiceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(skin.radiusMd);
+    final outline = skin.outline;
     return Material(
-      color: TitoColors.card,
-      borderRadius: BorderRadius.circular(TitoRadii.md),
+      color: skin.paperDense,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: radius,
+        side: outline == null
+            ? BorderSide.none
+            : BorderSide(
+                color: skin.isPlastic
+                    ? skin.ink.withValues(alpha: 0.28)
+                    : outline,
+                width: skin.outlineWidth,
+              ),
+      ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderRadius: radius,
         onTap: () => Navigator.pop(context, app),
         child: Padding(
           padding: const EdgeInsets.all(14),

@@ -7,8 +7,9 @@ import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
+import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
 
@@ -90,18 +91,18 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
             handleDiameter + companionPadding.right,
             handleDiameter + companionPadding.bottom,
           );
+          final skin = TitoSkin.of(context);
           return Stack(
             fit: StackFit.expand,
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: TitoColors.cream.withValues(alpha: 0.16),
+                  color: skin.pageInk.withValues(alpha: 0.08),
                   border: Border.all(
-                    color: TitoColors.card.withValues(alpha: 0.35),
+                    color: skin.pageInk.withValues(alpha: 0.35),
+                    width: skin.isFlat ? 1.5 : 1,
                   ),
-                  borderRadius: BorderRadius.circular(
-                    DeviceLayout.rMd(context),
-                  ),
+                  borderRadius: BorderRadius.circular(skin.radiusMd),
                 ),
                 child: GestureDetector(
                   key: const ValueKey('companion-position-canvas'),
@@ -141,38 +142,49 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
                 alignment: Alignment.bottomCenter,
                 child: SafeArea(
                   top: false,
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
-                    decoration: BoxDecoration(
-                      color: TitoColors.card.withValues(alpha: 0.94),
-                      borderRadius: BorderRadius.circular(
-                        DeviceLayout.rMd(context),
-                      ),
-                      border: Border.all(color: TitoColors.ink, width: 1.5),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            AppZh.companionPositionHint,
-                            style: SecondaryTypography.onCard.body14,
-                          ),
+                  child: ListenableBuilder(
+                    listenable: retroStyle,
+                    builder: (context, _) {
+                      final barSkin = TitoSkin.of(context);
+                      return Container(
+                        margin: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+                        decoration: BoxDecoration(
+                          color: barSkin.paper,
+                          borderRadius: BorderRadius.circular(barSkin.radiusMd),
+                          border: barSkin.outline == null
+                              ? null
+                              : Border.all(
+                                  color: barSkin.outline!,
+                                  width: barSkin.outlineWidth,
+                                ),
+                          boxShadow: barSkin.cardShadow(small: true),
                         ),
-                        const SizedBox(width: 8),
-                        TextButton(
-                          onPressed: () async {
-                            await companionRepository.resetOffset();
-                            if (!mounted) return;
-                            setState(() {
-                              _offsetX = companionRepository.offsetX;
-                              _offsetY = companionRepository.offsetY;
-                            });
-                          },
-                          child: Text(AppZh.companionPositionReset),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                AppZh.companionPositionHint,
+                                style: SecondaryTypography.onCard.body14
+                                    .copyWith(color: barSkin.ink),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            TextButton(
+                              onPressed: () async {
+                                await companionRepository.resetOffset();
+                                if (!mounted) return;
+                                setState(() {
+                                  _offsetX = companionRepository.offsetX;
+                                  _offsetY = companionRepository.offsetY;
+                                });
+                              },
+                              child: Text(AppZh.companionPositionReset),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -197,32 +209,34 @@ class _PositionHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: diameter,
-      height: diameter,
-      decoration: BoxDecoration(
-        color: TitoColors.card,
-        shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: TitoColors.ink.withValues(alpha: 0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return ListenableBuilder(
+      listenable: retroStyle,
+      builder: (context, child) {
+        final skin = TitoSkin.of(context);
+        return Container(
+          width: diameter,
+          height: diameter,
+          decoration: BoxDecoration(
+            color: skin.paper,
+            shape: BoxShape.circle,
+            border: skin.outline == null
+                ? null
+                : Border.all(color: skin.outline!, width: skin.outlineWidth),
+            boxShadow: skin.cardShadow(small: true),
           ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      padding: const EdgeInsets.all(4),
-      child: FallbackSpriteImage(
-        sources: [
-          if (isShiny) ...animatedShinySpriteCandidatesFor(speciesId),
-          if (bundledCompanionGifAsset(speciesId) != null)
-            bundledCompanionGifAsset(speciesId)!,
-          ...animatedSpriteCandidatesFor(speciesId),
-        ],
-        showLoadingProgress: false,
-      ),
+          clipBehavior: Clip.antiAlias,
+          padding: const EdgeInsets.all(4),
+          child: FallbackSpriteImage(
+            sources: [
+              if (isShiny) ...animatedShinySpriteCandidatesFor(speciesId),
+              if (bundledCompanionGifAsset(speciesId) != null)
+                bundledCompanionGifAsset(speciesId)!,
+              ...animatedSpriteCandidatesFor(speciesId),
+            ],
+            showLoadingProgress: false,
+          ),
+        );
+      },
     );
   }
 }

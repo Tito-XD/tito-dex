@@ -7,7 +7,9 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
+import '../theme/tito_skin.dart';
 import 'dex_shape_icon.dart';
+import 'type_badge.dart';
 
 /// Swatch for each Pokédex colour.
 ///
@@ -262,6 +264,7 @@ class _ShapeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = dexShapeLabelZh(slug) ?? slug;
+    final skin = TitoSkin.of(context);
     return Semantics(
       selected: selected,
       button: true,
@@ -270,29 +273,31 @@ class _ShapeChip extends StatelessWidget {
         selected: selected,
         builder: (context, selection) => Material(
           color: Colors.transparent,
+          elevation: 0,
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(999),
             child: Ink(
-              decoration: BoxDecoration(
-                color: Color.lerp(
-                  TitoColors.card,
-                  TitoColors.softYellow,
-                  selection,
-                ),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: TitoColors.ink, width: 2),
-              ),
+              decoration: dexSkinChipDecoration(context, selected: selection),
               padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  DexShapeIcon(slug: slug, size: 22),
+                  _DexFilterIconPlate(
+                    child: DexShapeIcon(
+                      slug: slug,
+                      size: skin.isFlat ? 16 : 22,
+                      color: skin.isFlat
+                          ? skin.ink
+                          : dexSkinChipInk(context, selected: selection),
+                    ),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     label,
                     style: SecondaryTypography.onCard.small12.copyWith(
                       fontWeight: FontWeight.w800,
+                      color: dexSkinChipInk(context, selected: selection),
                     ),
                   ),
                 ],
@@ -301,6 +306,29 @@ class _ShapeChip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DexFilterIconPlate extends StatelessWidget {
+  const _DexFilterIconPlate({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!TitoSkin.of(context).isFlat) {
+      return child;
+    }
+    return Container(
+      width: 26,
+      height: 26,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
+      child: child,
     );
   }
 }
@@ -318,6 +346,7 @@ class _SizeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     return Semantics(
       selected: selected,
       button: true,
@@ -326,29 +355,31 @@ class _SizeChip extends StatelessWidget {
         selected: selected,
         builder: (context, selection) => Material(
           color: Colors.transparent,
+          elevation: 0,
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(999),
             child: Ink(
-              decoration: BoxDecoration(
-                color: Color.lerp(
-                  TitoColors.card,
-                  TitoColors.softYellow,
-                  selection,
-                ),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: TitoColors.ink, width: 2),
-              ),
+              decoration: dexSkinChipDecoration(context, selected: selection),
               padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  DexSizeIcon(bucket: bucket, size: 22),
+                  _DexFilterIconPlate(
+                    child: DexSizeIcon(
+                      bucket: bucket,
+                      size: skin.isFlat ? 16 : 22,
+                      color: skin.isFlat
+                          ? skin.ink
+                          : dexSkinChipInk(context, selected: selection),
+                    ),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     bucket.labelZh,
                     style: SecondaryTypography.onCard.small12.copyWith(
                       fontWeight: FontWeight.w800,
+                      color: dexSkinChipInk(context, selected: selection),
                     ),
                   ),
                 ],
@@ -398,7 +429,18 @@ class _Swatch extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: color,
                   shape: BoxShape.circle,
-                  border: Border.all(color: TitoColors.ink, width: 2.5),
+                  border: () {
+                    final skin = TitoSkin.of(context);
+                    if (skin.isFlat) {
+                      return selected
+                          ? Border.all(color: skin.ink, width: 3)
+                          : null;
+                    }
+                    final side = dexSkinSide(context);
+                    return side == BorderSide.none
+                        ? null
+                        : Border.fromBorderSide(side);
+                  }(),
                 ),
                 child: ExcludeSemantics(
                   child: Opacity(

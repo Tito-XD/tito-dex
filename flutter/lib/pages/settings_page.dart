@@ -33,6 +33,9 @@ import '../widgets/retro_forms.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
+import '../theme/tito_theme.dart';
+import '../widgets/tito_chips.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -948,7 +951,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text(
                       AppZh.settingsSaveFileHint,
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoSkin.of(context).mutedInk,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -960,8 +963,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           : AppZh.settingsSaveFileUnset,
                       style: SecondaryTypography.onCard.body14.copyWith(
                         color: !hasSaveFile
-                            ? TitoColors.mutedInk
-                            : TitoColors.ink,
+                            ? TitoSkin.of(context).mutedInk
+                            : TitoSkin.of(context).ink,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1002,7 +1005,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ? AppZh.settingsLastSynced(lastSynced)
                           : AppZh.settingsLastSyncedNone,
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoSkin.of(context).mutedInk,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1026,7 +1029,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     AppZh.settingsDexOfflineHint,
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                      color: TitoSkin.of(context).mutedInk,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1054,7 +1057,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text(
                       '${AppZh.settingsDexOfflineProgress(dexProgress.phase, dexProgress.current, dexProgress.total)} · ${(dexDisplayProgress * 100).round()}%',
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoSkin.of(context).mutedInk,
                       ),
                     ),
                     if (dexProgress.label != null) ...[
@@ -1064,7 +1067,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: TitoSkin.of(context).mutedInk,
                         ),
                       ),
                     ],
@@ -1073,7 +1076,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     AppZh.settingsDexCdnDownloadHint,
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                      color: TitoSkin.of(context).mutedInk,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1107,7 +1110,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   _defaultGameEdition.labelZh,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoSkin.of(context).mutedInk,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1121,7 +1124,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   AppZh.settingsDexDefaultGameVersionHint,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoSkin.of(context).mutedInk,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -1208,7 +1211,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     AppZh.settingsEmulatorHint,
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                      color: TitoSkin.of(context).mutedInk,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1244,9 +1247,9 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   Icons.info_outline_rounded,
-                  color: TitoColors.deepBlue,
+                  color: TitoSkin.of(context).ink,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -1268,7 +1271,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SelectableText(
                   AppZh.settingsAttributionBody,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoSkin.of(context).mutedInk,
                     height: 1.5,
                   ),
                 ),
@@ -1355,7 +1358,7 @@ class _SettingsNavigationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final skin = TitoSkin.of(context);
     return StickerCard(
       padding: EdgeInsets.zero,
       child: Column(
@@ -1363,17 +1366,26 @@ class _SettingsNavigationList extends StatelessWidget {
           for (var index = 0; index < entries.length; index++) ...[
             ListTile(
               key: ValueKey('settings-category-${entries[index].section.name}'),
-              leading: Icon(entries[index].icon, color: scheme.primary),
-              title: Text(entries[index].section.title),
-              subtitle: Text(entries[index].hint),
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: scheme.onSurfaceVariant,
+              leading: Icon(entries[index].icon, color: skin.accentInkOnLight),
+              title: Text(
+                entries[index].section.title,
+                style: skin.heading(15),
               ),
+              subtitle: Text(
+                entries[index].hint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: skin.mutedInk,
+                ),
+              ),
+              trailing: Icon(Icons.chevron_right_rounded, color: skin.mutedInk),
               onTap: () => context.push(entries[index].section.route),
             ),
             if (index != entries.length - 1)
-              Divider(height: 1, indent: 56, color: scheme.outlineVariant),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: (skin.outline ?? skin.mutedInk).withValues(alpha: 0.35),
+              ),
           ],
         ],
       ),
@@ -1424,7 +1436,7 @@ class _SettingsToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final skin = TitoSkin.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -1435,12 +1447,17 @@ class _SettingsToggleRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: SecondaryTypography.onCard.body14),
+                Text(
+                  label,
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    color: skin.ink,
+                  ),
+                ),
                 const SizedBox(height: 2),
                 Text(
                   hint,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: scheme.onSurfaceVariant,
+                    color: skin.mutedInk,
                     height: 1.3,
                   ),
                 ),
@@ -1463,7 +1480,7 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final skin = TitoSkin.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -1472,14 +1489,16 @@ class _Row extends StatelessWidget {
           Text(
             label,
             style: SecondaryTypography.onCard.team12.copyWith(
-              color: scheme.onSurfaceVariant,
+              color: skin.mutedInk,
             ),
           ),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: SecondaryTypography.onCard.meta14,
+              style: SecondaryTypography.onCard.meta14.copyWith(
+                color: skin.ink,
+              ),
             ),
           ),
         ],
@@ -1513,7 +1532,7 @@ class _CurrentGameSection extends StatelessWidget {
                 Text(
                   AppZh.settingsCurrentGame,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoSkin.of(context).mutedInk,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -1573,38 +1592,18 @@ class _InterfaceSection extends StatelessWidget {
                     children: [
                       Text(
                         AppZh.settingsVisualTheme,
-                        style: SecondaryTypography.onCard.body14,
+                        style: TitoSkin.of(context).heading(15),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         AppZh.settingsVisualThemeHint,
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoSkin.of(context).mutedInk,
+                        ),
                       ),
                       const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: SegmentedButton<AppVisualStyle>(
-                          key: const Key('settings-visual-theme'),
-                          segments: [
-                            for (final style in AppVisualStyle.values)
-                              ButtonSegment<AppVisualStyle>(
-                                value: style,
-                                label: Text(
-                                  style.labelFor(
-                                    View.of(context).platformDispatcher.locale,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                          ],
-                          selected: {appVisualStyle.style},
-                          showSelectedIcon: false,
-                          onSelectionChanged: (selection) {
-                            appVisualStyle.setStyle(selection.single);
-                          },
-                        ),
+                      const _ThemeStylePicker(
+                        key: Key('settings-visual-theme'),
                       ),
                     ],
                   ),
@@ -1632,6 +1631,189 @@ class _InterfaceSection extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+const _themeCopyLocale = Locale('zh');
+
+void _applyVisualStyle(BuildContext context, AppVisualStyle style) {
+  final previous = appVisualStyle.style;
+  if (previous == style) {
+    return;
+  }
+  final name = style.labelFor(_themeCopyLocale);
+  appVisualStyle.setStyle(style);
+  final messenger = ScaffoldMessenger.of(context);
+  messenger.hideCurrentSnackBar();
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text('已切换为$name'),
+      duration: const Duration(seconds: 4),
+      action: SnackBarAction(
+        label: '撤销',
+        onPressed: () => appVisualStyle.setStyle(previous),
+      ),
+    ),
+  );
+}
+
+class _ThemeStylePicker extends StatelessWidget {
+  const _ThemeStylePicker({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = appVisualStyle.style;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= 460;
+        final options = [
+          for (final style in AppVisualStyle.values)
+            _ThemeStyleOption(
+              style: style,
+              selected: style == selected,
+              wide: wide,
+              onSelect: () => _applyVisualStyle(context, style),
+            ),
+        ];
+        if (!wide) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < options.length; i++) ...[
+                if (i > 0) const SizedBox(height: 8),
+                options[i],
+              ],
+            ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var i = 0; i < options.length; i++) ...[
+              if (i > 0) const SizedBox(width: 8),
+              Expanded(child: options[i]),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ThemeStyleOption extends StatelessWidget {
+  const _ThemeStyleOption({
+    required this.style,
+    required this.selected,
+    required this.wide,
+    required this.onSelect,
+  });
+
+  final AppVisualStyle style;
+  final bool selected;
+  final bool wide;
+  final VoidCallback onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final name = style.labelFor(_themeCopyLocale);
+    final tagline = style.taglineFor(_themeCopyLocale);
+    final radius = BorderRadius.circular(skin.radiusMd);
+    final ring = selected
+        ? (skin.isFlat ? skin.ink : skin.accentInkOnLight)
+        : (skin.outline ?? skin.mutedInk).withValues(
+            alpha: skin.isFlat ? 0 : 0.45,
+          );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(name, style: skin.heading(wide ? 13 : 15)),
+        const SizedBox(height: 2),
+        Text(
+          tagline,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            color: skin.mutedInk,
+            fontSize: wide ? 11 : 12,
+            height: 1.25,
+          ),
+        ),
+      ],
+    );
+    final preview = _ThemeHeroPreview(style: style);
+    final body = wide
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [preview, const SizedBox(height: 8), text],
+          )
+        : Row(
+            children: [
+              SizedBox(width: 128, child: preview),
+              const SizedBox(width: 10),
+              Expanded(child: text),
+            ],
+          );
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        key: ValueKey('theme-style-${style.storageValue}'),
+        onTap: onSelect,
+        borderRadius: radius,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            border: Border.all(color: ring, width: skin.isFlat ? 3 : 2),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+            child: body,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tiny trainer hero painted in [style]'s own theme, so each option previews
+/// its material even while another skin is active.
+class _ThemeHeroPreview extends StatelessWidget {
+  const _ThemeHeroPreview({required this.style});
+
+  final AppVisualStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: buildTitoTheme(style),
+      child: Builder(
+        builder: (context) {
+          final skin = TitoSkin.of(context);
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(2, 11, 2, 2),
+            child: StickerCard.hero(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text('Tito', style: skin.heading(12)),
+                      const Spacer(),
+                      const TitoStampChip(
+                        label: '10·17',
+                        onPage: false,
+                        fontSize: 9,
+                      ),
+                    ],
+                  ),
+                  Text('42', style: skin.display(22)),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -1683,7 +1865,7 @@ class _AppShortcutsSection extends StatelessWidget {
                         Text(
                           AppZh.settingsAppShortcutsHint,
                           style: SecondaryTypography.onCard.small12.copyWith(
-                            color: TitoColors.mutedInk,
+                            color: TitoSkin.of(context).mutedInk,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -1694,7 +1876,7 @@ class _AppShortcutsSection extends StatelessWidget {
                               section.labelZh,
                               style: SecondaryTypography.onCard.small12
                                   .copyWith(
-                                    color: TitoColors.mutedInk,
+                                    color: TitoSkin.of(context).mutedInk,
                                     fontWeight: FontWeight.w800,
                                   ),
                             ),
@@ -1757,7 +1939,7 @@ class _AppShortcutsSection extends StatelessWidget {
                 Text(
                   AppZh.settingsAppShortcutsHint,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoSkin.of(context).mutedInk,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -1844,7 +2026,7 @@ class _CompanionSection extends StatelessWidget {
                       Text(
                         '×${companionRepository.sizeScale.toStringAsFixed(2)}',
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: TitoSkin.of(context).mutedInk,
                         ),
                       ),
                     ],
@@ -1861,10 +2043,12 @@ class _CompanionSection extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: TitoColors.card,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: TitoColors.ink,
-                            width: TitoBorders.element,
-                          ),
+                          border: TitoSkin.of(context).outline == null
+                              ? null
+                              : Border.all(
+                                  color: TitoSkin.of(context).outline!,
+                                  width: TitoSkin.of(context).outlineWidth,
+                                ),
                         ),
                         clipBehavior: Clip.antiAlias,
                         padding: const EdgeInsets.all(4),
@@ -1903,7 +2087,9 @@ class _CompanionSection extends StatelessWidget {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: SecondaryTypography.onCard.small12
-                                    .copyWith(color: TitoColors.mutedInk),
+                                    .copyWith(
+                                      color: TitoSkin.of(context).mutedInk,
+                                    ),
                               ),
                             ],
                           ],
@@ -1923,7 +2109,7 @@ class _CompanionSection extends StatelessWidget {
                             context.push('/settings/companion-position'),
                         style: FilledButton.styleFrom(
                           backgroundColor: TitoColors.skyBlue,
-                          foregroundColor: TitoColors.ink,
+                          foregroundColor: TitoSkin.of(context).ink,
                         ),
                         child: const Text(AppZh.companionSettingsPosition),
                       ),
@@ -1945,7 +2131,7 @@ class _CompanionSection extends StatelessWidget {
                         },
                         style: FilledButton.styleFrom(
                           backgroundColor: TitoColors.coral,
-                          foregroundColor: TitoColors.ink,
+                          foregroundColor: TitoSkin.of(context).ink,
                         ),
                         child: const Text(AppZh.companionSettingsPick),
                       ),
@@ -2004,7 +2190,7 @@ class _SettingsAvatarPreview extends StatelessWidget {
                 : 'T',
             style: SecondaryTypography.onCard.h15.copyWith(
               fontWeight: FontWeight.w900,
-              color: TitoColors.deepBlue,
+              color: TitoSkin.of(context).ink,
             ),
           );
 
@@ -2020,7 +2206,12 @@ class _SettingsAvatarPreview extends StatelessWidget {
                 colors: [TitoColors.softYellow, TitoColors.coral],
               ),
         shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+        border: TitoSkin.of(context).outline == null
+            ? null
+            : Border.all(
+                color: TitoSkin.of(context).outline!,
+                width: TitoSkin.of(context).outlineWidth,
+              ),
       ),
       alignment: Alignment.center,
       clipBehavior: Clip.antiAlias,

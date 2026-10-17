@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'sticker_card.dart';
+import 'type_badge.dart';
 
 /// Placeholder block for loading layouts (detail header, cards, etc.).
 class TitoSkeletonBox extends StatelessWidget {
@@ -18,17 +21,39 @@ class TitoSkeletonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.35),
-        borderRadius: BorderRadius.circular(radius),
-        border: Border.all(
-          color: TitoColors.ink.withValues(alpha: 0.12),
-          width: 2,
-        ),
-      ),
+    final skin = TitoSkin.of(context);
+    return ListenableBuilder(
+      listenable: retroStyle,
+      builder: (context, _) {
+        final side = dexSkinSide(context);
+        // Flat has no skin stroke while retro stickers are on, so a bar
+        // takes the same outlined block as an uncaught dex cell.
+        final border = side == BorderSide.none
+            ? (skin.isFlat
+                  ? Border.all(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                      width: 1.5,
+                    )
+                  : null)
+            : Border.fromBorderSide(
+                BorderSide(
+                  color: side.color.withValues(alpha: 0.45),
+                  width: side.width,
+                ),
+              );
+        final fill = skin.isFlat
+            ? skin.paper
+            : Color.alphaBlend(skin.ink.withValues(alpha: 0.07), skin.paper);
+        return Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: fill,
+            borderRadius: BorderRadius.circular(radius),
+            border: border,
+          ),
+        );
+      },
     );
   }
 }
@@ -47,11 +72,7 @@ class TitoDetailHeaderSkeleton extends StatelessWidget {
             child: TitoSkeletonBox(height: 18, width: double.infinity),
           ),
           const SizedBox(width: 8),
-          TitoSkeletonBox(
-            height: 52,
-            width: 52,
-            radius: TitoRadii.sm,
-          ),
+          TitoSkeletonBox(height: 52, width: 52, radius: TitoRadii.sm),
         ],
       ),
     );
@@ -83,30 +104,35 @@ class TitoDexMiniCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     // Mirrors PokemonMiniCard: flexible sprite slot, number, name, type row.
-    return StickerCard(
-      padding: const EdgeInsets.all(6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Expanded(
-            child: Center(
-              child: TitoSkeletonBox(
-                height: 40,
-                width: 40,
-                radius: TitoRadii.sm,
-              ),
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Center(
+            child: TitoSkeletonBox(
+              height: 40,
+              width: 40,
+              radius: skin.radiusSm,
             ),
           ),
-          const SizedBox(height: 4),
-          const TitoSkeletonBox(height: 9, width: 32),
-          const SizedBox(height: 4),
-          const TitoSkeletonBox(height: 11, width: 56),
-          const SizedBox(height: 5),
-          const TitoSkeletonBox(height: 13, width: 64),
-        ],
-      ),
+        ),
+        const SizedBox(height: 4),
+        const TitoSkeletonBox(height: 9, width: 32),
+        const SizedBox(height: 4),
+        const TitoSkeletonBox(height: 11, width: 56),
+        const SizedBox(height: 5),
+        const TitoSkeletonBox(height: 13, width: 64),
+      ],
     );
+    if (skin.isFlat) {
+      return DecoratedBox(
+        decoration: dexFlatSeparatedDecoration(context, radius: skin.radiusMd),
+        child: Padding(padding: const EdgeInsets.all(6), child: body),
+      );
+    }
+    return StickerCard.dense(padding: const EdgeInsets.all(6), child: body);
   }
 }
 

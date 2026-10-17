@@ -21,18 +21,22 @@ import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../navigation/tito_route_work.dart';
-import '../theme/app_visual_style.dart';
+import '../navigation/tito_page_transition.dart';
 import '../theme/device_layout.dart';
+import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_motion.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/dex_filter_banner.dart';
 import '../widgets/dex_species_filter_sheet.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
+import '../widgets/retro_forms.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
+import '../widgets/type_badge.dart';
 import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_animated_size_switcher.dart';
@@ -1022,7 +1026,9 @@ class _DexPageState extends State<DexPage> {
                                                 .onCard
                                                 .small12
                                                 .copyWith(
-                                                  color: TitoColors.mutedInk,
+                                                  color: TitoSkin.of(
+                                                    context,
+                                                  ).mutedInk,
                                                   height: 1.45,
                                                 ),
                                           ),
@@ -1165,24 +1171,7 @@ class _DexPageState extends State<DexPage> {
               child: Semantics(
                 button: true,
                 label: '回到图鉴顶部',
-                child: Material(
-                  color: TitoColors.softYellow,
-                  shape: const CircleBorder(
-                    side: BorderSide(color: TitoColors.ink, width: 2),
-                  ),
-                  child: InkWell(
-                    onTap: _scrollToTop,
-                    customBorder: const CircleBorder(),
-                    child: const SizedBox(
-                      width: 44,
-                      height: 44,
-                      child: Icon(
-                        Icons.vertical_align_top_rounded,
-                        color: TitoColors.deepBlue,
-                      ),
-                    ),
-                  ),
-                ),
+                child: _DexScrollTopButton(onTap: _scrollToTop),
               ),
             ),
           ),
@@ -1195,9 +1184,8 @@ class _DexPageState extends State<DexPage> {
       DeviceLayout.useSquareDashboard(context) ? 6 : 8;
 
   void _showReferenceMenu(BuildContext context) {
-    showModalBottomSheet<void>(
+    showTitoModalBottomSheet<void>(
       context: context,
-      showDragHandle: true,
       builder: (context) {
         return SafeArea(
           child: Column(
@@ -1273,46 +1261,105 @@ class _DexTopBarAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(DeviceLayout.rMd(context));
-    final scheme = Theme.of(context).colorScheme;
-    final shellColor = appVisualStyle.usesFlatUi
-        ? scheme.primary
-        : TitoColors.card;
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: radius,
-      child: StickerPressable(
-        borderRadius: radius,
-        // Outline pill on the gradient header — sink physics only.
-        ownShadow: false,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: radius,
-            child: Container(
-              height: _height,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(999);
+    return ListenableBuilder(
+      listenable: retroStyle,
+      builder: (context, _) {
+        final foreground = skin.isJournal ? skin.pageInk : skin.ink;
+        final decoration = skin.isPlastic
+            ? BoxDecoration(
                 borderRadius: radius,
-                border: Border.all(color: shellColor, width: 2),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, color: shellColor, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    label,
-                    style: SecondaryTypography.onPage(context).small12.copyWith(
-                      color: shellColor,
-                      fontWeight: FontWeight.w800,
-                    ),
+                border: Border.all(
+                  color: skin.outline!,
+                  width: skin.outlineWidth,
+                ),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xF7FFFFFF), Color(0xFFD5E4EC)],
+                ),
+              )
+            : skin.isFlat
+            ? BoxDecoration(
+                color: skin.chipFill,
+                borderRadius: radius,
+                border: dexSkinSide(context) == BorderSide.none
+                    ? null
+                    : Border.fromBorderSide(dexSkinSide(context)),
+              )
+            : BoxDecoration(
+                borderRadius: radius,
+                border: Border.all(
+                  color: skin.pageInk,
+                  width: skin.outlineWidth,
+                ),
+              );
+        return HandheldFocusDecorator(
+          onActivate: onTap,
+          borderRadius: radius,
+          child: StickerPressable(
+            borderRadius: radius,
+            // Outline pill on the page — sink physics only, no second shadow.
+            ownShadow: false,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: radius,
+                child: Container(
+                  height: _height,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: decoration,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(icon, color: foreground, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        label,
+                        style: SecondaryTypography.onPage(context).small12
+                            .copyWith(
+                              color: foreground,
+                              fontWeight: FontWeight.w800,
+                            ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+class _DexScrollTopButton extends StatelessWidget {
+  const _DexScrollTopButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
+    return Material(
+      color: skin.isPlastic ? const Color(0xFFF4FBFD) : TitoColors.softYellow,
+      elevation: 0,
+      shape: CircleBorder(
+        side: skin.isPlastic
+            ? BorderSide(color: skin.outline!, width: skin.outlineWidth)
+            : side,
+      ),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Icon(Icons.vertical_align_top_rounded, color: skin.ink),
         ),
       ),
     );
@@ -1449,7 +1496,7 @@ class _DexModeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = DeviceLayout.rMd(context);
+    final skin = TitoSkin.of(context);
     final square = DeviceLayout.useSquareDashboard(context);
     final openPicker = showRegionPicker && regionPickerActive && selected;
 
@@ -1465,70 +1512,62 @@ class _DexModeTab extends StatelessWidget {
             scale: 1 + 0.015 * selection,
             child: HandheldFocusDecorator(
               onActivate: openPicker ? (onRegionPickerTap ?? onTap) : onTap,
-              borderRadius: BorderRadius.circular(radius),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: openPicker ? onRegionPickerTap : onTap,
-                  canRequestFocus: false,
-                  borderRadius: BorderRadius.circular(radius),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      color: Color.lerp(
-                        TitoColors.card,
-                        TitoColors.softYellow,
-                        selection,
-                      ),
-                      borderRadius: BorderRadius.circular(radius),
-                      border: Border.all(color: TitoColors.ink, width: 2),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: square ? 5 : 8,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: SecondaryTypography.onCard.body14
-                                    .copyWith(fontWeight: FontWeight.w800),
+              borderRadius: BorderRadius.circular(skin.radiusLg),
+              child: GestureDetector(
+                onTap: openPicker ? onRegionPickerTap : onTap,
+                child: StickerCard(
+                  variant: selected
+                      ? StickerVariant.softYellow
+                      : StickerVariant.cream,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: square ? 5 : 8,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: SecondaryTypography.onCard.body14.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: skin.ink,
                               ),
                             ),
-                            if (openPicker)
-                              const Padding(
-                                padding: EdgeInsets.only(right: 2),
-                                child: Icon(
-                                  Icons.arrow_drop_down_rounded,
-                                  size: 18,
-                                  color: TitoColors.ink,
-                                ),
-                              ),
-                            Text(
-                              '$count',
-                              style: SecondaryTypography.onCard.meta14.copyWith(
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: SecondaryTypography.onCard.meta14.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: TitoColors.mutedInk,
                           ),
+                          if (openPicker)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2),
+                              child: Icon(
+                                Icons.arrow_drop_down_rounded,
+                                size: 18,
+                                color: skin.ink,
+                              ),
+                            ),
+                          Text(
+                            '$count',
+                            style: SecondaryTypography.onCard.meta14.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: skin.ink,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onCard.meta14.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: skin.mutedInk,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -1553,55 +1592,57 @@ class _DexFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: selected ? 1 : 0),
-      duration: TitoMotion.duration(context, TitoMotion.fast),
-      curve: Curves.easeOutCubic,
-      builder: (context, selection, _) {
-        return Transform.translate(
-          key: ValueKey<String>('dex-filter-chip-motion-$label'),
-          offset: Offset(0, -1.5 * selection),
-          child: Transform.scale(
-            scale: 1 + 0.02 * selection,
-            child: HandheldFocusDecorator(
-              onActivate: onTap,
-              borderRadius: BorderRadius.circular(999),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onTap,
-                  canRequestFocus: false,
+    return ListenableBuilder(
+      listenable: retroStyle,
+      builder: (context, _) {
+        return TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: selected ? 1 : 0),
+          duration: TitoMotion.duration(context, TitoMotion.fast),
+          curve: Curves.easeOutCubic,
+          builder: (context, selection, _) {
+            return Transform.translate(
+              key: ValueKey<String>('dex-filter-chip-motion-$label'),
+              offset: Offset(0, -1.5 * selection),
+              child: Transform.scale(
+                scale: 1 + 0.02 * selection,
+                child: HandheldFocusDecorator(
+                  onActivate: onTap,
                   borderRadius: BorderRadius.circular(999),
-                  child: Ink(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Color.lerp(
-                        TitoColors.card,
-                        TitoColors.softYellow,
-                        selection,
-                      ),
+                  child: Material(
+                    color: Colors.transparent,
+                    elevation: 0,
+                    child: InkWell(
+                      onTap: onTap,
+                      canRequestFocus: false,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: TitoColors.ink, width: 2),
-                    ),
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        fontWeight: FontWeight.w800,
-                        height: 1.2,
-                        fontSize: 12,
+                      child: Ink(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 4,
+                        ),
+                        decoration: dexSkinChipDecoration(
+                          context,
+                          selected: selection,
+                        ),
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: SecondaryTypography.onCard.small12.copyWith(
+                            fontWeight: FontWeight.w800,
+                            height: 1.2,
+                            fontSize: 12,
+                            color: dexSkinChipInk(context, selected: selection),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
@@ -1617,53 +1658,53 @@ class _DexSpeciesFilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = DeviceLayout.rMd(context);
+    final skin = TitoSkin.of(context);
     final square = DeviceLayout.useSquareDashboard(context);
     final label = filter.speciesAxesLabelZh;
     final active = label != null;
+    final icon = skin.isFlat
+        ? StickerIconPlate(
+            icon: Icons.tune_rounded,
+            color: active ? TitoColors.softYellow : TitoColors.skyBlue,
+            size: 28,
+            iconColor: skin.ink,
+          )
+        : Icon(Icons.tune_rounded, size: 18, color: skin.ink);
 
     return HandheldFocusDecorator(
       onActivate: onTap,
-      borderRadius: BorderRadius.circular(radius),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          canRequestFocus: false,
-          borderRadius: BorderRadius.circular(radius),
-          child: Ink(
-            decoration: BoxDecoration(
-              color: active ? TitoColors.softYellow : TitoColors.card,
-              borderRadius: BorderRadius.circular(radius),
-              border: Border.all(color: TitoColors.ink, width: 2),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: square ? 6 : 9,
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.tune_rounded, size: 18, color: TitoColors.ink),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label ?? AppZh.dexSpeciesFilterOpen,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+      borderRadius: BorderRadius.circular(skin.radiusMd),
+      child: GestureDetector(
+        onTap: onTap,
+        child: StickerCard.dense(
+          variant: active ? StickerVariant.softYellow : StickerVariant.cream,
+          padding: EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: square ? 6 : 9,
+          ),
+          child: Row(
+            children: [
+              icon,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label ?? AppZh.dexSpeciesFilterOpen,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: skin.ink,
                   ),
                 ),
-                Icon(
-                  active
-                      ? Icons.check_circle_rounded
-                      : Icons.chevron_right_rounded,
-                  size: 18,
-                  color: TitoColors.ink,
-                ),
-              ],
-            ),
+              ),
+              Icon(
+                active
+                    ? Icons.check_circle_rounded
+                    : Icons.chevron_right_rounded,
+                size: 18,
+                color: skin.ink,
+              ),
+            ],
           ),
         ),
       ),

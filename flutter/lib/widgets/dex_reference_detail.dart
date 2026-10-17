@@ -9,6 +9,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/sticker_card.dart';
 import 'dex_sprite_image.dart';
 import 'type_badge.dart';
@@ -262,7 +263,7 @@ class ReferenceScopeNotice extends StatelessWidget {
           Icon(
             unavailable ? Icons.block_rounded : Icons.info_outline_rounded,
             size: 18,
-            color: TitoColors.ink,
+            color: TitoSkin.of(context).ink,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -546,7 +547,7 @@ class ConditionReferenceDetail extends StatelessWidget {
             children: [
               Icon(
                 referenceConditionIcon(slug, kind),
-                color: TitoColors.ink,
+                color: TitoSkin.of(context).ink,
                 size: 28,
               ),
               const SizedBox(width: 8),
@@ -611,7 +612,11 @@ class MoveReferenceDetail extends StatelessWidget {
         if (category != null && category.isNotEmpty)
           Row(
             children: [
-              Icon(moveCategoryIcon(category), size: 18, color: TitoColors.ink),
+              Icon(
+                moveCategoryIcon(category),
+                size: 18,
+                color: TitoSkin.of(context).ink,
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -730,14 +735,16 @@ class _TypeModifierChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = _modifierLabel(multiplier);
-    final color = _modifierColor(multiplier);
+    final color = _modifierColor(context, multiplier);
 
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         color: typeTileColor(type),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 1.5),
+        border: side == BorderSide.none ? null : Border.fromBorderSide(side),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -749,6 +756,7 @@ class _TypeModifierChip extends StatelessWidget {
             style: SecondaryTypography.onCard.small12.copyWith(
               fontWeight: FontWeight.w800,
               fontSize: 10,
+              color: skin.ink,
             ),
           ),
           const SizedBox(width: 4),
@@ -781,17 +789,18 @@ class _TypeModifierChip extends StatelessWidget {
     return '×1';
   }
 
-  Color _modifierColor(double multiplier) {
+  Color _modifierColor(BuildContext context, double multiplier) {
+    final skin = TitoSkin.of(context);
     if (multiplier >= 2) {
       return const Color(0xFF2E9E5B);
     }
     if (multiplier <= 0) {
-      return TitoColors.mutedInk;
+      return skin.mutedInk;
     }
     if (multiplier <= 0.5) {
       return const Color(0xFFE07B35);
     }
-    return TitoColors.ink;
+    return skin.ink;
   }
 }
 
@@ -802,17 +811,20 @@ class _CategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: TitoColors.softYellow,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 2),
+        border: side == BorderSide.none ? null : Border.fromBorderSide(side),
       ),
       child: Text(
         label,
         style: SecondaryTypography.onCard.small12.copyWith(
           fontWeight: FontWeight.w800,
+          color: skin.ink,
         ),
       ),
     );

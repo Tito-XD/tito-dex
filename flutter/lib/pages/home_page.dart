@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -7,10 +9,13 @@ import '../l10n/app_zh.dart';
 import '../navigation/tito_page_transition.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
-import '../theme/tito_buttons.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/app_header.dart';
 import '../widgets/companion_standby.dart';
+import '../widgets/handheld_input.dart';
 import '../widgets/home_dashboard_body.dart';
+import '../widgets/sticker_card.dart';
+import '../widgets/sticker_pressable.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
@@ -87,15 +92,11 @@ class _QuickActionsRow extends StatelessWidget {
             Expanded(
               child: _withDexHero(
                 actions[index],
-                TitoQuickTile(
+                _HomeQuickTile(
                   label: actions[index].label,
                   icon: actions[index].icon,
-                  onTap: () => _openRoute(context, actions[index]),
-                  compact: true,
-                  dense: true,
-                  square: true,
                   iconAsset: actions[index].iconAsset,
-                  backgroundColor: actions[index].tileColor,
+                  onTap: () => _openRoute(context, actions[index]),
                 ),
               ),
             ),
@@ -131,26 +132,20 @@ List<_QuickAction> _quickActions() {
       label: AppZh.navTeam,
       icon: Icons.groups_rounded,
       route: '/team',
-      tone: TitoPolaroidTone.blue,
       iconAsset: 'assets/icons/Team.png',
-      tileColor: const Color(0xFFFBEFC3),
     ),
     _QuickAction(
       label: AppZh.navDex,
       icon: Icons.grid_view_rounded,
       route: '/dex',
       heroTag: TitoHomeActionHero.dex,
-      tone: TitoPolaroidTone.coral,
       iconAsset: 'assets/icons/Dex.png',
-      tileColor: const Color(0xFFF9DEDC),
     ),
     _QuickAction(
       label: AppZh.navSearch,
       icon: Icons.search_rounded,
       route: '/search',
-      tone: TitoPolaroidTone.mint,
       iconAsset: 'assets/icons/Search.png',
-      tileColor: const Color(0xFFDFF1F9),
     ),
   ];
 }
@@ -161,20 +156,104 @@ class _QuickAction {
     required this.icon,
     required this.route,
     this.heroTag,
-    required this.tone,
     required this.iconAsset,
-    required this.tileColor,
   });
 
   final String label;
   final IconData icon;
   final String route;
   final String? heroTag;
-  final TitoPolaroidTone tone;
 
   /// Hand-drawn transparent icon, shown directly on the tile (no frame).
   final String iconAsset;
+}
 
-  /// Pastel card tint close to the icon's main color.
-  final Color tileColor;
+/// Team / Dex / Search as action heroes: journal stickers, plastic shells,
+/// flat colour blocks. Not trainer heroes — no tape or tilt.
+class _HomeQuickTile extends StatelessWidget {
+  const _HomeQuickTile({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    required this.iconAsset,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final String iconAsset;
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final tint = skin.heroTint(TitoHeroRole.action);
+    final radius = BorderRadius.circular(skin.radiusHero);
+    final content = Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        splashColor: skin.ink.withValues(alpha: 0.08),
+        highlightColor: skin.ink.withValues(alpha: 0.04),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final side = constraints.maxHeight.isFinite
+                ? (constraints.maxWidth.isFinite
+                      ? math.min(constraints.maxWidth, constraints.maxHeight)
+                      : constraints.maxHeight)
+                : 88.0;
+            final iconSide = side * (skin.isFlat ? 0.42 : 0.48);
+            final fontSize = (side * 0.16).clamp(11.0, 18.0);
+            Widget glyph = Image.asset(
+              iconAsset,
+              width: iconSide,
+              height: iconSide,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) =>
+                  Icon(icon, color: tint.ink, size: iconSide * 0.72),
+            );
+            if (skin.isFlat) {
+              glyph = Container(
+                width: iconSide + 8,
+                height: iconSide + 8,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  color: Color(0x73FFFFFF),
+                  shape: BoxShape.circle,
+                ),
+                child: glyph,
+              );
+            }
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                glyph,
+                SizedBox(height: side * 0.04),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: skin.heading(fontSize, color: tint.ink),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: radius,
+      child: StickerPressable(
+        borderRadius: radius,
+        ownShadow: false,
+        child: StickerCard.hero(
+          role: TitoHeroRole.action,
+          padding: EdgeInsets.zero,
+          child: content,
+        ),
+      ),
+    );
+  }
 }

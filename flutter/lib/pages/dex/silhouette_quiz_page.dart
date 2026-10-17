@@ -13,6 +13,8 @@ import '../../theme/device_layout.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/tito_skin.dart';
+import '../../widgets/type_badge.dart';
 import '../../widgets/companion_picker_sheet.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/secondary_page_scaffold.dart';
@@ -297,15 +299,15 @@ class _QuizBody extends StatelessWidget {
               icon: const Icon(Icons.pets_rounded, size: 18),
               label: const Text(AppZh.quizAdoptCompanion),
               style: OutlinedButton.styleFrom(
-                foregroundColor: TitoColors.ink,
-                backgroundColor: TitoColors.card,
+                foregroundColor: TitoSkin.of(context).ink,
+                backgroundColor: TitoSkin.of(context).paper,
+                elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  side: const BorderSide(
-                    color: TitoColors.ink,
-                    width: TitoBorders.element,
+                  borderRadius: BorderRadius.circular(
+                    TitoSkin.of(context).radiusMd,
                   ),
+                  side: dexSkinSide(context),
                 ),
               ),
             ),
@@ -314,15 +316,19 @@ class _QuizBody extends StatelessWidget {
           FilledButton(
             onPressed: onNext,
             style: FilledButton.styleFrom(
-              backgroundColor: TitoColors.softYellow,
-              foregroundColor: TitoColors.ink,
+              backgroundColor: TitoSkin.of(context).isFlat
+                  ? TitoSkin.of(context).primaryFill
+                  : TitoColors.softYellow,
+              foregroundColor: TitoSkin.of(context).isFlat
+                  ? TitoSkin.of(context).onPrimaryFill
+                  : TitoSkin.of(context).ink,
+              elevation: 0,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(TitoRadii.md),
-                side: const BorderSide(
-                  color: TitoColors.ink,
-                  width: TitoBorders.card,
+                borderRadius: BorderRadius.circular(
+                  TitoSkin.of(context).radiusMd,
                 ),
+                side: dexSkinSide(context),
               ),
             ),
             child: const Text(AppZh.quizNext),
@@ -361,27 +367,34 @@ class _ChoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     final background = switch (state) {
       _ChoiceState.correct => TitoColors.mint,
       _ChoiceState.wrong => TitoColors.coral,
-      _ChoiceState.muted => TitoColors.card.withValues(alpha: 0.55),
-      _ChoiceState.idle => TitoColors.card,
+      _ChoiceState.muted => skin.paperDense,
+      _ChoiceState.idle => skin.paper,
     };
+    final radius = BorderRadius.circular(skin.radiusMd);
+    final side = dexSkinSide(context);
 
     return StickerPressable(
-      borderRadius: BorderRadius.circular(TitoRadii.md),
+      borderRadius: radius,
+      ownShadow: false,
       interactive: onTap != null,
       child: Material(
         color: background,
-        borderRadius: BorderRadius.circular(TitoRadii.md),
+        elevation: 0,
+        borderRadius: radius,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(TitoRadii.md),
+          borderRadius: radius,
           child: Container(
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: TitoColors.ink, width: 2),
+              borderRadius: radius,
+              border: side == BorderSide.none
+                  ? null
+                  : Border.fromBorderSide(side),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
@@ -390,6 +403,7 @@ class _ChoiceButton extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: SecondaryTypography.onCard.body14.copyWith(
                 fontWeight: FontWeight.w800,
+                color: skin.ink,
               ),
             ),
           ),
@@ -443,17 +457,20 @@ class _ScoreChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: TitoColors.card,
+        color: skin.chipFill,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 2),
+        border: side == BorderSide.none ? null : Border.fromBorderSide(side),
       ),
       child: Text(
         label,
         style: SecondaryTypography.onCard.small12.copyWith(
           fontWeight: FontWeight.w800,
+          color: skin.ink,
         ),
       ),
     );

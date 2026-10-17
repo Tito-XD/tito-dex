@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../features/companion/companion_media.dart';
 import '../features/dex/online_media_catalog.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/secondary_page_scaffold.dart';
 
 /// Settings resource manager: inspect/delete cached companion media and
@@ -108,38 +108,40 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
       return entry.nameZh.contains(q) || entry.id.toString() == q;
     }).toList()..sort((a, b) => a.id.compareTo(b.id));
 
-    const fieldBorder = OutlineInputBorder(
-      borderSide: BorderSide(color: Color(0x66FFF7E6)),
-    );
+    final skin = TitoSkin.of(context);
+    final title = SecondaryTypography.onPage(context).h15;
+    final body = SecondaryTypography.onPage(context).body14;
+    final small = SecondaryTypography.onPage(
+      context,
+    ).small12.copyWith(color: skin.pageMutedInk);
+    final fieldSide = BorderSide(color: skin.pageInk.withValues(alpha: 0.45));
+    final fieldBorder = OutlineInputBorder(borderSide: fieldSide);
     return SecondaryPageScaffold(
       title: '媒体资源管理',
       children: [
-        Text('已缓存媒体', style: SecondaryTypography.onCard.h15),
+        Text('已缓存媒体', style: title),
         const SizedBox(height: 8),
         Text(
           _cached.isEmpty
               ? '暂无缓存'
               : '共 ${_cached.length} 个文件 · ${_sizeLabel(totalBytes)}',
-          style: SecondaryTypography.onCard.body14,
+          style: body,
         ),
         const SizedBox(height: 8),
         for (final file in _cached)
           ListTile(
             dense: true,
             contentPadding: EdgeInsets.zero,
-            title: Text(file.name, style: SecondaryTypography.onCard.body14),
+            title: Text(file.name, style: body),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  _sizeLabel(file.sizeBytes),
-                  style: SecondaryTypography.onCard.small12,
-                ),
+                Text(_sizeLabel(file.sizeBytes), style: small),
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.delete_outline_rounded,
                     size: 18,
-                    color: TitoColors.card,
+                    color: skin.pageInk,
                   ),
                   onPressed: () async {
                     await companionMediaCache.deleteCached(file.name);
@@ -162,17 +164,14 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
               child: const Text('全部清理'),
             ),
           ),
-        const Divider(height: 32, color: Color(0x33FFF7E6)),
-        Text('按宝可梦下载', style: SecondaryTypography.onCard.h15),
+        Divider(height: 32, color: skin.pageMutedInk.withValues(alpha: 0.35)),
+        Text('按宝可梦下载', style: title),
         const SizedBox(height: 8),
         if (_loading) ...[
           const LinearProgressIndicator(),
           const SizedBox(height: 8),
         ] else if (_loadError != null || _catalog.isEmpty) ...[
-          Text(
-            _loadError ?? '媒体目录暂时不可用。请确认数据包已安装，或重新读取资源。',
-            style: SecondaryTypography.onCard.body14,
-          ),
+          Text(_loadError ?? '媒体目录暂时不可用。请确认数据包已安装，或重新读取资源。', style: body),
           const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerLeft,
@@ -185,12 +184,10 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
           const SizedBox(height: 8),
         ],
         TextField(
-          style: const TextStyle(color: TitoColors.card),
+          style: TextStyle(color: skin.pageInk),
           decoration: InputDecoration(
             hintText: '搜索宝可梦名称或编号',
-            hintStyle: TextStyle(
-              color: TitoColors.card.withValues(alpha: 0.55),
-            ),
+            hintStyle: TextStyle(color: skin.pageMutedInk),
             isDense: true,
             enabledBorder: fieldBorder,
             focusedBorder: fieldBorder,
@@ -202,18 +199,15 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
             _catalog.isNotEmpty &&
             _query.trim().isNotEmpty &&
             matches.isEmpty)
-          Text('未找到匹配的宝可梦', style: SecondaryTypography.onCard.small12),
+          Text('未找到匹配的宝可梦', style: small),
         for (final entry in matches.take(40))
           ListTile(
             dense: true,
             contentPadding: EdgeInsets.zero,
-            title: Text(
-              '#${entry.id} ${entry.nameZh}',
-              style: SecondaryTypography.onCard.body14,
-            ),
+            title: Text('#${entry.id} ${entry.nameZh}', style: body),
             subtitle: Text(
               '${entry.cries.length} 条叫声 · ${entry.forms.length} 张形态图',
-              style: SecondaryTypography.onCard.small12,
+              style: small,
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,

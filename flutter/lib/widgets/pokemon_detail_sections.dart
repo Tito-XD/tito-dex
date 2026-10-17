@@ -15,10 +15,12 @@ import '../l10n/app_zh.dart';
 import '../features/dex/dex_search_terms.dart';
 import '../features/dex/dex_filter.dart';
 import '../features/dex/dex_encounter_labels.dart';
+import '../navigation/tito_page_transition.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'dex_sprite_image.dart';
 import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
@@ -97,13 +99,10 @@ class PokemonFormSelector extends StatelessWidget {
   bool get _hasMore => forms.length > _maxInlineChips;
 
   void _showMore(BuildContext context) {
-    showModalBottomSheet<void>(
+    showTitoModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: TitoColors.deepBlue,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.md)),
-      ),
+      ruled: false,
       builder: (context) => _FormPickerSheet(
         forms: forms,
         selectedKey: selectedKey,
@@ -117,6 +116,8 @@ class PokemonFormSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -135,14 +136,17 @@ class PokemonFormSelector extends StatelessWidget {
               ...pokemonFormStatusLabels(form),
             ].join(' · '),
             showCheckmark: false,
-            selectedColor: TitoColors.softYellow,
-            backgroundColor: TitoColors.card,
-            side: const BorderSide(
-              color: TitoColors.ink,
-              width: TitoBorders.element,
-            ),
+            elevation: 0,
+            pressElevation: 0,
+            selectedColor: skin.isFlat
+                ? skin.chipSelectedFill
+                : TitoColors.softYellow,
+            backgroundColor: skin.chipFill,
+            side: side,
             labelStyle: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.ink,
+              color: form.key == selectedKey && skin.isFlat
+                  ? skin.onChipSelected
+                  : skin.ink,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -151,13 +155,11 @@ class PokemonFormSelector extends StatelessWidget {
             onPressed: () => _showMore(context),
             label: Text('更多 (${forms.length - _inlineForms.length})'),
             tooltip: '展开全部形态',
-            backgroundColor: TitoColors.skyBlue.withValues(alpha: 0.15),
-            side: const BorderSide(
-              color: TitoColors.ink,
-              width: TitoBorders.element,
-            ),
+            elevation: 0,
+            backgroundColor: skin.chipFill,
+            side: side,
             labelStyle: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.ink,
+              color: skin.ink,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -180,6 +182,7 @@ class _FormPickerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
+    final skin = TitoSkin.of(context);
     return SizedBox(
       height: size.height * 0.55,
       child: Padding(
@@ -190,17 +193,11 @@ class _FormPickerSheet extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    '选择形态',
-                    style: SecondaryTypography.onGradient.h15.copyWith(
-                      color: TitoColors.card,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  child: Text('选择形态', style: skin.heading(15, color: skin.ink)),
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded, color: TitoColors.card),
+                  icon: Icon(Icons.close_rounded, color: skin.ink),
                 ),
               ],
             ),
@@ -245,23 +242,26 @@ class _FormPickerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(
+      skin.isFlat ? skin.radiusMd : skin.radiusSm,
+    );
+    final side = selected && !skin.isFlat
+        ? BorderSide(color: TitoColors.softYellow, width: skin.outlineWidth)
+        : dexSkinSide(context);
     return Material(
-      color: selected
-          ? TitoColors.softYellow.withValues(alpha: 0.18)
-          : TitoColors.card.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(TitoRadii.sm),
+      color: selected ? TitoColors.softYellow : skin.paperDense,
+      elevation: 0,
+      borderRadius: radius,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        borderRadius: radius,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(TitoRadii.sm),
-            border: Border.all(
-              color: selected
-                  ? TitoColors.softYellow
-                  : TitoColors.card.withValues(alpha: 0.35),
-              width: 2,
-            ),
+            borderRadius: radius,
+            border: side == BorderSide.none
+                ? null
+                : Border.fromBorderSide(side),
           ),
           padding: const EdgeInsets.all(6),
           child: Column(
@@ -288,7 +288,7 @@ class _FormPickerTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.card,
+                  color: skin.ink,
                   fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
                 ),
               ),
@@ -300,7 +300,9 @@ class _FormPickerTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.softYellow,
+                    color: skin.accentInkOn(
+                      selected ? TitoColors.softYellow : skin.paperDense,
+                    ),
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
                   ),
@@ -336,6 +338,23 @@ class _FormPickerTile extends StatelessWidget {
 /// opacity zero, then fade in over the route's tail — the creature lands
 /// first, the skeleton card materialises around it. On pop the card clears
 /// in the first stretch and the sprite rides back alone.
+BoxDecoration _detailSpritePlateDecoration(BuildContext context, Color accent) {
+  final skin = TitoSkin.of(context);
+  final side = dexSkinSide(context);
+  return BoxDecoration(
+    gradient: LinearGradient(
+      begin: const Alignment(-0.6, -0.8),
+      end: const Alignment(0.6, 0.8),
+      colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
+    ),
+    shape: skin.isFlat ? BoxShape.circle : BoxShape.rectangle,
+    borderRadius: skin.isFlat
+        ? null
+        : BorderRadius.circular(skin.isPlastic ? skin.radiusMd : skin.radiusSm),
+    border: side == BorderSide.none ? null : Border.fromBorderSide(side),
+  );
+}
+
 class PokemonDetailTransitionHeader extends StatelessWidget {
   const PokemonDetailTransitionHeader({super.key, required this.summary});
 
@@ -391,18 +410,7 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
                 Container(
                   width: plateSize,
                   height: plateSize,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: const Alignment(-0.6, -0.8),
-                      end: const Alignment(0.6, 0.8),
-                      colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
-                    ),
-                    borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    border: Border.all(
-                      color: TitoColors.ink,
-                      width: TitoBorders.element,
-                    ),
-                  ),
+                  decoration: _detailSpritePlateDecoration(context, accent),
                   clipBehavior: Clip.antiAlias,
                   child: Center(
                     child: PokemonCardTransitionHero(
@@ -542,18 +550,7 @@ class PokemonDetailHeader extends StatelessWidget {
                 Container(
                   width: plateSize,
                   height: plateSize,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: const Alignment(-0.6, -0.8),
-                      end: const Alignment(0.6, 0.8),
-                      colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
-                    ),
-                    borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    border: Border.all(
-                      color: TitoColors.ink,
-                      width: TitoBorders.element,
-                    ),
-                  ),
+                  decoration: _detailSpritePlateDecoration(context, accent),
                   clipBehavior: Clip.antiAlias,
                   child: Center(
                     child: PokemonCardTransitionHero(
@@ -1389,21 +1386,22 @@ class _StatsViewChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
+      elevation: 0,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        borderRadius: BorderRadius.circular(999),
         child: Ink(
           padding: const EdgeInsets.symmetric(vertical: 6),
-          decoration: BoxDecoration(
-            color: selected ? TitoColors.softYellow : TitoColors.card,
-            borderRadius: BorderRadius.circular(TitoRadii.sm),
-            border: Border.all(color: TitoColors.ink, width: 2),
+          decoration: dexSkinChipDecoration(
+            context,
+            selected: selected ? 1 : 0,
           ),
           child: Text(
             label,
             textAlign: TextAlign.center,
             style: SecondaryTypography.onCard.small12.copyWith(
               fontWeight: FontWeight.w800,
+              color: dexSkinChipInk(context, selected: selected ? 1 : 0),
             ),
           ),
         ),
@@ -1476,8 +1474,12 @@ class TypeEffectivenessGrid extends StatelessWidget {
                   crossAxisCount;
               // Icon tile never exceeds the cell it lives in.
               final tileSide = tileWidth.clamp(28.0, 56.0).toDouble();
-              final cellHeight = tileSide + 22.0;
+              // Name (9px) plus multiplier (12px) need more than 22px once
+              // the CJK face is measured; 22 clipped the multiplier.
+              final cellHeight = tileSide + 36.0;
 
+              final skin = TitoSkin.of(context);
+              final tileSideBorder = dexSkinSide(context);
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -1500,8 +1502,15 @@ class TypeEffectivenessGrid extends StatelessWidget {
                         height: math.min(tileSide, tileWidth),
                         decoration: BoxDecoration(
                           color: typeTileColor(type),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: TitoColors.ink, width: 2),
+                          shape: skin.isFlat
+                              ? BoxShape.circle
+                              : BoxShape.rectangle,
+                          borderRadius: skin.isFlat
+                              ? null
+                              : BorderRadius.circular(skin.radiusSm),
+                          border: tileSideBorder == BorderSide.none
+                              ? null
+                              : Border.fromBorderSide(tileSideBorder),
                         ),
                         alignment: Alignment.center,
                         child: TypeIconImage(
@@ -1517,13 +1526,14 @@ class TypeEffectivenessGrid extends StatelessWidget {
                         style: SecondaryTypography.onCard.small12.copyWith(
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
+                          color: skin.ink,
                         ),
                       ),
                       Text(
                         label,
                         style: SecondaryTypography.onCard.small12.copyWith(
                           fontWeight: FontWeight.w900,
-                          color: _multiplierColor(multiplier),
+                          color: _multiplierColor(context, multiplier),
                         ),
                       ),
                     ],
@@ -1537,17 +1547,18 @@ class TypeEffectivenessGrid extends StatelessWidget {
     );
   }
 
-  Color _multiplierColor(double multiplier) {
+  Color _multiplierColor(BuildContext context, double multiplier) {
+    final skin = TitoSkin.of(context);
     if (multiplier >= 2) {
       return const Color(0xFFD94848);
     }
     if (multiplier <= 0) {
-      return TitoColors.mutedInk;
+      return skin.mutedInk;
     }
     if (multiplier <= 0.5) {
       return const Color(0xFF4B7FD1);
     }
-    return TitoColors.ink;
+    return skin.ink;
   }
 }
 
@@ -1604,16 +1615,30 @@ class AbilitiesCard extends StatelessWidget {
                             horizontal: 6,
                             vertical: 2,
                           ),
-                          decoration: BoxDecoration(
-                            color: TitoColors.skyBlue.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: TitoColors.ink, width: 1),
-                          ),
+                          decoration: () {
+                            final skin = TitoSkin.of(context);
+                            final side = dexSkinSide(context);
+                            return BoxDecoration(
+                              color: skin.isFlat
+                                  ? TitoColors.skyBlue
+                                  : Color.alphaBlend(
+                                      TitoColors.skyBlue.withValues(
+                                        alpha: 0.45,
+                                      ),
+                                      skin.paper,
+                                    ),
+                              borderRadius: BorderRadius.circular(999),
+                              border: side == BorderSide.none
+                                  ? null
+                                  : Border.fromBorderSide(side),
+                            );
+                          }(),
                           child: Text(
                             AppZh.dexAbilityHidden,
                             style: SecondaryTypography.onCard.small12.copyWith(
                               fontWeight: FontWeight.w800,
                               fontSize: 10,
+                              color: TitoSkin.of(context).ink,
                             ),
                           ),
                         ),
@@ -1883,12 +1908,17 @@ class _MoveTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
-        color: typeTileColor(entry.move.type).withValues(alpha: 0.35),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(color: TitoColors.ink, width: 2),
+        color: Color.alphaBlend(
+          typeTileColor(entry.move.type).withValues(alpha: 0.28),
+          skin.paperDense,
+        ),
+        borderRadius: BorderRadius.circular(skin.radiusSm),
+        border: side == BorderSide.none ? null : Border.fromBorderSide(side),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1897,7 +1927,7 @@ class _MoveTile extends StatelessWidget {
             Text(
               'Lv.${entry.level}',
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: skin.mutedInk,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -2088,15 +2118,17 @@ class SpeciesAxisChips extends StatelessWidget {
       children: [
         for (final (label, filter) in entries)
           ActionChip(
-            backgroundColor: TitoColors.card,
-            side: const BorderSide(color: TitoColors.ink, width: 2),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(999),
+            elevation: 0,
+            backgroundColor: TitoSkin.of(context).chipFill,
+            side: dexSkinSide(context),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(999)),
             ),
             label: Text(
               label,
               style: SecondaryTypography.onCard.small12.copyWith(
                 fontWeight: FontWeight.w800,
+                color: TitoSkin.of(context).ink,
               ),
             ),
             onPressed: () {

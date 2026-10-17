@@ -7,8 +7,10 @@ import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/handheld_input.dart';
+import '../widgets/retro_forms.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
 
@@ -97,25 +99,44 @@ class _CompanionToolTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(skin.radiusMd);
+    final outline = skin.outline;
     return HandheldFocusDecorator(
       onActivate: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: radius,
       child: StickerPressable(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: radius,
+        ownShadow: false,
         child: Material(
-          color: TitoColors.card,
+          color: skin.paper,
+          elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: TitoColors.ink, width: 2),
+            borderRadius: radius,
+            side: outline == null
+                ? BorderSide.none
+                : BorderSide(
+                    color: skin.isPlastic
+                        ? skin.ink.withValues(alpha: 0.28)
+                        : outline,
+                    width: skin.outlineWidth,
+                  ),
           ),
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: radius,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                  Icon(icon, color: TitoColors.deepBlue, size: 22),
+                  StickerIconPlate(
+                    icon: icon,
+                    color: skin.isFlat
+                        ? TitoColors.softYellow
+                        : TitoColors.skyBlue,
+                    size: 36,
+                    iconColor: skin.ink,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -123,25 +144,27 @@ class _CompanionToolTile extends StatelessWidget {
                       children: [
                         Text(
                           title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: SecondaryTypography.onCard.body14.copyWith(
                             fontWeight: FontWeight.w800,
+                            color: skin.ink,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           subtitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: SecondaryTypography.onCard.small12.copyWith(
-                            color: TitoColors.mutedInk,
+                            color: skin.mutedInk,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: TitoColors.mutedInk,
-                  ),
+                  Icon(Icons.chevron_right_rounded, color: skin.mutedInk),
                 ],
               ),
             ),

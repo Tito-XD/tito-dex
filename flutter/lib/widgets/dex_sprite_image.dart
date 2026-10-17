@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
+import 'type_badge.dart';
 
 class DexSpriteImage extends StatelessWidget {
   const DexSpriteImage({
@@ -25,22 +26,22 @@ class DexSpriteImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (source == null || source!.isEmpty) {
-      return _placeholder();
+      return _placeholder(context);
     }
 
     if (source!.startsWith('assets/')) {
-      return _image(Image.asset(source!, fit: fit));
+      return _image(context, Image.asset(source!, fit: fit));
     }
 
     final uri = Uri.tryParse(source!);
     if (uri != null && uri.hasScheme && uri.scheme.startsWith('http')) {
-      return _image(Image.network(source!, fit: fit));
+      return _image(context, Image.network(source!, fit: fit));
     }
 
-    return _image(Image.file(File(source!), fit: fit));
+    return _image(context, Image.file(File(source!), fit: fit));
   }
 
-  Widget _image(Image image) {
+  Widget _image(BuildContext context, Image image) {
     return Image(
       image: image.image,
       height: height,
@@ -50,31 +51,34 @@ class DexSpriteImage extends StatelessWidget {
         if (wasSynchronouslyLoaded || frame != null) {
           return child;
         }
-        return _placeholder(shimmer: true);
+        return _placeholder(context, shimmer: true);
       },
-      errorBuilder: (_, __, ___) => _placeholder(),
+      errorBuilder: (_, __, ___) => _placeholder(context),
     );
   }
 
-  Widget _placeholder({bool shimmer = false}) {
+  Widget _placeholder(BuildContext context, {bool shimmer = false}) {
+    final skin = TitoSkin.of(context);
+    final side = dexSkinSide(context);
     final box = Container(
       height: height,
       width: width,
       decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(
-          color: TitoColors.ink.withValues(alpha: 0.1),
-          width: 2,
-        ),
+        color: skin.paperDense,
+        borderRadius: BorderRadius.circular(skin.radiusSm),
+        border: side == BorderSide.none
+            ? null
+            : Border.fromBorderSide(
+                side.copyWith(color: side.color.withValues(alpha: 0.45)),
+              ),
       ),
     );
     if (!shimmer) {
       return box;
     }
     return Shimmer.fromColors(
-      baseColor: TitoColors.card.withValues(alpha: 0.3),
-      highlightColor: TitoColors.card.withValues(alpha: 0.7),
+      baseColor: skin.paperDense,
+      highlightColor: Color.lerp(skin.paperDense, Colors.white, 0.55)!,
       child: box,
     );
   }

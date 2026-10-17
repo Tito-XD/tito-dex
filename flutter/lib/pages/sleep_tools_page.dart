@@ -4,9 +4,11 @@ import '../features/sleep/sleep_calculator.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_chips.dart';
 
 class SleepToolsPage extends StatefulWidget {
   const SleepToolsPage({super.key});
@@ -138,17 +140,11 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
                 runSpacing: 6,
                 children: [
                   for (final ingredient in sleepIngredients)
-                    ActionChip(
-                      avatar: const Icon(Icons.add_rounded, size: 16),
-                      label: Text(
-                        '${ingredient.nameZh} · ${ingredient.baseEnergy}',
-                      ),
-                      onPressed: () => _changeQuantity(ingredient, 1),
-                      backgroundColor: TitoColors.card,
-                      side: const BorderSide(color: TitoColors.ink, width: 2),
-                      labelStyle: SecondaryTypography.onCard.small12.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+                    TitoChip(
+                      icon: Icons.add_rounded,
+                      label: '${ingredient.nameZh} · ${ingredient.baseEnergy}',
+                      dense: true,
+                      onTap: () => _changeQuantity(ingredient, 1),
                     ),
                 ],
               ),
@@ -157,7 +153,7 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
                 Text(
                   AppZh.sleepIngredientEmpty,
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoSkin.of(context).mutedInk,
                     fontWeight: FontWeight.w700,
                   ),
                 )
@@ -207,7 +203,7 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
                   (_recipeEnergy * 3).round(),
                 ),
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoSkin.of(context).mutedInk,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -227,7 +223,7 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
                 Text(
                   AppZh.sleepSourceBody,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoSkin.of(context).mutedInk,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -253,8 +249,10 @@ class _TimeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     final value =
         '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    final outline = skin.outline;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -262,6 +260,7 @@ class _TimeButton extends StatelessWidget {
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
             fontWeight: FontWeight.w800,
+            color: skin.ink,
           ),
         ),
         const SizedBox(height: 6),
@@ -269,6 +268,22 @@ class _TimeButton extends StatelessWidget {
           onPressed: onTap,
           icon: const Icon(Icons.schedule_rounded, size: 18),
           label: Text(value),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: skin.ink,
+            backgroundColor: skin.isFlat ? skin.chipFill : skin.paper,
+            elevation: 0,
+            side: outline == null
+                ? BorderSide.none
+                : BorderSide(
+                    color: skin.isPlastic
+                        ? skin.ink.withValues(alpha: 0.28)
+                        : outline,
+                    width: skin.outlineWidth,
+                  ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(skin.radiusSm),
+            ),
+          ),
         ),
       ],
     );
@@ -299,6 +314,7 @@ class _IngredientQuantityRow extends StatelessWidget {
               '${ingredient.nameZh} · ${ingredient.baseEnergy}',
               style: SecondaryTypography.onCard.body14.copyWith(
                 fontWeight: FontWeight.w800,
+                color: TitoSkin.of(context).ink,
               ),
             ),
           ),
@@ -338,28 +354,40 @@ class _ResultBand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final outline = skin.outline;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: TitoColors.mint,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: TitoColors.ink, width: 2),
+        borderRadius: BorderRadius.circular(skin.radiusMd),
+        border: outline == null
+            ? null
+            : Border.all(
+                color: skin.isPlastic
+                    ? skin.ink.withValues(alpha: 0.28)
+                    : outline,
+                width: skin.outlineWidth,
+              ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              mainText,
-              style: SecondaryTypography.onCard.h15.copyWith(
-                fontWeight: FontWeight.w900,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                mainText,
+                maxLines: 1,
+                style: skin.display(26, color: skin.ink),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               detailText,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: skin.mutedInk,
                 fontWeight: FontWeight.w700,
               ),
             ),

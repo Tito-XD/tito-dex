@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
 
@@ -32,6 +32,7 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
     return StickerCard(
       variant: widget.variant,
       child: Column(
@@ -50,10 +51,7 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            widget.title,
-                            style: SecondaryTypography.onCard.h15,
-                          ),
+                          Text(widget.title, style: skin.heading(15)),
                           if (widget.subtitle != null && !_expanded) ...[
                             const SizedBox(height: 4),
                             Text(
@@ -61,7 +59,7 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: SecondaryTypography.onCard.small12
-                                  .copyWith(color: TitoColors.mutedInk),
+                                  .copyWith(color: skin.mutedInk),
                             ),
                           ],
                         ],
@@ -71,17 +69,14 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
                       _expanded
                           ? Icons.expand_less_rounded
                           : Icons.expand_more_rounded,
-                      color: TitoColors.ink,
+                      color: skin.ink,
                     ),
                   ],
                 ),
               ),
             ),
           ),
-          if (_expanded) ...[
-            const SizedBox(height: 12),
-            widget.child,
-          ],
+          if (_expanded) ...[const SizedBox(height: 12), widget.child],
         ],
       ),
     );

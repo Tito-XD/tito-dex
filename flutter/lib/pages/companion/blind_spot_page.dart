@@ -13,6 +13,7 @@ import '../../models/journey.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/tito_skin.dart';
 import '../../widgets/companion_tool_fields.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
@@ -357,8 +358,13 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
 
                     return Column(
                       children: [
-                        StickerCard(
-                          variant: StickerVariant.mint,
+                        Builder(
+                          builder: (context) {
+                            final muted = TitoSkin.of(context)
+                                .heroTint(TitoHeroRole.action)
+                                .mutedInk;
+                            return StickerCard.hero(
+                          role: TitoHeroRole.action,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -386,11 +392,13 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                                 Text(
                                   '世代修正属性：${normalized.map(typeNameZh).join('/')}',
                                   style: SecondaryTypography.onCard.small12
-                                      .copyWith(color: TitoColors.mutedInk),
+                                      .copyWith(color: muted),
                                 ),
                               ],
                             ],
                           ),
+                        );
+                          },
                         ),
                       ],
                     );

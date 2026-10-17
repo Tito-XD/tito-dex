@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
+import '../theme/tito_skin.dart';
 import 'journey_card.dart';
 import 'party_strip.dart';
 import 'tito_skeleton.dart';
@@ -371,11 +372,20 @@ class _TrainerCardSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TrainerCard(
+    final card = TrainerCard(
       journey: journey,
       compact: true,
       dense: dense,
       avatarPlaceholder: bootstrapping,
+    );
+    // Journal tape overhangs the hero by ~9px and the card tilts -1.4°.
+    // Keep that paint inside the scroll/column clip instead of shearing it off.
+    if (!TitoSkin.of(context).isJournal) {
+      return card;
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 12, 4, 2),
+      child: card,
     );
   }
 }

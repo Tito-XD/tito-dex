@@ -9,10 +9,11 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
+import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 import 'sticker_pressable.dart';
 import 'tito_progress_bar.dart';
-import 'tito_sprite_sticker.dart';
 
 /// Design-spec team row: sticker sprite, name, HP + EXP bars.
 class PartyTeamList extends StatelessWidget {
@@ -84,6 +85,8 @@ class _PartyTeamRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(skin.radiusMd);
     final label = member.nickname ?? localizeSpecies(member.species);
     final speciesId = member.speciesId;
     // v0.6.7 team template: rounded-square sprite plate, name + sub + type
@@ -98,27 +101,23 @@ class _PartyTeamRow extends StatelessWidget {
     ];
 
     return StickerPressable(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: radius,
       ownShadow: false,
       interactive: onTap != null,
-      child: StickerCard(
+      child: StickerCard.dense(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: radius,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (speciesId != null)
-                TitoSpriteSticker(
-                  source:
-                      summary?.displaySpritePath ??
-                      defaultSpriteUrlFor(speciesId),
-                  size: 46,
-                  radius: 13,
-                )
-              else
-                const TitoSpriteSticker(source: null, size: 46, radius: 13),
+              _TeamSpritePlate(
+                source: speciesId == null
+                    ? null
+                    : (summary?.displaySpritePath ??
+                          defaultSpriteUrlFor(speciesId)),
+              ),
               const SizedBox(width: 11),
               Expanded(
                 child: Column(
@@ -129,7 +128,7 @@ class _PartyTeamRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SecondaryTypography.onCard.h15.copyWith(
-                        color: TitoColors.deepBlue,
+                        color: skin.ink,
                       ),
                     ),
                     if (subParts.isNotEmpty) ...[
@@ -139,7 +138,7 @@ class _PartyTeamRow extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: skin.mutedInk,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -186,9 +185,10 @@ class _PartyTeamRow extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   '${AppZh.level}${member.level}',
-                  style: SecondaryTypography.onCard.h15.copyWith(
-                    color: TitoColors.coral,
-                    fontWeight: FontWeight.w800,
+                  style: skin.display(
+                    15,
+                    color: skin.accentInkOn(skin.paper),
+                    weight: FontWeight.w800,
                   ),
                 ),
               ],
@@ -196,6 +196,40 @@ class _PartyTeamRow extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TeamSpritePlate extends StatelessWidget {
+  const _TeamSpritePlate({required this.source});
+
+  final String? source;
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final outline = skin.outline;
+    final radius = skin.isFlat ? null : BorderRadius.circular(skin.radiusSm);
+    return Container(
+      width: 46,
+      height: 46,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: skin.isFlat ? TitoColors.softYellow : skin.paper,
+        shape: skin.isFlat ? BoxShape.circle : BoxShape.rectangle,
+        borderRadius: radius,
+        border: outline == null
+            ? null
+            : Border.all(
+                color: skin.isPlastic
+                    ? skin.ink.withValues(alpha: 0.28)
+                    : outline,
+                width: skin.outlineWidth,
+              ),
+      ),
+      child: source == null
+          ? Icon(Icons.catching_pokemon_outlined, size: 22, color: skin.mutedInk)
+          : DexSpriteImage(source: source, width: 38, height: 38),
     );
   }
 }
@@ -208,19 +242,23 @@ class _TypePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final outline = skin.outline;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
       decoration: BoxDecoration(
         color: typeTileColor(typeKey),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+        border: outline == null
+            ? null
+            : Border.all(color: outline, width: skin.outlineWidth),
       ),
       child: Text(
         typeNameZh(typeKey),
         style: SecondaryTypography.onCard.small12.copyWith(
           fontSize: 10,
           fontWeight: FontWeight.w800,
-          color: TitoColors.ink.withValues(alpha: 0.75),
+          color: skin.ink.withValues(alpha: 0.8),
         ),
       ),
     );
@@ -242,7 +280,10 @@ class _StatBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final team12 = SecondaryTypography.onCard.team12;
+    final skin = TitoSkin.of(context);
+    final team12 = SecondaryTypography.onCard.team12.copyWith(
+      color: skin.mutedInk,
+    );
 
     return Row(
       children: [
@@ -252,7 +293,7 @@ class _StatBar extends StatelessWidget {
             value: value,
             height: 8,
             fillColor: fillColor,
-            trackColor: TitoColors.skyBlue.withValues(alpha: 0.45),
+            trackColor: skin.mutedInk.withValues(alpha: 0.22),
           ),
         ),
         if (detail != null) ...[
@@ -271,82 +312,33 @@ class _EmptyTeamRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Team template: dashed warm card, centered label, no drop shadow.
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(skin.radiusMd);
     return StickerPressable(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: radius,
       ownShadow: false,
       interactive: onTap != null,
-      child: CustomPaint(
-        painter: _DashedRRectPainter(
-          color: TitoColors.ink.withValues(alpha: 0.45),
-          radius: 12,
-        ),
-        child: Material(
-          color: TitoColors.cardWarm,
-          borderRadius: BorderRadius.circular(12),
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_rounded,
-                    size: 18,
-                    color: TitoColors.mutedInk.withValues(alpha: 0.8),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    AppZh.teamEmptySlot,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      color: TitoColors.mutedInk,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
+      child: StickerCard.dense(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_rounded, size: 18, color: skin.mutedInk),
+              const SizedBox(width: 6),
+              Text(
+                AppZh.teamEmptySlot,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  color: skin.mutedInk,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
-}
-
-/// Dashed rounded-rect outline for the empty team slot (no native dashed
-/// borders in Flutter).
-class _DashedRRectPainter extends CustomPainter {
-  const _DashedRRectPainter({required this.color, required this.radius});
-
-  final Color color;
-  final double radius;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-    final rrect = RRect.fromRectAndRadius(
-      Offset.zero & size,
-      Radius.circular(radius),
-    ).deflate(1);
-    final path = Path()..addRRect(rrect);
-    const dash = 6.0;
-    const gap = 5.0;
-    for (final metric in path.computeMetrics()) {
-      var distance = 0.0;
-      while (distance < metric.length) {
-        final end = (distance + dash).clamp(0.0, metric.length);
-        canvas.drawPath(metric.extractPath(distance, end), paint);
-        distance = end + gap;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedRRectPainter oldDelegate) =>
-      color != oldDelegate.color || radius != oldDelegate.radius;
 }

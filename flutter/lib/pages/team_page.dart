@@ -17,6 +17,7 @@ import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_skin.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../widgets/party_team_list.dart';
@@ -258,56 +259,76 @@ class _TeamPageState extends State<TeamPage> {
         if (_showSaveDiffBanner)
           Padding(
             padding: const EdgeInsets.only(bottom: 14),
-            child: Material(
-              color: TitoColors.softYellow,
-              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-              child: InkWell(
-                onTap: _confirmSyncFromSave,
-                borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.sync_rounded, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          AppZh.partySaveDiffBanner,
-                          style: SecondaryTypography.onCard.body14.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: _dismissDiffBanner,
-                        tooltip: AppZh.partySaveDiffDismiss,
-                        visualDensity: VisualDensity.compact,
-                        icon: const Icon(Icons.close_rounded, size: 18),
-                      ),
-                    ],
+            child: Builder(
+              builder: (context) {
+                final skin = TitoSkin.of(context);
+                final radius = BorderRadius.circular(skin.radiusMd);
+                final outline = skin.outline;
+                return Material(
+                  color: TitoColors.softYellow,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: radius,
+                    side: outline == null
+                        ? BorderSide.none
+                        : BorderSide(color: outline, width: skin.outlineWidth),
                   ),
-                ),
-              ),
+                  child: InkWell(
+                    onTap: _confirmSyncFromSave,
+                    borderRadius: radius,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.sync_rounded, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              AppZh.partySaveDiffBanner,
+                              style: SecondaryTypography.onCard.body14.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _dismissDiffBanner,
+                            tooltip: AppZh.partySaveDiffDismiss,
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-        StickerCard(
-          variant: StickerVariant.deep,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${AppZh.navTeam} · ${gameEditionRepository.edition.selectedLabelZh}',
-                style: SecondaryTypography.onGradient.h15,
+        Builder(
+          builder: (context) {
+            final muted = TitoSkin.of(
+              context,
+            ).heroTint(TitoHeroRole.journey).mutedInk;
+            return StickerCard.hero(
+              role: TitoHeroRole.journey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${AppZh.navTeam} · ${gameEditionRepository.edition.selectedLabelZh}',
+                    style: SecondaryTypography.onGradient.h15,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    AppZh.teamSubtitle(_party.length),
+                    style: SecondaryTypography.onGradient.meta14.copyWith(
+                      color: muted,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                AppZh.teamSubtitle(_party.length),
-                style: SecondaryTypography.onGradient.meta14.copyWith(
-                  color: TitoColors.skyBlue,
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
         const SizedBox(height: 14),
         TeamSummaryCard(party: _party, detailsFuture: _partyDetailsFuture),
@@ -550,7 +571,8 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
   @override
   Widget build(BuildContext context) {
     final abilityOptions = defensiveAbilityOptionsFrom(_abilities);
-    final radius = BorderRadius.circular(TitoRadii.sm);
+    final skin = TitoSkin.of(context);
+    final radius = BorderRadius.circular(skin.radiusSm);
     return StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1024,10 +1046,13 @@ class _EditorActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = TitoSkin.of(context);
+    final outline = skin.outline;
     return StickerPressable(
       borderRadius: radius,
       child: Material(
         color: background,
+        elevation: 0,
         borderRadius: radius,
         child: InkWell(
           onTap: onTap,
@@ -1037,10 +1062,9 @@ class _EditorActionButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
               borderRadius: radius,
-              border: Border.all(
-                color: TitoColors.ink,
-                width: TitoBorders.element,
-              ),
+              border: outline == null
+                  ? null
+                  : Border.all(color: outline, width: skin.outlineWidth),
             ),
             child: Text(
               label,
