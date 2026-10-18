@@ -40,8 +40,10 @@ class _TitoEntranceState extends State<TitoEntrance>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final motion = TitoMotion.of(context);
+    // Loading the saved skin before readiness must not consume the first entry.
+    // Once started, a later theme change settles instead of replaying it.
     if (TitoMotion.disabled(context) ||
-        (_motion != null && _motion != motion) ||
+        (_consumed && _motion != null && _motion != motion) ||
         ModalRoute.of(context)?.isCurrent == false) {
       _settle();
     }

@@ -166,6 +166,46 @@ void main() {
     );
   }
 
+  for (final stored in [AppVisualStyle.solidPlastic, AppVisualStyle.flatUi]) {
+    testWidgets('loading a stored $stored theme preserves first entrance', (
+      tester,
+    ) async {
+      final phase = ValueNotifier(0);
+      addTearDown(phase.dispose);
+      await tester.pumpWidget(
+        ValueListenableBuilder<int>(
+          valueListenable: phase,
+          builder: (_, value, _) => MaterialApp(
+            themeAnimationDuration: Duration.zero,
+            theme: buildTitoTheme(value == 0 ? AppVisualStyle.classic : stored),
+            home: TitoEntrance(
+              ready: value == 2,
+              itemCount: 2,
+              child: const Column(
+                children: [
+                  TitoEntranceItem(index: 0, child: Text('first')),
+                  TitoEntranceItem(index: 1, child: Text('second')),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      phase.value = 1;
+      await tester.pump();
+      _expectSettled(tester);
+      phase.value = 2;
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 80));
+      expect(_opacity(tester, 0), inExclusiveRange(0, 1));
+      expect(_opacity(tester, 0), greaterThan(_opacity(tester, 1)));
+      await tester.pumpAndSettle();
+      _expectSettled(tester);
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
+
   testWidgets(
     'disabled first frame is visible and disposal while waiting is safe',
     (tester) async {
