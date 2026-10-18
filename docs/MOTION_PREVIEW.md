@@ -29,3 +29,10 @@ Launcher 为原生 Compose 包 `com.tito.titodex.launcher`，版本 `0.3.1-motio
 构建顺序：先 App 的分析/完整测试及 arm64 预览构建，再 Launcher 的单元测试及 debug/release 构建。16 GB 主机禁止两套构建并发。Launcher 真机前使用交接指定备份/恢复流程。
 
 本轮 App 静态分析通过；完整回归 660 项通过、6 项按条件跳过，包含启动时读取已保存主题、一次性入场、快速连续按压、取消/失焦释放和减少动画验证。APK、真机验收、源提交与附件摘要以实际发布记录为准；代码测试不代表实体按键、持续功耗或全部设备验收。
+
+## 已发布记录
+
+- [App 三主题动效预览](https://github.com/Tito-XD/tito-dex/releases/tag/app-theme-v0.9.6-motion.1)：APK 源码 `78ede3caaa7c25352cf9a8d40505f154caff2c0c`，SHA-256 `b13159770bbebb7895e696c50b8e65b92ac0e829a35b58897a3e4623a92b4b3e`。
+- [Launcher 跟手桌面与轻动效预览](https://github.com/Tito-XD/tito-dex/releases/tag/launcher-v0.3.1-motion.1)：APK 源码 `db779e51f30c89d5a5705904d013be547df6d04d`，SHA-256 `6404aa4184bb1eaca4b4dcaf11018b08fc8667f5ba3b544fde623a2d12ef3ced`。
+- 两个预览均已保留数据安装到 RG Rotate。正式 App 仍为 v0.9.24 / code 216，安装更新时间未变；Launcher 原壁纸、设置与默认 HOME 保留，系统动画比例已恢复。
+- 最终 App 包已录屏检查冷启动与三个入口进入/返回。Launcher 50 项回归通过，最终包真机验证包括编辑返回后的真实坐标点击、快速开合、拖动关闭、系统减少动画及模拟 D-pad/B 返回。实体按键手感与长时间性能尚未验收。
