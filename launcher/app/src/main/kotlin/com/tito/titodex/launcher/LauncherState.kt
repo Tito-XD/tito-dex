@@ -88,7 +88,14 @@ class LauncherState(
     private var toastJob: Job? = null
 
     /** Hit areas in root coordinates, reported by composables for popover anchors and drag targets. */
-    val rects = mutableMapOf<String, Rect>()
+    // Graphics-layer movement does not relayout children. Resolve coordinates
+    // at the moment of touch/drop/menu activation instead of caching rectangles.
+    internal val rectProviders = mutableMapOf<String, () -> Rect?>()
+    val rects: Map<String, Rect> = object : AbstractMap<String, Rect>() {
+        override fun get(key: String): Rect? = rectProviders[key]?.invoke()
+        override val entries: Set<Map.Entry<String, Rect>>
+            get() = rectProviders.mapNotNull { (key, bounds) -> bounds()?.let { key to it } }.toMap().entries
+    }
 
     val coach: Boolean get() = !settings.coachSeen && mode == Mode.Home && !settingsOpen
 

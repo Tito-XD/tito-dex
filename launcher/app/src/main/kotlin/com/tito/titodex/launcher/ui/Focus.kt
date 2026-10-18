@@ -31,6 +31,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
@@ -51,6 +52,21 @@ object FocusTargets {
         val r = requesters[key] ?: return false
         return runCatching { r.requestFocus(); true }.getOrDefault(false)
     }
+}
+
+/** Keep live coordinates through parent layer transforms without relayout. */
+internal fun Modifier.trackedBounds(state: LauncherState, key: String, active: Boolean = true): Modifier = composed {
+    val coordinates = remember { arrayOfNulls<LayoutCoordinates>(1) }
+    val bounds: () -> androidx.compose.ui.geometry.Rect? = remember {
+        { coordinates[0]?.takeIf { it.isAttached }?.boundsInRoot() }
+    }
+    DisposableEffect(state, key, active) {
+        if (active) state.rectProviders[key] = bounds
+        onDispose {
+            if (state.rectProviders[key] === bounds) state.rectProviders.remove(key)
+        }
+    }
+    this.onGloballyPositioned { coordinates[0] = it }
 }
 
 /**
@@ -83,12 +99,11 @@ fun Modifier.padTarget(state: LauncherState, key: String, label: String? = null,
     DisposableEffect(key, active) {
         if (active) FocusTargets.requesters[key] = requester
         onDispose {
-            state.rects.remove(key)
             if (FocusTargets.requesters[key] === requester) FocusTargets.requesters.remove(key)
         }
     }
     this
-        .onGloballyPositioned { if (active) state.rects[key] = it.boundsInRoot() }
+        .trackedBounds(state, key, active)
         .semantics {
             role = Role.Button
             if (label != null) contentDescription = label

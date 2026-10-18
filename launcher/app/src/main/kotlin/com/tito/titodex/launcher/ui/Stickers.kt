@@ -469,7 +469,7 @@ fun ShelfSticker(state: LauncherState, items: List<ShelfItem>, size: String, liv
     val drag = state.iconDrag
     Box(
         Modifier.fillMaxSize().plate(look, PlateKind.Shelf)
-            .onGloballyPositioned { if (live) state.rects["shelfbox"] = it.boundsInRoot() }
+            .trackedBounds(state, "shelfbox", live)
             .then(if (look.journal) Modifier.drawBehind {
                 val inset = 5.dp.toPx()
                 drawRoundRect(Color(0x8c7c8999), Offset(inset, inset), Size(this.size.width - inset * 2, this.size.height - inset * 2), CornerRadius(11.dp.toPx()), style = Stroke(1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(4f, 3f))))

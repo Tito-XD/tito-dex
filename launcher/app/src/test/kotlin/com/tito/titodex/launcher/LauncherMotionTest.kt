@@ -263,6 +263,21 @@ class LauncherMotionTest {
         assertEquals(listOf("com.b/B"), device.launched)
     }
 
+    @Test fun handleRemainsTouchableAfterReturningFromEdit() {
+        val (_, state) = launch()
+        mutate { state.enterEdit() }
+        rule.waitForIdle()
+        mutate { state.goHome() }
+        rule.waitForIdle()
+        mutate { setScale(0f) }
+        rule.waitForIdle()
+        val handle = rule.onNodeWithContentDescription("应用库").fetchSemanticsNode().boundsInRoot
+        assertEquals("touch rect must match visible handle after editing", handle, state.rects["handle"])
+        rule.onRoot().performTouchInput { click(handle.center) }
+        rule.waitForIdle()
+        assertEquals(Mode.Library, state.mode)
+    }
+
     @Test fun undoInterruptsModuleMovementWithoutReallocatingWidgetIds() {
         val (device, state) = launch()
         mutate { state.enterEdit(); state.addWidget(device.widgets.provider) }
