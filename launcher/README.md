@@ -2,7 +2,16 @@
 
 面向 Android 游戏掌机的独立轻量桌面。首个目标设备是 RG Rotate（Android 12、720×720、240 dpi）。与 TitoDex App 并列安装，保留其「训练家手帐」「固态塑料」「扁平贴纸」视觉语言。
 
-下一轮框架与触屏体验重做请先读 [HANDOFF.md](HANDOFF.md)。用户尚未认可 0.2.0 的最终体验；候选新方案尚未落地。
+当前开发版为 **0.3.1-motion.1 原生 Compose 动效预览版**。参见 [HANDOFF.md](HANDOFF.md) 和 [design/DIRECTION-0.3.md](design/DIRECTION-0.3.md)。首页为贴纸网格，应用库为抽屉，整理模式合并布局/外观/壁纸，并支持系统小组件。
+
+本轮恢复与构建入口（串行执行，不和 Flutter 构建并行）：
+
+```sh
+JAVA_HOME=/opt/homebrew/opt/openjdk@17 ./gradlew --no-daemon --max-workers=2 :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease
+ANDROID_HOME=/opt/homebrew/share/android-commandlinetools python3 tool/test_device.py ROTATE11939354 --apk app/build/outputs/apk/release/app-release.apk --debug-apk app/build/outputs/apk/debug/app-debug.apk
+```
+
+本轮 Pre-release 使用开发预览签名；动效方向与来源见 [MOTION.md](MOTION.md)，设备/截图/测试证据见 [VALIDATION.md](VALIDATION.md)。下方 0.2.0 说明保留作历史记录，其中旧 Flutter 构建命令不适用于当前 Launcher。
 
 ## 0.2.0 预览版
 
@@ -66,7 +75,7 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@17 python3 tool/test_device.py <serial>
 
 ## 来源与许可
 
-- 主题名称、配色和 Nunito 沿用仓库 [设计系统](../docs/DESIGN_SYSTEM.md)。Nunito 使用 SIL OFL 1.1，全文打包在 `assets/licenses/nunito-OFL.txt`，可在应用许可页查看。
+- 主题名称、配色和 Nunito 沿用仓库 [设计系统](../docs/DESIGN_SYSTEM.md)。Nunito 使用 SIL OFL 1.1，全文打包在 `app/src/main/res/raw/nunito_ofl.txt`，可在应用许可页查看。
 - 天气与城市搜索来自 [Open-Meteo](https://open-meteo.com/)，天气数据按 CC BY 4.0 标注；当前个人预览使用其非商业免费 API。见 [天气接口](https://open-meteo.com/en/docs)、[城市搜索](https://open-meteo.com/en/docs/geocoding-api)、[服务条款](https://open-meteo.com/en/terms)。网络开启后仅提交搜索词或所选城市坐标。
 - 默认桌面采用 Android [HOME role](https://developer.android.com/reference/android/app/role/RoleManager#ROLE_HOME) 与系统默认应用选择界面。
 - 原创矢量背景，不打包第三方 Pokémon 壁纸。非官方个人项目，与 Nintendo、Creatures、GAME FREAK 或 The Pokémon Company 无隶属、授权或赞助关系。
