@@ -5,11 +5,11 @@
 ## 当前接续状态
 
 - 用户已认可贴纸桌面的方向，并授权原生 Kotlin + Jetpack Compose 重写、系统小组件、APK 覆盖安装。
-- 工作树 `codex/titodex-launcher` 保留先前 agents 的重写，基于 `1c94b30`，大量修改尚未提交。不要重置这些修改。
+- 原生迁移与动效已在 `codex/titodex-launcher` 提交。线上动效预览源码为 `db779e51f30c89d5a5705904d013be547df6d04d`；不要把先前“修改尚未提交”的记录当成现状。
 - 当前源代码在 `app/src/main/kotlin/com/tito/titodex/launcher/`；Flutter `lib/` 删除是已授权的框架迁移。
 - 2026-10-18 接续时，RG Rotate 已安装 0.3.0 / versionCode 4 调试包，默认 HOME 也已是 TitoDex Launcher。旧报告中“尚未安装四项调整”的结论不完整；以设备与源码为准。
 - 本轮补齐：横向大字 2×1；用户随后纠正“留白”模板应使用竖向 1×2，新增竖排小时/分钟；日期短写、天气贴纸不显示城市、小时/每日预报；日期与天气不再随整行缩小，天气使用所选城市的时间偏移。
-- 0.3.0 / versionCode 5 已完成本地预览；当前准备 0.3.1-motion.1 / versionCode 6 动效预发布。构建、安装与线上发布结果以 `VALIDATION.md` 和 GitHub Pre-release 的实际记录为准。
+- `0.3.1-motion.1` / versionCode 6 已作为 [GitHub Pre-release](https://github.com/Tito-XD/tito-dex/releases/tag/launcher-v0.3.1-motion.1) 上线并保留数据安装至 RG。原设置和壁纸已备份、恢复及逐文件核对。50 项回归通过，真实触控复测包含编辑返回后再次点开应用库；详见 `VALIDATION.md`。
 - 用户进一步反馈竖排时钟间距偏大：改为同一段双行文字，统一控制基线间距，消除独立 Text 的重复字体留白；保持 1×2 网格占位与 16sp 日期/天气。紧凑版 APK 文件名增加 `-compact` 以区分同版本本地预览。
 - 用户最新要求：竖排日期与镂空英文星期统一为 16sp、同字体粗细、同基线；保持 `10/18 SUN` 同排和中文星期读屏。1×2 时间按剩余宽高放大，使用等宽数字与稳定测量避免分钟切换时尺寸跳动，并保留日期/天气的空间。此要求取代上一轮限制数字字号的试用方向；时钟调整版 APK 文件名增加 `-clock-fit`。
 - 用户澄清 TitoDex 入口应保留 Launcher 专属球形造型和差异化，不要求照搬 App 图标。当前使用 `TitoEmblem`：蓝色上半球、深色下半球、浅色中线与中央圆环；手帐为纸质虚线徽章，塑料为有亮边/厚度的圆形按键，扁平为蓝黑色块圆章及珊瑚色中心。小尺寸、大尺寸与入口菜单统一，固定入口仍打开正式 `com.tito.titodex`；编辑器小尺寸名为「徽章」，持久化 key 不变。此方向取代上一轮方形 App 图标底座，当前 APK 文件名增加 `-emblem`。
