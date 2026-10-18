@@ -165,7 +165,7 @@ class TitoQuickTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final skin = TitoSkin.of(context);
-    final radius = BorderRadius.circular(TitoRadii.md);
+    final radius = BorderRadius.circular(skin.radiusHero);
     final labelColor = skin.isFlat ? skin.ink : TitoColors.deepBlue;
     final content = Material(
       color: Colors.transparent,
@@ -230,7 +230,7 @@ class TitoQuickTile extends StatelessWidget {
       surface = LiquidGlassSurface(
         tint: backgroundColor ?? TitoColors.card,
         opacity: 0.92,
-        radius: TitoRadii.md,
+        radius: skin.radiusHero,
         child: content,
       );
     } else if (skin.isFlat) {

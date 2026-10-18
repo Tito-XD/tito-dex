@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_visual_style.dart';
+import '../theme/motion_preferences.dart';
+import '../theme/retro_style.dart';
+import '../theme/tito_motion.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_skin.dart';
@@ -20,58 +23,78 @@ class StickerSwitch extends StatelessWidget {
   final ValueChanged<bool>? onChanged;
 
   @override
-  Widget build(BuildContext context) {
-    final skin = TitoSkin.of(context);
-    final enabled = onChanged != null;
-    final side = skin.controlSide;
-    final trackOn = skin.isFlat ? TitoColors.deepBlue : TitoColors.mint;
-    final trackOff = skin.isFlat
-        ? TitoColors.flatSurfaceContainerHigh
-        : TitoColors.cardWarm;
-    final knobOn = skin.isFlat ? TitoColors.softYellow : TitoColors.deepBlue;
-    return Semantics(
-      toggled: value,
-      button: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: enabled ? () => onChanged!(!value) : null,
-        child: Opacity(
-          opacity: enabled ? 1.0 : 0.45,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 120),
-            curve: Curves.easeOut,
-            width: 46,
-            height: 27,
-            padding: EdgeInsets.all(skin.isFlat ? 3 : 1),
-            decoration: BoxDecoration(
-              color: value ? trackOn : trackOff,
-              borderRadius: BorderRadius.circular(999),
-              border: side == BorderSide.none
-                  ? null
-                  : Border.fromBorderSide(side),
-              boxShadow: skin.chipShadow,
-            ),
-            child: AnimatedAlign(
-              duration: const Duration(milliseconds: 120),
-              curve: Curves.easeOut,
-              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                width: skin.isFlat ? 21 : 19,
-                height: skin.isFlat ? 21 : 19,
-                decoration: BoxDecoration(
-                  color: value ? knobOn : TitoColors.card,
-                  shape: BoxShape.circle,
-                  border: side == BorderSide.none
-                      ? null
-                      : Border.fromBorderSide(side),
-                ),
-              ),
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: Listenable.merge([motionPreferences, retroStyle]),
+    builder: (context, _) {
+      final skin = TitoSkin.of(context);
+      final motion = TitoMotion.of(context);
+      final enabled = onChanged != null;
+      final animate = enabled && !TitoMotion.disabled(context);
+      final side = skin.controlSide;
+      final trackOn = skin.isFlat ? TitoColors.deepBlue : TitoColors.mint;
+      final trackOff = skin.isFlat
+          ? TitoColors.flatSurfaceContainerHigh
+          : TitoColors.cardWarm;
+      final knobOn = skin.isFlat ? TitoColors.softYellow : TitoColors.deepBlue;
+      final target = value ? 1.0 : 0.0;
+      return Semantics(
+        toggled: value,
+        button: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: enabled ? () => onChanged!(!value) : null,
+          child: Opacity(
+            opacity: enabled ? 1.0 : 0.45,
+            child: TweenAnimationBuilder<double>(
+              // Start at the selected side; mounting a settings row isn't an
+              // interaction. Retarget from the current position on rapid taps.
+              tween: Tween<double>(begin: target, end: target),
+              duration: animate ? motion.selection : Duration.zero,
+              curve: motion.settleCurve,
+              builder: (context, value, _) {
+                final progress = animate ? value : target;
+                final stretch = animate
+                    ? motion.switchStretch * 4 * progress * (1 - progress)
+                    : 0.0;
+                return Container(
+                  width: 46,
+                  height: 27,
+                  padding: EdgeInsets.all(skin.isFlat ? 3 : 1),
+                  decoration: BoxDecoration(
+                    color: Color.lerp(trackOff, trackOn, progress),
+                    borderRadius: BorderRadius.circular(999),
+                    border: side == BorderSide.none
+                        ? null
+                        : Border.fromBorderSide(side),
+                    boxShadow: skin.chipShadow,
+                  ),
+                  child: Align(
+                    alignment: Alignment(-1 + 2 * progress, 0),
+                    child: Transform.scale(
+                      scaleX: 1 + stretch,
+                      scaleY: 1 / (1 + stretch),
+                      transformHitTests: false,
+                      child: Container(
+                        width: skin.isFlat ? 21 : 19,
+                        height: skin.isFlat ? 21 : 19,
+                        decoration: BoxDecoration(
+                          color: Color.lerp(TitoColors.card, knobOn, progress),
+                          shape: BoxShape.circle,
+                          border: side == BorderSide.none
+                              ? null
+                              : Border.fromBorderSide(side),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
 }
 
 /// Soft-yellow pill floating above a settings card as the group title.

@@ -1,13 +1,15 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../theme/motion_preferences.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_motion.dart';
 import '../theme/tito_skin.dart';
 import 'handheld_input.dart';
 
-/// Trainer's Journal uses the original hard physical sticker press, Solid
-/// Plastic uses the softer glass depth recipe, and Flat UI delegates feedback
-/// to its Material state layers.
+/// Journal keeps its hard shadow and physical press; Plastic adds a restrained
+/// compression. Flat delegates feedback to the child's Material state layer.
 class StickerPressable extends StatefulWidget {
   const StickerPressable({
     super.key,
@@ -26,76 +28,143 @@ class StickerPressable extends StatefulWidget {
   State<StickerPressable> createState() => _StickerPressableState();
 }
 
-class _StickerPressableState extends State<StickerPressable> {
-  static const _minHold = Duration(milliseconds: 120);
+class _StickerPressableState extends State<StickerPressable>
+    with SingleTickerProviderStateMixin {
+  final _pointers = <int, Offset>{};
+  late final AnimationController _press;
+  double _target = 0;
 
-  var _pressed = false;
-  DateTime? _pressedAt;
+  @override
+  void initState() {
+    super.initState();
+    _press = AnimationController.unbounded(vsync: this, value: 0);
+    retroStyle.addListener(_preferencesChanged);
+    motionPreferences.addListener(_preferencesChanged);
+  }
 
-  void _setPressed(bool pressed) {
-    if (!mounted) return;
-    if (pressed) {
-      if (!_pressed) {
-        _pressedAt = DateTime.now();
-        setState(() => _pressed = true);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (TitoMotion.disabled(context) || TitoSkin.of(context).isFlat) {
+      _pointers.clear();
+    }
+  }
+
+  @override
+  void didUpdateWidget(StickerPressable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!widget.interactive) _pointers.clear();
+  }
+
+  void _preferencesChanged() {
+    setState(() {
+      if (!retroStyle.enabled || !motionPreferences.listAnimationsEnabled) {
+        _pointers.clear();
       }
-      return;
+    });
+  }
+
+  void _release(int pointer) {
+    if (mounted && _pointers.containsKey(pointer)) {
+      setState(() => _pointers.remove(pointer));
     }
-    if (!_pressed) return;
-    final elapsed = DateTime.now().difference(_pressedAt ?? DateTime.now());
-    if (elapsed < _minHold) {
-      Future<void>.delayed(_minHold - elapsed, () {
-        if (mounted && _pressed) setState(() => _pressed = false);
-      });
-      return;
-    }
-    setState(() => _pressed = false);
+  }
+
+  @override
+  void dispose() {
+    retroStyle.removeListener(_preferencesChanged);
+    motionPreferences.removeListener(_preferencesChanged);
+    _pointers.clear();
+    _press.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final skin = TitoSkin.of(context);
-    if (skin.isFlat) return widget.child;
+    if (skin.isFlat) {
+      _target = 0;
+      _press.value = 0;
+      return widget.child;
+    }
 
-    return ListenableBuilder(
-      listenable: retroStyle,
-      builder: (context, child) {
-        final depthEnabled = retroStyle.enabled;
-        final keyHeld = widget.interactive && HandheldPressed.of(context);
-        final sunk =
-            depthEnabled && widget.interactive && (_pressed || keyHeld);
-        final restingShadow = skin.isJournal
-            ? TrainerJournalShadows.sticker
-            : SolidPlasticShadows.sticker;
-        final pressedShadow = skin.isJournal
-            ? TrainerJournalShadows.stickerPressed
-            : SolidPlasticShadows.stickerPressed;
-        Widget result = AnimatedContainer(
-          duration: const Duration(milliseconds: 80),
-          curve: Curves.easeOut,
-          transform: Matrix4.translationValues(0, sunk ? 3 : 0, 0),
-          decoration: BoxDecoration(
-            borderRadius: widget.borderRadius,
-            boxShadow: !depthEnabled || !widget.ownShadow
-                ? null
-                : sunk
-                ? pressedShadow
-                : restingShadow,
-          ),
-          child: child,
-        );
-        if (widget.interactive) {
-          result = Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: (_) => _setPressed(true),
-            onPointerUp: (_) => _setPressed(false),
-            onPointerCancel: (_) => _setPressed(false),
-            child: result,
-          );
+    final motion = TitoMotion.of(context);
+    final depthEnabled = retroStyle.enabled;
+    final animate = depthEnabled && !TitoMotion.disabled(context);
+    final keyHeld = HandheldPressed.of(context);
+    final sunk =
+        animate && widget.interactive && (_pointers.isNotEmpty || keyHeld);
+    final target = sunk ? 1.0 : 0.0;
+    if (!animate || !widget.interactive) {
+      _target = 0;
+      if (_press.value != 0 || _press.isAnimating) _press.value = 0;
+    } else if (_target != target) {
+      _target = target;
+      // Retarget the actual painted value, not a tween re-evaluated with the
+      // new curve. That keeps rapid press/release/repress position-continuous.
+      _press.animateTo(
+        target,
+        duration: sunk ? motion.press : motion.release,
+        curve: sunk ? motion.settleCurve : motion.releaseCurve,
+      );
+    }
+    final restingShadow = skin.isJournal
+        ? TrainerJournalShadows.sticker
+        : SolidPlasticShadows.sticker;
+    final pressedShadow = skin.isJournal
+        ? TrainerJournalShadows.stickerPressed
+        : SolidPlasticShadows.stickerPressed;
+
+    return Listener(
+      // The listener and hit region stay at their original size while only
+      // painting moves. Each release belongs to its pointer, with no delayed
+      // callback that could release a newer press.
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (event) {
+        if (mounted && animate && widget.interactive) {
+          setState(() => _pointers[event.pointer] = event.position);
         }
-        return result;
       },
-      child: widget.child,
+      onPointerMove: (event) {
+        final origin = _pointers[event.pointer];
+        if (origin != null && (event.position - origin).distance > kTouchSlop) {
+          _release(event.pointer);
+        }
+      },
+      onPointerUp: (event) => _release(event.pointer),
+      onPointerCancel: (event) => _release(event.pointer),
+      child: AnimatedBuilder(
+        animation: _press,
+        child: widget.child,
+        builder: (context, child) {
+          // Apply the accessibility change on this very frame, even if an
+          // implicit animation was halfway through a previous press.
+          final progress = animate && widget.interactive ? _press.value : 0.0;
+          final shadowProgress = progress.clamp(0.0, 1.0);
+          return Transform.translate(
+            offset: Offset(0, motion.pressDepth * progress),
+            transformHitTests: false,
+            child: Transform.scale(
+              scaleX: 1 + (motion.pressScaleX - 1) * progress,
+              scaleY: 1 + (motion.pressScaleY - 1) * progress,
+              transformHitTests: false,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: widget.borderRadius,
+                  boxShadow: !depthEnabled || !widget.ownShadow
+                      ? null
+                      : BoxShadow.lerpList(
+                          restingShadow,
+                          pressedShadow,
+                          shadowProgress,
+                        ),
+                ),
+                child: child,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

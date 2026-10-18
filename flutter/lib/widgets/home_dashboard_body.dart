@@ -5,6 +5,7 @@ import '../theme/device_layout.dart';
 import '../theme/tito_skin.dart';
 import 'journey_card.dart';
 import 'party_strip.dart';
+import 'tito_entrance.dart';
 import 'tito_skeleton.dart';
 import 'trainer_card.dart';
 
@@ -30,23 +31,27 @@ class HomeDashboardBody extends StatelessWidget {
     // Square handhelds AND regular landscape screens (tablets, rotated
     // phones) share the horizontal composition: portrait's fixed-height
     // stack would clip the party card and force scrolling there.
-    if (DeviceLayout.useSquareDashboard(context) ||
-        DeviceLayout.isLandscape(context)) {
-      return _HorizontalHomeLayout(
-        journey: journey,
-        saveLinked: saveLinked,
-        onJourneyOpen: onJourneyOpen,
-        quickActions: quickActions,
-        bootstrapping: bootstrapping,
-      );
-    }
-
-    return _PortraitHomeLayout(
-      journey: journey,
-      saveLinked: saveLinked,
-      onJourneyOpen: onJourneyOpen,
-      quickActions: quickActions,
-      bootstrapping: bootstrapping,
+    final horizontal =
+        DeviceLayout.useSquareDashboard(context) ||
+        DeviceLayout.isLandscape(context);
+    return TitoEntrance(
+      itemCount: 6,
+      ready: !bootstrapping,
+      child: horizontal
+          ? _HorizontalHomeLayout(
+              journey: journey,
+              saveLinked: saveLinked,
+              onJourneyOpen: onJourneyOpen,
+              quickActions: quickActions,
+              bootstrapping: bootstrapping,
+            )
+          : _PortraitHomeLayout(
+              journey: journey,
+              saveLinked: saveLinked,
+              onJourneyOpen: onJourneyOpen,
+              quickActions: quickActions,
+              bootstrapping: bootstrapping,
+            ),
     );
   }
 }
@@ -93,17 +98,23 @@ class _PortraitHomeLayout extends StatelessWidget {
                   SizedBox(height: gap),
                   SizedBox(
                     height: journeyHeight,
-                    child: JourneyCard(
-                      journey: journey,
-                      onOpenDetail: onJourneyOpen,
-                      compact: compact,
+                    child: TitoEntranceItem(
+                      index: 1,
+                      child: JourneyCard(
+                        journey: journey,
+                        onOpenDetail: onJourneyOpen,
+                        compact: compact,
+                      ),
                     ),
                   ),
                 ],
                 SizedBox(height: gap),
                 SizedBox(
                   height: partyHeight,
-                  child: PartyStrip(party: journey.party, compact: compact),
+                  child: TitoEntranceItem(
+                    index: 2,
+                    child: PartyStrip(party: journey.party, compact: compact),
+                  ),
                 ),
                 SizedBox(height: gap),
                 quickActions,
@@ -209,11 +220,14 @@ class _HorizontalHomeLayout extends StatelessWidget {
                                   ignoring: bootstrapping,
                                   child: Opacity(
                                     opacity: bootstrapping ? 0.0 : 1.0,
-                                    child: JourneyCard(
-                                      journey: journey,
-                                      onOpenDetail: onJourneyOpen,
-                                      compact: true,
-                                      dense: true,
+                                    child: TitoEntranceItem(
+                                      index: 1,
+                                      child: JourneyCard(
+                                        journey: journey,
+                                        onOpenDetail: onJourneyOpen,
+                                        compact: true,
+                                        dense: true,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -228,11 +242,14 @@ class _HorizontalHomeLayout extends StatelessWidget {
                             ignoring: bootstrapping,
                             child: Opacity(
                               opacity: bootstrapping ? 0.0 : 1.0,
-                              child: PartyStrip(
-                                party: journey.party,
-                                compact: true,
-                                square: true,
-                                gridMode: true,
+                              child: TitoEntranceItem(
+                                index: 2,
+                                child: PartyStrip(
+                                  party: journey.party,
+                                  compact: true,
+                                  square: true,
+                                  gridMode: true,
+                                ),
                               ),
                             ),
                           ),
@@ -255,12 +272,15 @@ class _HorizontalHomeLayout extends StatelessWidget {
                             ignoring: bootstrapping,
                             child: Opacity(
                               opacity: bootstrapping ? 0.0 : 1.0,
-                              child: PartyStrip(
-                                party: journey.party,
-                                compact: true,
-                                square: true,
-                                gridMode: true,
-                                stripMode: true,
+                              child: TitoEntranceItem(
+                                index: 2,
+                                child: PartyStrip(
+                                  party: journey.party,
+                                  compact: true,
+                                  square: true,
+                                  gridMode: true,
+                                  stripMode: true,
+                                ),
                               ),
                             ),
                           ),
@@ -323,11 +343,14 @@ class _WideRowsContent extends StatelessWidget {
                 SizedBox(width: gap),
                 Expanded(
                   child: hideWhileBootstrapping(
-                    JourneyCard(
-                      journey: journey,
-                      onOpenDetail: onJourneyOpen,
-                      compact: true,
-                      dense: true,
+                    TitoEntranceItem(
+                      index: 1,
+                      child: JourneyCard(
+                        journey: journey,
+                        onOpenDetail: onJourneyOpen,
+                        compact: true,
+                        dense: true,
+                      ),
                     ),
                   ),
                 ),
@@ -345,12 +368,15 @@ class _WideRowsContent extends StatelessWidget {
         SizedBox(
           height: 200,
           child: hideWhileBootstrapping(
-            PartyStrip(
-              party: journey.party,
-              compact: true,
-              square: true,
-              gridMode: true,
-              stripMode: true,
+            TitoEntranceItem(
+              index: 2,
+              child: PartyStrip(
+                party: journey.party,
+                compact: true,
+                square: true,
+                gridMode: true,
+                stripMode: true,
+              ),
             ),
           ),
         ),
@@ -380,12 +406,14 @@ class _TrainerCardSlot extends StatelessWidget {
     );
     // Journal tape overhangs the hero by ~9px and the card tilts -1.4°.
     // Keep that paint inside the scroll/column clip instead of shearing it off.
-    if (!TitoSkin.of(context).isJournal) {
-      return card;
-    }
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 12, 4, 2),
-      child: card,
+    return TitoEntranceItem(
+      index: 0,
+      child: !TitoSkin.of(context).isJournal
+          ? card
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(4, 12, 4, 2),
+              child: card,
+            ),
     );
   }
 }

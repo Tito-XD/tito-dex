@@ -170,34 +170,40 @@ void main() {
         ),
       );
 
-      final pressable = tester.widget<AnimatedContainer>(
+      final pressable = tester.widget<DecoratedBox>(
         find.descendant(
           of: find.byType(StickerPressable),
-          matching: find.byType(AnimatedContainer),
+          matching: find.byType(DecoratedBox),
         ),
       );
       expect(
-        (pressable.decoration! as BoxDecoration).boxShadow,
+        (pressable.decoration as BoxDecoration).boxShadow,
         TrainerJournalShadows.sticker,
       );
 
       final gesture = await tester.startGesture(
         tester.getCenter(find.byKey(childKey)),
       );
+      final restingPosition = tester.getTopLeft(find.byKey(childKey));
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 80));
-      final sunk = tester.widget<AnimatedContainer>(
+      final sunk = tester.widget<DecoratedBox>(
         find.descendant(
           of: find.byType(StickerPressable),
-          matching: find.byType(AnimatedContainer),
+          matching: find.byType(DecoratedBox),
         ),
       );
-      expect(sunk.transform!.storage[13], 3);
       expect(
-        (sunk.decoration! as BoxDecoration).boxShadow,
+        tester.getTopLeft(find.byKey(childKey)),
+        restingPosition + const Offset(0, 3),
+      );
+      expect(
+        (sunk.decoration as BoxDecoration).boxShadow,
         TrainerJournalShadows.stickerPressed,
       );
       await gesture.up();
-      await tester.pump(const Duration(milliseconds: 120));
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.byKey(childKey)), restingPosition);
     },
   );
 }

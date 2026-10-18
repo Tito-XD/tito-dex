@@ -51,7 +51,7 @@ The three themes follow the TitoDex Launcher's visual direction (0.3):
   yellow double ring (`#f7d977` + `#ae9562`).
 - **固态塑料** — moulded shells: vertical white→tint gradients, a 1.5px inner top
   highlight plus inner bottom darkening, a white rim and a deeper soft drop.
-  Hero radius 26. Role tints: trainer lavender `#f6f2ff→#d7cdea`, shelf cyan
+  Hero radius 16, shared with the other themes. Role tints: trainer lavender `#f6f2ff→#d7cdea`, shelf cyan
   `#ecfafc→#b9dfe7`. Primary round keys are radial die-cast with a specular
   cap. Accent `#3d7f93` (light) / `#b9dfe7` (dark). Focus: white ring + cyan
   glow. All optics are static paint — no live blur in content.
@@ -59,6 +59,18 @@ The three themes follow the TitoDex Launcher's visual direction (0.3):
   soft-yellow, primary action coral, date pill deep-blue with cream text. No
   shadows anywhere, very large tight numerals, circular icon chips, stadium
   buttons. Focus: a 3.5px ink outline.
+
+### Home quick entries (2026-10-18 correction)
+
+All three themes share compact card radii; Plastic expresses its material
+through gradients, rims and depth rather than larger corners. Home's Team,
+Dex and Search entries retain their original individual pastel fills:
+`#fbefc3` (yellow), `#f9dedc` (pink), `#dff1f9` (blue). Use `TitoQuickTile`
+with these fills instead of applying the same `action` hero tint to all three.
+The transparent illustrations sit directly on each tile, with no extra circle,
+plate or frame behind them. Journal keeps its press-down shadow, Plastic its
+moulded surface, and Flat its shadowless solid fill. Reserve tape and stitched
+hero decoration for the featured cards above these compact entries.
 
 ## Color Direction
 
@@ -106,7 +118,7 @@ Surfaces come in three levels (`TitoSurfaceLevel`):
 
 | Level | Use | Journal | Plastic | Flat |
 | --- | --- | --- | --- | --- |
-| `hero` | 1–3 per screen: trainer card, current shelf / journey | paper + tape + tilt (trainer) or dashed inner frame | role gradient, radius 26 | role colour block |
+| `hero` | 1–3 per screen: trainer card, current shelf / journey | paper + tape + tilt (trainer) or dashed inner frame | role gradient, radius 16 | role colour block |
 | `normal` | grouped settings, section cards | paper, slate outline, 0/5 drop + paper edge | moulded tint | `#eceef6` block |
 | `dense` | list rows, grid cells, anything repeated | paper, slate outline, 0/3 drop, no decoration | opaque tint, small drop | block, tighter radius |
 
@@ -115,7 +127,7 @@ Tokens are absolute logical px on `TitoSkin` (not halved by
 
 | Token | Journal | Plastic | Flat |
 | --- | --- | --- | --- |
-| `radiusSm / Md / Lg / Hero` | 8 / 11 / 14 / 16 | 10 / 14 / 20 / 26 | 10 / 14 / 18 / 22 |
+| `radiusSm / Md / Lg / Hero` | 8 / 11 / 14 / 16 | 8 / 11 / 14 / 16 | 8 / 11 / 14 / 16 |
 | `outline`, `outlineWidth` | `#7c8999`, 1.4 | white 78%, 1.1 | none |
 | `heroTiltDegrees` | -1.4 | 0 | 0 |
 | `headingTracking / displayTracking` (em) | -0.02 / -0.03 | -0.02 / -0.03 | -0.035 / -0.05 |
@@ -205,6 +217,40 @@ plus app screens `home`, `team`, `dex`, `search`, `settings`) at 480×480 and
 800×450 logical. Without the define the galleries run as a ~1s smoke test and
 the app screens are skipped. Add a page by extending the route list in the
 `app screens` test or adding a gallery widget.
+
+## RG theme preview (2026-10-18)
+
+The theme-refresh branch was packaged and installed side by side on RG Rotate
+as `com.tito.titodex.themepreview` (launcher label `TitoDex 主题预览`, version
+`0.9.6-theme-preview`, code 191). This is the theme branch's development
+snapshot, not an upgrade of the installed production v0.9.24 (code 216).
+The production package and its data were not replaced or copied. The preview
+has its own settings and initial example data.
+
+Reproduce with `bash tools/build_theme_preview.sh`. It builds arm64 release
+code, signs the separate package with the local development certificate, and
+checks the APK's manifest, ZIP integrity, native libraries and bundled assets.
+The artifact is `flutter/build/theme-preview/TitoDex-theme-preview-rg-arm64.apk`.
+Gradle uses a 2 GB heap, two workers and no parallel project builds; do not run
+it concurrently with the Launcher build on a 16 GB machine.
+
+Device checks covered the three theme switches, home and Flat dex grid.
+Artwork loaded in the earlier captures; a later cold launch left the Flaaffy
+portrait blank while the other party portraits were visible. That image-loading
+issue remains unverified and is not evidence of full App acceptance.
+Screenshots are private/local under
+`flutter/build/theme-preview/validation/`. Full controller, all detail routes
+and production upgrade acceptance were not repeated in this packaging pass.
+
+The later 2026-10-18 home correction restores the original individual pastel
+quick-entry fills, removes the extra Flat icon circles, and aligns all skin
+card radii with Journal's compact scale. The updated side-by-side preview was
+installed at 22:50:50 (Asia/Shanghai), still code 191, with the formal v0.9.24
+untouched. Analysis and 53 focused existing checks passed; fresh RG captures
+and touch checks for Team / Dex / Search are in
+`flutter/build/theme-preview/validation/20261018-home-refine/`. The original
+Flat preference was restored after comparing the three themes. This pass did
+not repeat full controller or production-upgrade acceptance.
 
 ## Typography
 

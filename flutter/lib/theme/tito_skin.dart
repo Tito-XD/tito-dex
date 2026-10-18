@@ -135,7 +135,8 @@ class TitoSkin extends ThemeExtension<TitoSkin> {
   final Color tapeColor;
 
   /// Logical radii. Unlike `DeviceLayout.rLg` these are not halved on RG
-  /// panels: the values were tuned on the 480×480 handheld canvas.
+  /// panels. All themes share the compact Journal geometry; material
+  /// differences come from fills, rims and shadows, not inflated corners.
   final double radiusSm;
   final double radiusMd;
   final double radiusLg;
@@ -221,10 +222,10 @@ class TitoSkin extends ThemeExtension<TitoSkin> {
     sheetFill: Color(0xFFEEF4F7),
     ruleColor: Color(0x00000000),
     tapeColor: Color(0x00000000),
-    radiusSm: 10,
-    radiusMd: 14,
-    radiusLg: 20,
-    radiusHero: 26,
+    radiusSm: 8,
+    radiusMd: 11,
+    radiusLg: 14,
+    radiusHero: 16,
     heroTiltDegrees: 0,
     headingTracking: -0.02,
     displayTracking: -0.03,
@@ -250,10 +251,10 @@ class TitoSkin extends ThemeExtension<TitoSkin> {
     sheetFill: TitoColors.flatSurface,
     ruleColor: Color(0x00000000),
     tapeColor: Color(0x00000000),
-    radiusSm: 10,
-    radiusMd: 14,
-    radiusLg: 18,
-    radiusHero: 22,
+    radiusSm: 8,
+    radiusMd: 11,
+    radiusLg: 14,
+    radiusHero: 16,
     heroTiltDegrees: 0,
     headingTracking: -0.035,
     displayTracking: -0.05,

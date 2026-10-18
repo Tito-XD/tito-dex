@@ -200,6 +200,10 @@ class _HandheldFocusDecoratorState extends State<HandheldFocusDecorator> {
   Widget build(BuildContext context) {
     return Focus(
       onKeyEvent: _trackActivateKey,
+      onFocusChange: (focused) {
+        // A route push or D-pad move may take focus before key-up arrives.
+        if (!focused && _keyHeld) setState(() => _keyHeld = false);
+      },
       // Skip in traversal (this is a passive listener, not a target) or it
       // steals the D-pad hop from the real focusable child.
       canRequestFocus: false,
