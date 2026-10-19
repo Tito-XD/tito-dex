@@ -9,8 +9,8 @@ export GRADLE_OPTS="${GRADLE_OPTS:-} -Dorg.gradle.daemon=false"
 export TITODEX_APPLICATION_ID=com.tito.titodex.themepreview
 export TITODEX_APP_LABEL='TitoDex 主题预览'
 export TITODEX_VERSION_NAME_SUFFIX=''
-PREVIEW_VERSION=0.9.6-motion.1
-PREVIEW_BUILD_NUMBER=193
+PREVIEW_VERSION=0.9.6-motion.2
+PREVIEW_BUILD_NUMBER=194
 FLUTTER_BIN="${FLUTTER_BIN:-/opt/homebrew/share/flutter/bin/flutter}"
 BUILD_TOOLS="${ANDROID_BUILD_TOOLS:-$ANDROID_HOME/build-tools/36.0.0}"
 PREVIEW_KEYSTORE="${PREVIEW_KEYSTORE:-$HOME/.android/debug.keystore}"

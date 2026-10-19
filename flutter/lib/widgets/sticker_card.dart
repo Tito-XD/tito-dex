@@ -170,8 +170,7 @@ class StickerCard extends StatelessWidget {
       final tint = skin.heroTint(heroRole);
       return LiquidGlassSurface(
         tint: tint.top,
-        tintBottom: tint.bottom,
-        opacity: 0.97,
+        opacity: heroRole == TitoHeroRole.journey ? 0.95 : 0.92,
         radius: radius,
         boxShadow: skin.cardShadow(),
         child: _content(context, tint),

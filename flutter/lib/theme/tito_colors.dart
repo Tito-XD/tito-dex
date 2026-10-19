@@ -59,19 +59,18 @@ abstract final class TrainerJournalShadows {
   );
 }
 
-/// Concentrated moulded depth for Solid Plastic surfaces: a deep, slightly
-/// tucked drop plus a tight contact shadow, like an injection-moulded shell
-/// sitting on the device.
+/// Restrained moulded depth for Solid Plastic surfaces, matching the original
+/// matte shell rather than making every content panel look like a raised key.
 abstract final class SolidPlasticShadows {
   static const List<BoxShadow> sticker = [
     BoxShadow(
-      color: Color(0x5413263D),
-      blurRadius: 15,
-      spreadRadius: -4,
-      offset: Offset(0, 9),
+      color: Color(0x3313263D),
+      blurRadius: 16,
+      spreadRadius: -3,
+      offset: Offset(0, 8),
     ),
     BoxShadow(
-      color: Color(0x2E13263D),
+      color: Color(0x1813263D),
       blurRadius: 3,
       spreadRadius: -1,
       offset: Offset(0, 2),

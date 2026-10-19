@@ -35,7 +35,6 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_skin.dart';
 import '../theme/tito_theme.dart';
-import '../widgets/tito_chips.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -1796,17 +1795,7 @@ class _ThemeHeroPreview extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      Text('Tito', style: skin.heading(12)),
-                      const Spacer(),
-                      const TitoStampChip(
-                        label: '10·17',
-                        onPage: false,
-                        fontSize: 9,
-                      ),
-                    ],
-                  ),
+                  Text('Tito', style: skin.heading(12)),
                   Text('42', style: skin.display(22)),
                 ],
               ),

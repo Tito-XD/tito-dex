@@ -9,7 +9,6 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_skin.dart';
 import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
-import 'tito_chips.dart';
 
 enum TrainerCardDensity { standard, dense, micro }
 
@@ -171,22 +170,11 @@ class _TrainerCardBody extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       style: nameStyle,
     );
-    final stamp = TitoStampChip(
-      label: '${now.month}·${now.day}',
-      onPage: false,
-      fontSize: metrics.greetingFontSize < 22 ? 10 : 11,
-    );
     final textColumn = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(child: greeting),
-            const SizedBox(width: 6),
-            stamp,
-          ],
-        ),
+        greeting,
         SizedBox(height: metrics.textGap),
         nameLine,
       ],

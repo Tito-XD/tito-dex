@@ -363,7 +363,7 @@ class _PartySlotFrame extends StatelessWidget {
         ? (empty ? skin.sheetFill.withValues(alpha: 0.72) : skin.sheetFill)
         : skin.isJournal
         ? TitoColors.card.withValues(alpha: empty ? 0.28 : 0.66)
-        : Colors.white.withValues(alpha: empty ? 0.32 : 0.62);
+        : Colors.white.withValues(alpha: empty ? 0.18 : 0.35);
     final outlined = skin.outline != null;
     final box = DecoratedBox(
       decoration: BoxDecoration(

@@ -77,9 +77,8 @@ class TitoPrimaryButton extends StatelessWidget {
       );
       final surface = skin.isPlastic
           ? LiquidGlassSurface(
-              tint: const Color(0xFF3D5779),
-              tintBottom: const Color(0xFF243650),
-              opacity: onPressed == null ? 0.78 : 0.97,
+              tint: TitoColors.deepBlue,
+              opacity: onPressed == null ? 0.78 : 0.95,
               radius: skin.radiusMd,
               borderColor: Colors.white.withValues(alpha: 0.42),
               child: content,

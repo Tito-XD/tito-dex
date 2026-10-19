@@ -36,3 +36,14 @@ Launcher 为原生 Compose 包 `com.tito.titodex.launcher`，版本 `0.3.1-motio
 - [Launcher 跟手桌面与轻动效预览](https://github.com/Tito-XD/tito-dex/releases/tag/launcher-v0.3.1-motion.1)：APK 源码 `db779e51f30c89d5a5705904d013be547df6d04d`，SHA-256 `6404aa4184bb1eaca4b4dcaf11018b08fc8667f5ba3b544fde623a2d12ef3ced`。
 - 两个预览均已保留数据安装到 RG Rotate。正式 App 仍为 v0.9.24 / code 216，安装更新时间未变；Launcher 原壁纸、设置与默认 HOME 保留，系统动画比例已恢复。
 - 最终 App 包已录屏检查冷启动与三个入口进入/返回。Launcher 50 项回归通过，最终包真机验证包括编辑返回后的真实坐标点击、快速开合、拖动关闭、系统减少动画及模拟 D-pad/B 返回。实体按键手感与长时间性能尚未验收。
+
+## RG 本地后续：固态塑料回调（2026-10-19）
+
+- `0.9.6-motion.2` / code 194 恢复正式版的奶油白主面板、深蓝旅程卡、弱斜向渐变、细内边与轻投影；保留紧凑圆角和此前动效。
+- 三主题 Trainer Card 及设置主题缩略预览统一移除日期。
+- 分析无问题，56 项现有主题/首页/动效检查通过。截图测试延长取帧时间至入场结束后，更新后的 13 项首页/设置截图检查也通过。
+- 提交同步前再次运行完整 Flutter 回归：660 项通过，6 项截图用例按条件跳过。产品代码与已装机 `motion.2` 包一致，无需重复构建。
+- 独立预览包通过签名及完整性校验，并以保留数据方式更新 RG。设备 APK SHA-256 与本地一致：`cdc511226b516240fcdf3b60a1abe3400b2cd2c02a801933bfabdbf8da6672da`。
+- RG 已逐一检查三主题首页无日期、塑料首页/图鉴材质，以及队伍、图鉴、搜索入口进入和返回。截图后恢复原来的扁平贴纸主题。
+- 正式 App 仍为 v0.9.24 / code 216，安装时间未变化。本次未更新 Launcher，未创建新的线上发布。
+- 本地证据：`flutter/build/theme-preview/validation/20261019-plastic-restore/`。APK：`flutter/build/theme-preview/TitoDex-0.9.6-motion.2-theme-preview-rg-arm64.apk`。

@@ -46,17 +46,18 @@ The three themes follow the TitoDex Launcher's visual direction (0.3):
   (`#7c8999`, 1.4px) and slate ink (`#36475b`), on a dotted blue-grey desk with
   faint postmark waves. It keeps the app's hard 0/5 sticker drop and press-down
   physics (a blend, not a replacement). Hero surfaces only add washi tape, a
-  -1.4° tilt, dashed inner frames, rubber-stamp date chips and ruled-paper
+  -1.4° tilt, dashed inner frames, rubber-stamp chips and ruled-paper
   sheets. Accent ink `#b0745a` on paper, `#f2c9a8` on the dark desk. Focus is a
   yellow double ring (`#f7d977` + `#ae9562`).
-- **固态塑料** — moulded shells: vertical white→tint gradients, a 1.5px inner top
-  highlight plus inner bottom darkening, a white rim and a deeper soft drop.
-  Hero radius 16, shared with the other themes. Role tints: trainer lavender `#f6f2ff→#d7cdea`, shelf cyan
-  `#ecfafc→#b9dfe7`. Primary round keys are radial die-cast with a specular
+- **固态塑料** — the original matte shell: warm cream trainer and party
+  panels, a deep-blue journey card and a blue-grey backdrop. Subtle diagonal
+  gradients, a thin light-to-dark inner rim and restrained soft shadows keep
+  content panels light. Hero radius 16 is shared with the other themes.
+  Primary round keys are radial die-cast with a specular
   cap. Accent `#3d7f93` (light) / `#b9dfe7` (dark). Focus: white ring + cyan
   glow. All optics are static paint — no live blur in content.
 - **扁平贴纸** — solid colour blocks on `#f9f9ff` with `#1a1c20` ink: trainer
-  soft-yellow, primary action coral, date pill deep-blue with cream text. No
+  soft-yellow, primary action coral, status chips deep-blue with cream text. No
   shadows anywhere, very large tight numerals, circular icon chips, stadium
   buttons. Focus: a 3.5px ink outline.
 
@@ -71,6 +72,21 @@ The transparent illustrations sit directly on each tile, with no extra circle,
 plate or frame behind them. Journal keeps its press-down shadow, Plastic its
 moulded surface, and Flat its shadowless solid fill. Reserve tape and stitched
 hero decoration for the featured cards above these compact entries.
+
+### Plastic refinement and Trainer Card (2026-10-19)
+
+Device comparison with the original v0.9.24 Solid Plastic favoured its warm,
+unified palette. Restore that surface recipe: cream trainer/party/action
+panels, a deep-blue journey panel, the original diagonal gradient and fine
+inner rim, lighter shadows and translucent white party slots. Do not carry
+over the Launcher's large lavender/cyan role panels or thick inset edges.
+Keep the shared compact radii, individual pastel quick entries and the new
+press/entrance motion.
+
+Trainer Card contains the avatar, time-of-day greeting and trainer name.
+It has no date chip in any theme; the Settings theme previews follow the same
+rule. The reusable stamp primitive remains available for meaningful status
+labels elsewhere.
 
 ## Color Direction
 
@@ -111,14 +127,14 @@ Color usage:
 - **solid offset sticker shadows are the Journal signature** — a hard
   `0 5px 0` drop with no blur (never Material's soft elevation), plus a
   `0 2px 0 #e4dfd3` paper edge on light cards. Paired with press-down physics
-  it reads as a physical handheld key. Plastic uses a deeper soft drop; Flat
+  it reads as a physical handheld key. Plastic uses a restrained soft drop; Flat
   has none.
 
 Surfaces come in three levels (`TitoSurfaceLevel`):
 
 | Level | Use | Journal | Plastic | Flat |
 | --- | --- | --- | --- | --- |
-| `hero` | 1–3 per screen: trainer card, current shelf / journey | paper + tape + tilt (trainer) or dashed inner frame | role gradient, radius 16 | role colour block |
+| `hero` | 1–3 per screen: trainer card, current shelf / journey | paper + tape + tilt (trainer) or dashed inner frame | cream / deep-blue matte shell, radius 16 | role colour block |
 | `normal` | grouped settings, section cards | paper, slate outline, 0/5 drop + paper edge | moulded tint | `#eceef6` block |
 | `dense` | list rows, grid cells, anything repeated | paper, slate outline, 0/3 drop, no decoration | opaque tint, small drop | block, tighter radius |
 

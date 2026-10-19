@@ -43,15 +43,10 @@ class LiquidGlassSurface extends StatelessWidget {
     this.borderColor,
     this.borderWidth = TitoBorders.glass,
     this.boxShadow,
-    this.tintBottom,
   });
 
   final Widget child;
   final Color tint;
-
-  /// When set, the shell runs from [tint] at the top to [tintBottom] instead
-  /// of the default white-to-tint moulding (used for per-role hero tints).
-  final Color? tintBottom;
   final EdgeInsets padding;
   final double radius;
   final double opacity;
@@ -70,41 +65,24 @@ class LiquidGlassSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(radius);
-    final explicitBottom = tintBottom;
-    final darkTint =
-        Color.lerp(tint, explicitBottom ?? tint, 0.5)!.computeLuminance() <
-        0.35;
+    final darkTint = tint.computeLuminance() < 0.35;
     final outline =
         borderColor ??
         (darkTint
             ? Colors.white.withValues(alpha: 0.38)
             : Colors.white.withValues(alpha: 0.78));
-    // Injection-moulded shell: milky white at the top settling into the tint.
-    final Color top;
-    final Color middle;
-    final Color bottom;
-    if (explicitBottom != null) {
-      top = tint.withValues(alpha: opacity);
-      middle = Color.lerp(
-        tint,
-        explicitBottom,
-        0.45,
-      )!.withValues(alpha: opacity * 0.98);
-      bottom = explicitBottom.withValues(alpha: opacity * 0.95);
-    } else {
-      top = Color.alphaBlend(
-        Colors.white.withValues(alpha: darkTint ? 0.16 : 0.5),
-        tint,
-      ).withValues(alpha: opacity);
-      middle = Color.alphaBlend(
-        TitoColors.glassCyan.withValues(alpha: darkTint ? 0.025 : 0.06),
-        tint,
-      ).withValues(alpha: opacity * 0.98);
-      bottom = Color.alphaBlend(
-        TitoColors.deepBlue.withValues(alpha: darkTint ? 0.16 : 0.09),
-        tint,
-      ).withValues(alpha: opacity * 0.95);
-    }
+    final top = Color.alphaBlend(
+      Colors.white.withValues(alpha: darkTint ? 0.16 : 0.24),
+      tint,
+    ).withValues(alpha: opacity);
+    final middle = Color.alphaBlend(
+      TitoColors.glassCyan.withValues(alpha: darkTint ? 0.025 : 0.045),
+      tint,
+    ).withValues(alpha: opacity * 0.98);
+    final bottom = Color.alphaBlend(
+      TitoColors.deepBlue.withValues(alpha: darkTint ? 0.16 : 0.075),
+      tint,
+    ).withValues(alpha: opacity * 0.95);
 
     final staticFill = DecoratedBox(
       key: const ValueKey('solid-plastic-static-fill'),
@@ -112,9 +90,9 @@ class LiquidGlassSurface extends StatelessWidget {
         borderRadius: borderRadius,
         border: Border.all(color: outline, width: borderWidth),
         gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: const [0, 0.45, 1],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0, 0.42, 1],
           colors: [top, middle, bottom],
         ),
       ),
@@ -218,11 +196,11 @@ class LiquidGlassRoundButton extends StatelessWidget {
   }
 }
 
-/// One cheap static paint pass gives moulded matte plastic its edge depth:
-/// a 1.5px inner top highlight and a 3px inner bottom darkening (the CSS
-/// `inset 0 1.5px 0` / `inset 0 -3px 0` pair from the launcher). It never
-/// samples the pixels behind the card, so long lists stay close to
-/// opaque-card rendering cost and there are no glossy reflection streaks.
+/// One cheap static paint pass gives moulded matte plastic its edge depth: a
+/// light-to-dark inner rim. It does not sample the pixels behind the card, so
+/// long lists stay close to opaque-card rendering cost. The earlier glossy
+/// treatments (diagonal sheen + top specular line) were removed — solid
+/// plastic reads matte now, with no reflection streaks.
 class _PlasticOpticsPainter extends CustomPainter {
   const _PlasticOpticsPainter({required this.radius, required this.darkTint});
 
@@ -234,30 +212,29 @@ class _PlasticOpticsPainter extends CustomPainter {
     if (size.isEmpty) {
       return;
     }
-    final shell = RRect.fromRectAndRadius(
-      Offset.zero & size,
-      Radius.circular(radius.clamp(0.0, size.shortestSide / 2)),
-    );
-    canvas.save();
-    canvas.clipRRect(shell);
-    // Even-odd fill of the shell and a shifted copy leaves only the crescent
-    // along one inner edge; the other sliver falls outside the clip.
-    void crescent(double dy, Color color) {
-      canvas.drawPath(
-        Path()
-          ..fillType = PathFillType.evenOdd
-          ..addRRect(shell)
-          ..addRRect(shell.shift(Offset(0, dy))),
-        Paint()..color = color,
-      );
+    final bounds = Offset.zero & size;
+    final inset = 1.35;
+    final innerRect = bounds.deflate(inset);
+    if (innerRect.isEmpty) {
+      return;
     }
-
-    crescent(1.5, Colors.white.withValues(alpha: darkTint ? 0.28 : 0.92));
-    crescent(
-      -3,
-      const Color(0xFF13263D).withValues(alpha: darkTint ? 0.28 : 0.10),
+    final innerRadius = (radius - inset).clamp(0.0, radius);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(innerRect, Radius.circular(innerRadius)),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0, 0.48, 1],
+          colors: [
+            Colors.white.withValues(alpha: darkTint ? 0.12 : 0.26),
+            Colors.white.withValues(alpha: 0.03),
+            TitoColors.deepBlue.withValues(alpha: darkTint ? 0.26 : 0.15),
+          ],
+        ).createShader(bounds),
     );
-    canvas.restore();
   }
 
   @override

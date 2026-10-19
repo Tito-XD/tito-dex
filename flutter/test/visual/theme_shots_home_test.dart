@@ -79,7 +79,8 @@ void main() {
         ),
       ),
     );
-    await pumpThemeShotFrames(tester, frames: 6);
+    // Capture the resting surface after the shared, staggered home entrance.
+    await pumpThemeShotFrames(tester, frames: 16);
   }
 
   Widget homePage() => TitoPageContainer(
