@@ -13,14 +13,13 @@ import '../features/dex/ability_type_modifiers.dart';
 import '../features/dex/battle_effectiveness.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/type_chart.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_surface_tokens.dart';
-import '../theme/trainer_journal.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/sticker_card.dart';
+import '../theme/tito_typography.dart';
 
 /// Compact selector for side-by-side combatant forms; long labels truncate
 /// only in the field, while the menu can wrap to keep every option readable.
@@ -45,7 +44,7 @@ class CompanionSelectField<T> extends StatelessWidget {
         Text(
           label!,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 4),
@@ -129,7 +128,7 @@ class CompanionNumberField extends StatelessWidget {
     final caption = Text(
       label,
       style: SecondaryTypography.onCard.small12.copyWith(
-        fontWeight: FontWeight.w800,
+        fontWeight: TitoTypography.weight(FontWeight.w800),
       ),
     );
     final field = TextField(
@@ -138,7 +137,7 @@ class CompanionNumberField extends StatelessWidget {
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       style: SecondaryTypography.onCard.body14.copyWith(
-        fontWeight: FontWeight.w800,
+        fontWeight: TitoTypography.weight(FontWeight.w800),
       ),
       decoration: retroInsetDecoration(context: context, hintText: hint)
           .copyWith(
@@ -197,7 +196,7 @@ class TypeChipPicker extends StatelessWidget {
         Text(
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 8),
@@ -281,21 +280,17 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final colors = widget.selected.map(typeTileColor).toList();
     final radius = BorderRadius.circular(TitoRadii.md);
-    final emptyFill = appVisualStyle.usesFlatUi
-        ? scheme.surfaceContainerHighest
-        : appVisualStyle.usesSolidPlastic
-        ? Colors.white.withValues(alpha: 0.8)
-        : TitoColors.card;
+    final field = TitoSurfaceTokens.of(context).surface(TitoSurfaceRole.field);
+    final emptyFill = field.fill;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           widget.label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 4),
@@ -354,10 +349,10 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       if (type == null)
-                                        const Icon(
+                                        Icon(
                                           Icons.category_rounded,
                                           size: 20,
-                                          color: TitoColors.mutedInk,
+                                          color: TitoTypography.mutedColor,
                                         )
                                       else
                                         TypeIconImage(typeEn: type, size: 20),
@@ -373,12 +368,12 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
                                                 .onCard
                                                 .body14
                                                 .copyWith(
-                                                  fontWeight: FontWeight.w800,
-                                                  color:
-                                                      colors.isEmpty &&
-                                                          appVisualStyle
-                                                              .usesFlatUi
-                                                      ? scheme.onSurface
+                                                  fontWeight:
+                                                      TitoTypography.weight(
+                                                        FontWeight.w800,
+                                                      ),
+                                                  color: colors.isEmpty
+                                                      ? field.foreground
                                                       : TitoColors.ink,
                                                 ),
                                           ),
@@ -458,7 +453,9 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
                             decoration: BoxDecoration(
                               color: typeTileColor(type),
                               borderRadius: tileRadius,
-                              border: _typeTileBorder(active),
+                              border: Border.fromBorderSide(
+                                titoSwatchOutline(context, selected: active),
+                              ),
                             ),
                             child: Stack(
                               children: [
@@ -480,9 +477,13 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
                                                 .onCard
                                                 .small12
                                                 .copyWith(
-                                                  fontWeight: FontWeight.w800,
+                                                  fontWeight:
+                                                      TitoTypography.weight(
+                                                        FontWeight.w800,
+                                                      ),
                                                   height: 1.2,
-                                                  color: TitoColors.ink,
+                                                  color:
+                                                      TitoTypography.inkColor,
                                                 ),
                                           ),
                                         ),
@@ -521,30 +522,6 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
 BoxBorder? _companionControlBorder(BuildContext context) =>
     TitoSurfaceTokens.of(context).surface(TitoSurfaceRole.element).border;
 
-/// Type grid tile outline: the selected tile always gets a full ink ring;
-/// idle tiles fade the ring (TJ), use a milky hairline (Plastic), or go
-/// borderless (Flat).
-BoxBorder? _typeTileBorder(bool active) {
-  if (active) {
-    return appVisualStyle.usesTrainerJournal
-        ? Border.all(
-            color: TrainerJournal.selectedEdge,
-            width: TitoBorders.journalElement,
-          )
-        : Border.all(color: TitoColors.ink, width: TitoBorders.element);
-  }
-  if (appVisualStyle.usesTrainerJournal) {
-    return null;
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return Border.all(
-      color: Colors.white.withValues(alpha: 0.7),
-      width: TitoBorders.glass,
-    );
-  }
-  return null;
-}
-
 class CompanionSectionCard extends StatelessWidget {
   const CompanionSectionCard({
     super.key,
@@ -572,8 +549,8 @@ class CompanionSectionCard extends StatelessWidget {
             Text(
               subtitle!,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w700,
+                color: TitoTypography.mutedColor,
+                fontWeight: TitoTypography.weight(FontWeight.w700),
               ),
             ),
           ],
@@ -788,7 +765,7 @@ class LinkedPokemonTypesRow extends StatelessWidget {
     return Text(
       '${AppZh.companionLinkedTypes}：${types.map(typeNameZh).join(' / ')}',
       style: SecondaryTypography.onCard.body14.copyWith(
-        fontWeight: FontWeight.w800,
+        fontWeight: TitoTypography.weight(FontWeight.w800),
       ),
     );
   }
@@ -913,7 +890,7 @@ class AbilityChipPicker extends StatelessWidget {
         Text(
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 8),
@@ -988,7 +965,7 @@ class ManualAbilityPicker extends StatelessWidget {
         Text(
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 8),
@@ -1029,7 +1006,7 @@ class FieldConditionPicker extends StatelessWidget {
         Text(
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 8),
@@ -1070,7 +1047,7 @@ class TerrainConditionPicker extends StatelessWidget {
         Text(
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 8),
@@ -1131,7 +1108,7 @@ class TerastalPicker extends StatelessWidget {
         Text(
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 8),
@@ -1142,7 +1119,9 @@ class TerastalPicker extends StatelessWidget {
           avatar: Icon(
             Icons.diamond_rounded,
             size: 16,
-            color: terastallized ? TitoColors.ink : TitoColors.mutedInk,
+            color: terastallized
+                ? TitoTypography.inkColor
+                : TitoTypography.mutedColor,
           ),
           onSelected: (next) {
             onTerastallizedChanged(next);
@@ -1193,7 +1172,7 @@ class HeldItemPicker extends StatelessWidget {
         Text(
           AppZh.companionHeldItemPick,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 8),
@@ -1257,7 +1236,7 @@ class StatusConditionPicker extends StatelessWidget {
         Text(
           AppZh.companionStatusPick,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 8),

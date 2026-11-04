@@ -35,8 +35,8 @@ import '../theme/motion_preferences.dart';
 import '../widgets/retro_forms.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -46,6 +46,8 @@ import '../widgets/app_update_card.dart';
 import '../widgets/trainer_shortcut_button.dart';
 import '../widgets/tito_progress_dialog.dart';
 import '../widgets/tito_progress_bar.dart';
+import '../theme/tito_typography.dart';
+import '../navigation/tito_page_transition.dart';
 
 bool shouldPrioritizeOfflineData(DexCacheStatus? status) {
   final manifest = status?.manifest;
@@ -669,7 +671,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   Text(
                     AppZh.settingsDexCdnDownloadHint,
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoTypography.mutedColor,
+                    ),
                   ),
                   if (_dexDownloading && progress != null) ...[
                     const SizedBox(height: 12),
@@ -677,7 +681,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 6),
                     Text(
                       '${AppZh.settingsDexOfflineProgress(progress.phase, progress.current, progress.total)} · ${(displayProgress * 100).round()}%',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoTypography.mutedColor,
+                      ),
                     ),
                   ],
                   const SizedBox(height: 12),
@@ -994,7 +1000,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text(
                       AppZh.settingsSaveFileHint,
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoTypography.mutedColor,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1006,7 +1012,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           : AppZh.settingsSaveFileUnset,
                       style: SecondaryTypography.onCard.body14.copyWith(
                         color: !hasSaveFile
-                            ? TitoColors.mutedInk
+                            ? TitoTypography.mutedColor
                             : TitoColors.ink,
                       ),
                     ),
@@ -1048,7 +1054,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ? AppZh.settingsLastSynced(lastSynced)
                           : AppZh.settingsLastSyncedNone,
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoTypography.mutedColor,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1072,7 +1078,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     AppZh.settingsDexOfflineHint,
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                      color: TitoTypography.mutedColor,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1090,7 +1096,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           )
                         : AppZh.settingsDexOfflineUnset,
                     style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                   if (_dexDownloading && dexProgress != null) ...[
@@ -1100,7 +1106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text(
                       '${AppZh.settingsDexOfflineProgress(dexProgress.phase, dexProgress.current, dexProgress.total)} · ${(dexDisplayProgress * 100).round()}%',
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoTypography.mutedColor,
                       ),
                     ),
                     if (dexProgress.label != null) ...[
@@ -1110,7 +1116,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: TitoTypography.mutedColor,
                         ),
                       ),
                     ],
@@ -1119,7 +1125,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     AppZh.settingsDexCdnDownloadHint,
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                      color: TitoTypography.mutedColor,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1146,28 +1152,28 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   AppZh.settingsDexAdvancedOptions,
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _defaultGameEdition.label,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   AppZh.settingsDexDefaultGameVersion,
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   AppZh.settingsDexDefaultGameVersionHint,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -1186,7 +1192,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: SecondaryTypography.onCard.body14.copyWith(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: TitoTypography.weight(FontWeight.w800),
                           ),
                         ),
                       ),
@@ -1254,7 +1260,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     AppZh.settingsEmulatorHint,
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                      color: TitoTypography.mutedColor,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1263,7 +1269,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ? AppZh.settingsEmulatorSelected(emulator.appName)
                         : AppZh.settingsEmulatorUnset,
                     style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1274,7 +1280,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text(
                       AppZh.continueSheetDesktopHint,
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoTypography.mutedColor,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1340,7 +1346,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SelectableText(
                   AppZh.settingsAttributionBody,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                     height: 1.5,
                   ),
                 ),
@@ -1585,8 +1591,8 @@ class _CurrentGameSection extends StatelessWidget {
                 Text(
                   AppZh.settingsCurrentGame,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                    fontWeight: FontWeight.w800,
+                    color: TitoTypography.mutedColor,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -1650,7 +1656,9 @@ class _InterfaceSection extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         AppZh.settingsVisualThemeHint,
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoTypography.mutedColor,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       SizedBox(
@@ -1712,10 +1720,9 @@ class _AppShortcutsSection extends StatelessWidget {
   const _AppShortcutsSection();
 
   Future<void> _showCustomizer(BuildContext context) {
-    return showModalBottomSheet<void>(
+    return showTitoModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      useSafeArea: true,
       builder: (sheetContext) => FractionallySizedBox(
         heightFactor: 0.86,
         child: SafeArea(
@@ -1755,7 +1762,7 @@ class _AppShortcutsSection extends StatelessWidget {
                         Text(
                           AppZh.settingsAppShortcutsHint,
                           style: SecondaryTypography.onCard.small12.copyWith(
-                            color: TitoColors.mutedInk,
+                            color: TitoTypography.mutedColor,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -1766,8 +1773,10 @@ class _AppShortcutsSection extends StatelessWidget {
                               section.label,
                               style: SecondaryTypography.onCard.small12
                                   .copyWith(
-                                    color: TitoColors.mutedInk,
-                                    fontWeight: FontWeight.w800,
+                                    color: TitoTypography.mutedColor,
+                                    fontWeight: TitoTypography.weight(
+                                      FontWeight.w800,
+                                    ),
                                   ),
                             ),
                           ),
@@ -1825,7 +1834,7 @@ class _AppShortcutsSection extends StatelessWidget {
                 Text(
                   AppZh.settingsAppShortcutsHint,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -1836,7 +1845,7 @@ class _AppShortcutsSection extends StatelessWidget {
                             .map((item) => item.label)
                             .join(AppLocale.pick(zh: '、', en: ', ')),
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -1914,7 +1923,7 @@ class _CompanionSection extends StatelessWidget {
                       Text(
                         '×${companionRepository.sizeScale.toStringAsFixed(2)}',
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: TitoTypography.mutedColor,
                         ),
                       ),
                     ],
@@ -1929,15 +1938,12 @@ class _CompanionSection extends StatelessWidget {
                         width: 64,
                         height: 64,
                         decoration: BoxDecoration(
-                          color: TitoColors.card,
+                          color: TitoSurfaceTokens.of(
+                            context,
+                          ).surface(TitoSurfaceRole.avatar).fill,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: appVisualStyle.usesTrainerJournal
-                                ? TrainerJournal.smallEdge
-                                : TitoColors.ink,
-                            width: appVisualStyle.usesTrainerJournal
-                                ? TitoBorders.journalElement
-                                : TitoBorders.element,
+                          border: Border.fromBorderSide(
+                            TitoSurfaceTokens.of(context).elementOutline,
                           ),
                         ),
                         clipBehavior: Clip.antiAlias,
@@ -1961,7 +1967,9 @@ class _CompanionSection extends StatelessWidget {
                             Text(
                               nameZh,
                               style: SecondaryTypography.onCard.body14.copyWith(
-                                fontWeight: FontWeight.w800,
+                                fontWeight: TitoTypography.weight(
+                                  FontWeight.w800,
+                                ),
                               ),
                             ),
                             if (choice?.animationLabel != null ||
@@ -1977,7 +1985,7 @@ class _CompanionSection extends StatelessWidget {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: SecondaryTypography.onCard.small12
-                                    .copyWith(color: TitoColors.mutedInk),
+                                    .copyWith(color: TitoTypography.mutedColor),
                               ),
                             ],
                           ],
@@ -2069,7 +2077,7 @@ class _SettingsAvatarPreview extends StatelessWidget {
                 ? journey.trainerName[0].toUpperCase()
                 : 'T',
             style: SecondaryTypography.onCard.h15.copyWith(
-              fontWeight: FontWeight.w900,
+              fontWeight: TitoTypography.weight(FontWeight.w900),
               color: TitoColors.deepBlue,
             ),
           );
@@ -2086,13 +2094,8 @@ class _SettingsAvatarPreview extends StatelessWidget {
                 colors: [TitoColors.softYellow, TitoColors.coral],
               ),
         shape: BoxShape.circle,
-        border: Border.all(
-          color: appVisualStyle.usesTrainerJournal
-              ? TrainerJournal.smallEdge
-              : TitoColors.ink,
-          width: appVisualStyle.usesTrainerJournal
-              ? TitoBorders.journalElement
-              : TitoBorders.element,
+        border: Border.fromBorderSide(
+          TitoSurfaceTokens.of(context).elementOutline,
         ),
       ),
       alignment: Alignment.center,

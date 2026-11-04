@@ -5,6 +5,7 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
 import '../theme/tito_surface_tokens.dart';
 import 'handheld_input.dart';
+import '../theme/tito_typography.dart';
 
 /// The tool rail and scope selector share geometry and interaction states.
 class TitoSegmentedControl<T> extends StatelessWidget {
@@ -164,7 +165,9 @@ class TitoSegmentedControl<T> extends StatelessWidget {
                                       curve: Curves.easeOutCubic,
                                       style: SecondaryTypography.onCard.small12
                                           .copyWith(
-                                            fontWeight: FontWeight.w800,
+                                            fontWeight: TitoTypography.weight(
+                                              FontWeight.w800,
+                                            ),
                                             color: value == entry.key
                                                 ? selectedForeground ??
                                                       selected.foreground

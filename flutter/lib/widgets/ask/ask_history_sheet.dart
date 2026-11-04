@@ -6,6 +6,7 @@ import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import 'ask_paper_style.dart';
 import 'ask_game_label.dart';
+import '../../theme/tito_typography.dart';
 
 enum AskHistoryManagerAction { compact, clear }
 
@@ -50,7 +51,7 @@ class AskHistoryManagerSheet extends StatelessWidget {
               child: Text(
                 AppZh.askTitoDexHistorySheetHint(askTitoDexContextEntryLimit),
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoTypography.mutedColor,
                   height: 1.35,
                 ),
               ),
@@ -62,7 +63,7 @@ class AskHistoryManagerSheet extends StatelessWidget {
                       child: Text(
                         AppZh.askTitoDexHistoryEmpty,
                         style: SecondaryTypography.onCard.body14.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: TitoTypography.mutedColor,
                         ),
                       ),
                     )
@@ -90,13 +91,19 @@ class AskHistoryManagerSheet extends StatelessWidget {
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: SecondaryTypography.onCard.body14
-                                      .copyWith(fontWeight: FontWeight.w800),
+                                      .copyWith(
+                                        fontWeight: TitoTypography.weight(
+                                          FontWeight.w800,
+                                        ),
+                                      ),
                                 ),
                                 const SizedBox(height: 3),
                                 Text(
                                   '${askGameLabel(entry.game)} · ${_formatHistoryTime(entry.createdAt)}',
                                   style: SecondaryTypography.onCard.small12
-                                      .copyWith(color: TitoColors.mutedInk),
+                                      .copyWith(
+                                        color: TitoTypography.mutedColor,
+                                      ),
                                 ),
                               ],
                             ),

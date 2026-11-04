@@ -6,7 +6,6 @@ import '../features/dex/version_availability.dart';
 import '../l10n/app_locale.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/localized_names.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
@@ -195,7 +194,7 @@ class PokemonMiniCard extends StatelessWidget {
                         style: TitoTypography.style(
                           fontSize: compact ? 10 : 12,
                           fontWeight: FontWeight.w700,
-                          color: TitoColors.mutedInk,
+                          color: TitoTypography.mutedColor,
                           height: 1.1,
                         ),
                       ),
@@ -270,9 +269,9 @@ class TypeChipRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             color: switch (tone) {
-              TypeChipTone.weak => const Color(0xFFFFD6C8),
-              TypeChipTone.resist => const Color(0xFFD4E9FF),
-              TypeChipTone.immune => const Color(0xFFE6E0F0),
+              TypeChipTone.weak => TitoColors.matchupWeakTint,
+              TypeChipTone.resist => TitoColors.matchupResistTint,
+              TypeChipTone.immune => TitoColors.matchupImmuneTint,
               TypeChipTone.neutral => TitoColors.skyBlue,
             },
             borderRadius: BorderRadius.circular(TitoRadii.sm),
@@ -460,15 +459,14 @@ class _EvolutionTriggerLabel extends StatelessWidget {
     // A link-trade-only step can never be done alone on one cartridge —
     // mark the pill so the lock is visible at a glance.
     final tradeLocked = evolutionRequiresTrade(node);
-    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: appVisualStyle.usesFlatUi
-              ? scheme.surfaceContainerLow
-              : TitoColors.card,
+          color: TitoSurfaceTokens.of(
+            context,
+          ).surface(TitoSurfaceRole.selection).fill,
           borderRadius: BorderRadius.circular(TitoRadii.sm),
           border: Border.fromBorderSide(
             _pillStroke(context, accent: tradeLocked ? TitoColors.coral : null),
@@ -488,7 +486,9 @@ class _EvolutionTriggerLabel extends StatelessWidget {
             Text(
               label,
               textAlign: TextAlign.center,
-              style: context.tito.caption.copyWith(fontWeight: FontWeight.w800),
+              style: context.tito.caption.copyWith(
+                fontWeight: TitoTypography.weight(FontWeight.w800),
+              ),
             ),
           ],
         ),

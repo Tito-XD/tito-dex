@@ -5,12 +5,14 @@ import '../../features/journey/ask_titodex_service.dart';
 import '../../features/journey/progression_hints.dart';
 import '../../l10n/app_zh.dart';
 import '../../l10n/game_zh.dart';
-import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import '../../theme/tito_motion.dart';
 import '../assistant_surface.dart';
 import 'ask_paper_style.dart';
+import '../../theme/tito_typography.dart';
+import '../tito_pokeball_loading.dart';
+import '../../theme/tito_surface_tokens.dart';
 
 class AskConnectionStatusCard extends StatelessWidget {
   const AskConnectionStatusCard({
@@ -80,13 +82,13 @@ class AskConnectionStatusCard extends StatelessWidget {
       key: const Key('ask-titodex-connection-status'),
       padding: EdgeInsets.zero,
       radius: askAssistantStatusRadius,
-      color: usesAskPaperLook
+      color: usesAskPaperLook(context)
           ? Color.alphaBlend(
               TitoColors.skyBlue.withValues(alpha: 0.18),
               TitoColors.card,
             )
           : null,
-      borderColor: askPaperOutline(0.55),
+      borderColor: askPaperOutline(context, 0.55),
       borderWidth: TitoBorders.element,
       child: Material(
         color: Colors.transparent,
@@ -275,7 +277,7 @@ class _StatusSegment extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       style: SecondaryTypography.onCard.body14.copyWith(
         color: TitoColors.deepBlue,
-        fontWeight: FontWeight.w900,
+        fontWeight: TitoTypography.weight(FontWeight.w900),
         height: 1,
       ),
     );
@@ -331,26 +333,21 @@ class _StatusDot extends StatelessWidget {
   final bool checking;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 13,
-    height: 13,
-    decoration: BoxDecoration(
-      color: color,
-      shape: BoxShape.circle,
-      border: Border.all(
-        color: TitoColors.deepBlue,
-        width: appVisualStyle.usesTrainerJournal
-            ? TitoBorders.journalHairline
-            : TitoBorders.element,
-      ),
-    ),
-    child: checking
-        ? const Padding(
-            padding: EdgeInsets.all(2),
-            child: CircularProgressIndicator(strokeWidth: 1),
-          )
-        : null,
-  );
+  Widget build(BuildContext context) => checking
+      // The shared loading ball replaces the dot while a check is running.
+      ? const TitoPokeballLoading(size: 13, onLight: true)
+      : Container(
+          width: 13,
+          height: 13,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: TitoColors.deepBlue,
+              width: titoHairlineWidth(context),
+            ),
+          ),
+        );
 }
 
 Future<void> _showConnectionDetails(
@@ -381,7 +378,7 @@ Future<void> _showConnectionDetails(
                 style: SecondaryTypography.onCard.small12.copyWith(
                   color: TitoColors.deepBlue,
                   height: 1.35,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
                 ),
               ),
             ],
@@ -398,7 +395,7 @@ Future<void> _showConnectionDetails(
                   AppZh.askTitoDexWorkerChecking,
               },
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoTypography.mutedColor,
                 height: 1.35,
               ),
             ),
@@ -472,7 +469,7 @@ class _CapabilityDetail extends StatelessWidget {
           Icon(
             enabled ? Icons.check_circle_rounded : Icons.remove_circle_outline,
             size: 18,
-            color: enabled ? TitoColors.deepBlue : TitoColors.mutedInk,
+            color: enabled ? TitoColors.deepBlue : TitoTypography.mutedColor,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -483,8 +480,8 @@ class _CapabilityDetail extends StatelessWidget {
                 ? AppZh.askTitoDexCapAvailable
                 : AppZh.askTitoDexCapDisconnected,
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: enabled ? TitoColors.deepBlue : TitoColors.mutedInk,
-              fontWeight: FontWeight.w800,
+              color: enabled ? TitoColors.deepBlue : TitoTypography.mutedColor,
+              fontWeight: TitoTypography.weight(FontWeight.w800),
             ),
           ),
         ],

@@ -115,9 +115,12 @@ class JourneyCard extends StatelessWidget {
                           future:
                               assistantFuture ??
                               journeyAssistantRepository.loadPreview(journey),
-                          style: denseStyle(
-                            context.titoHome.onDeepMetaLabel,
-                          ).copyWith(fontWeight: FontWeight.w800),
+                          style: denseStyle(context.titoHome.onDeepMetaLabel)
+                              .copyWith(
+                                fontWeight: TitoTypography.weight(
+                                  FontWeight.w800,
+                                ),
+                              ),
                           expanded: expandedDenseMeta,
                         )
                       else

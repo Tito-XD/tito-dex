@@ -16,12 +16,9 @@ import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
-import '../../theme/tito_colors.dart';
 import '../../widgets/companion_tool_fields.dart';
 import '../../widgets/battle_tool_panels.dart';
 import '../../widgets/secondary_page_scaffold.dart';
-import '../../widgets/sticker_card.dart';
-import '../../widgets/tito_loading_panel.dart';
 
 class TypeMatchupPage extends StatefulWidget {
   const TypeMatchupPage({
@@ -187,14 +184,21 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                     ),
                   ),
           ),
-          result: _session.teamMode && relations != null
+          result: _loading
+              ? const BattleResultLoading()
+              : _error != null
+              ? BattleResultError(
+                  message: _error!,
+                  onRetry: _retryLoadRelations,
+                )
+              : _session.teamMode && relations != null
               ? BattleTeamPanel(
                   session: _session,
                   party: widget.journey.party,
                   relations: relations,
                   generation: generation,
                 )
-              : relations != null && !_loading && _error == null
+              : relations != null
               ? BattleMatchupSummary(
                   multipliers: computeBattleTypeMultipliers(
                     _defenderInput(relations, generation),
@@ -241,30 +245,7 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
               const SizedBox(height: 8),
               BattleTeamEditor(session: _session, party: widget.journey.party),
             ],
-            if (_loading)
-              TitoLoadingPanel(message: AppZh.companionLoading, compact: true)
-            else if (_error != null)
-              StickerCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _error!,
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
-                        height: 1.45,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    FilledButton.icon(
-                      onPressed: _retryLoadRelations,
-                      icon: const Icon(Icons.refresh_rounded, size: 18),
-                      label: Text(AppZh.dexRetry),
-                    ),
-                  ],
-                ),
-              )
-            else if (relations != null) ...[
+            if (!_loading && _error == null && relations != null) ...[
               if (!_session.teamMode)
                 BattleCombatants(
                   attacker: CompanionSectionCard(

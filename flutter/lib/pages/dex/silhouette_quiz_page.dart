@@ -9,12 +9,10 @@ import '../../features/dex/dex_repository.dart';
 import '../../features/dex/silhouette_quiz.dart';
 import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
-import '../../theme/app_visual_style.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
-import '../../theme/trainer_journal.dart';
 import '../../widgets/companion_picker_sheet.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/handheld_input.dart';
@@ -22,6 +20,8 @@ import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
 import '../../widgets/sticker_pressable.dart';
 import '../../widgets/tito_loading_panel.dart';
+import '../../theme/tito_typography.dart';
+import '../../theme/tito_surface_tokens.dart';
 
 /// "Who's that Pokémon" — silhouette quiz over the current dex scope,
 /// using the same sprites the dex already caches (offline friendly).
@@ -363,33 +363,17 @@ class _ChoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final flat = appVisualStyle.usesFlatUi;
-    final plastic = appVisualStyle.usesSolidPlastic;
-    // Idle / muted follow the theme surface; correct / wrong keep the shared
-    // mint / coral verdict colours on every theme.
-    final idle = flat
-        ? scheme.surfaceContainerHighest
-        : plastic
-        ? Colors.white.withValues(alpha: 0.82)
-        : TitoColors.card;
+    // Idle / muted follow the theme's field surface; correct / wrong keep the
+    // shared mint / coral verdict colours on every theme.
+    final field = TitoSurfaceTokens.of(context).surface(TitoSurfaceRole.field);
+    final idle = field.fill;
     final background = switch (state) {
       _ChoiceState.correct => TitoColors.mint,
       _ChoiceState.wrong => TitoColors.coral,
       _ChoiceState.muted => idle.withValues(alpha: idle.a * 0.55),
       _ChoiceState.idle => idle,
     };
-    final BoxBorder? border = flat
-        ? null
-        : plastic
-        ? Border.all(
-            color: Colors.white.withValues(alpha: 0.85),
-            width: TitoBorders.glass,
-          )
-        : Border.all(
-            color: TrainerJournal.edge,
-            width: TitoBorders.journalCard,
-          );
+    final border = field.border;
     final radius = BorderRadius.circular(TitoRadii.md);
 
     return HandheldFocusDecorator(
@@ -413,10 +397,8 @@ class _ChoiceButton extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: flat && state == _ChoiceState.idle
-                      ? scheme.onSurface
-                      : null,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
+                  color: state == _ChoiceState.idle ? field.foreground : null,
                 ),
               ),
             ),

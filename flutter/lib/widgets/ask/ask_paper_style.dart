@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_visual_style.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/tito_surface_tokens.dart';
 import '../../theme/trainer_journal.dart';
 import '../assistant_surface.dart';
 
@@ -9,25 +9,27 @@ import '../assistant_surface.dart';
 // only (D12); the other themes leave every surface to AssistantSurface and
 // the Material colour scheme.
 const askAssistantPaper = AssistantSurface.paper;
-const askAssistantCanvas = Color(0xFFF5F6F3);
-const askAssistantSkeleton = Color(0xFFDCE5E5);
+const askAssistantCanvas = TitoColors.assistantCanvas;
+const askAssistantSkeleton = TitoColors.assistantSkeleton;
 const askAssistantStatusRadius = 32.0;
 const askAssistantContextChipRadius = TitoRadii.lg;
 
-bool get usesAskPaperLook => appVisualStyle.usesTrainerJournal;
+bool usesAskPaperLook(BuildContext context) =>
+    TitoSurfaceTokens.of(context).finish == TitoSurfaceFinish.paper;
 
 /// The conversation viewport behind the answer cards.
 BoxDecoration askAnswerViewportDecoration(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
   final radius = BorderRadius.circular(TitoRadii.lg);
-  if (appVisualStyle.usesFlatUi) {
+  final finish = TitoSurfaceTokens.of(context).finish;
+  if (finish == TitoSurfaceFinish.material) {
     return BoxDecoration(
       color: scheme.surfaceContainerLow,
       borderRadius: radius,
       border: Border.all(color: scheme.outlineVariant),
     );
   }
-  if (appVisualStyle.usesSolidPlastic) {
+  if (finish == TitoSurfaceFinish.plastic) {
     return BoxDecoration(
       color: Colors.white.withValues(alpha: 0.7),
       borderRadius: radius,
@@ -45,8 +47,10 @@ BoxDecoration askAnswerViewportDecoration(BuildContext context) {
 }
 
 /// Ink outline tint for paper surfaces, again Trainer's Journal only.
-Color? askPaperOutline(double alpha) =>
-    usesAskPaperLook ? TrainerJournal.edge.withValues(alpha: alpha) : null;
+Color? askPaperOutline(BuildContext context, double alpha) =>
+    usesAskPaperLook(context)
+    ? TrainerJournal.edge.withValues(alpha: alpha)
+    : null;
 
 /// Shared outline geometry for history rows and source references. Callers
 /// retain their own container so source links keep Material ink feedback.
@@ -76,7 +80,8 @@ AskPaperTileStyle askPaperTileStyle(
   required double outlineAlpha,
 }) {
   final scheme = Theme.of(context).colorScheme;
-  if (appVisualStyle.usesFlatUi) {
+  final finish = TitoSurfaceTokens.of(context).finish;
+  if (finish == TitoSurfaceFinish.material) {
     return AskPaperTileStyle(
       fill: scheme.surfaceContainerHigh,
       border: BorderSide(
@@ -85,7 +90,7 @@ AskPaperTileStyle askPaperTileStyle(
       ),
     );
   }
-  if (appVisualStyle.usesSolidPlastic) {
+  if (finish == TitoSurfaceFinish.plastic) {
     return AskPaperTileStyle(
       fill: Colors.white.withValues(alpha: 0.8),
       border: BorderSide(

@@ -7,6 +7,32 @@ pre-Flutter React mock was removed in v0.6.5; values below document the Flutter
 implementation rather than a second UI stack. Architecture boundaries live in
 [ARCHITECTURE.md](./ARCHITECTURE.md).
 
+## 新增 UI 前必读
+
+`flutter/test/ui_consistency_budget_test.dart` 统计 `lib/pages`、`lib/widgets`、
+`lib/features`、`lib/navigation` 与 `app.dart` 中绕过设计系统的写法。计数高于预算即失败，
+并列出替代写法；计数降低时也会失败，要求在同一改动中把预算调低到新值，使欠账只减不增。
+
+| 不要写 | 改用 |
+| --- | --- |
+| `showModalBottomSheet`（预算 0） | `showTitoModalBottomSheet`：主题背景、拖动条、安全区和键盘避让已包含，调用处不再加 `backgroundColor` 或键盘内边距 |
+| `CircularProgressIndicator` / `LinearProgressIndicator`（预算 0） | 局部 `TitoInlineLoading`，区块 `TitoLoadingPanel`，图像 `TitoPokeballLoading`，确定进度 `TitoProgressBar` |
+| `Theme.of(context).textTheme`（仅首页标题例外） | `SecondaryTypography.onPage(context)` / `onCard` / `onGradient` |
+| `TitoColors.mutedInk`、在 `copyWith` 中写 `TitoColors.ink` | `TitoTypography.mutedColor` / `inkColor`，粗细用 `TitoTypography.weight` |
+| `appVisualStyle.usesFlatUi` 等全局主题判断（预算 0，换行写也计数） | `TitoSurfaceTokens.of(context).surface(TitoSurfaceRole.…)`；可选格子用 `titoChoiceTile`，彩色色块描边用 `titoSwatchOutline`，三主题都保留的手绘描边用 `titoInkOutline`，细线宽度用 `titoHairlineWidth`，装饰底色用 `titoStickerTint` |
+| 页面里写 `TitoSurfaceFinish.`（`lib/pages`、`lib/features` 预算 0） | 外观不同的控件做成 `lib/widgets` 下的共享组件，在组件内读 `TitoSurfaceTokens.of(context).finish`，如圆形页头按钮 `TitoHeaderRoundButton` / `TitoHeaderIconButton`、回到顶部 `TitoScrollToTopButton` |
+| `Color(0x…)` 字面量（属性表、版本色和手绘插画除外） | `TitoColors` / `TrainerJournal` 令牌或表面角色；属性倍率颜色用 `typeMultiplierColor` |
+| 裸 `TextStyle(` | 文本令牌或 `TitoTypography.style` |
+| 装饰性 `TitoColors.coral` | 珊瑚色只用于主操作与破坏性操作；选中用 softYellow / mint，文字用墨色或弱化色 |
+| `AppLocale.pick(zh:, en:)` | `lib/l10n/app_zh.dart` / `app_en.dart` 中的文案 |
+| 自写倍率文本（`toStringAsFixed`、`½`） | `formatTypeMultiplier`（`1/2`、`1/4`、`2.25`） |
+| 主按钮自定 `FilledButton` 配色 | `TitoPrimaryButton`；开关行用 `StickerSwitch` |
+
+页面层的常用角色：页头底色与标题 `pageChrome`，页面上的副标题 `pageSubtle`，返回箭头与页面描边按钮
+`pageAction`，圆形页头按钮 `headerButton`，页面上的淡框 `pageWell`，焦点框与选中环 `highlight`，
+奶油卡上的强调图标 `accent`，页面上的小状态标签 `pageBadge`。卡内选择用 `selection` / `selectionActive`，输入底色用 `field`。
+测试里直接 `pumpWidget` 时要传 `theme: buildTitoTheme(style)`；没有主题扩展时令牌按 Flat 取值。
+
 ## Design Personality
 
 Keywords:
@@ -144,6 +170,13 @@ as a selection highlight.
 底栏浮于连续滚动内容上，以轻阴影和 8px 底部留白保留悬浮感。背景遮罩从导航条上沿开始，由透明向底部页面底色渐变；底栏上方内容保持清晰，经过底栏后方时逐渐隐去。列表末尾为底栏预留空间，确保最后一张卡片可完整阅读。
 内容沿用淡入和高度过渡；两处共享滑动、文字颜色过渡、居中和减少动态效果规则。
 
+结果卡统一用 `BattleResultCard`（`lib/widgets/battle_tool_panels.dart`），内边距 16：
+单个计算值（伤害、能力值）用 `display: true` 的深色卡，标题为 `BattleResultText.eyebrow`，
+大数字为 `BattleResultText.hero`；列表和表格（克制、盲点、两个整队面板）用奶油卡，
+标题为 `BattleResultText.title`。加载和错误也放进结果位（`BattleResultLoading`、
+`BattleResultError`），页面在载入期间就保持「结果在前」的布局，数据到达时输入区不跳动，
+也不会先闪出空状态。HP 条等描边取 `TitoSurfaceTokens.elementOutline`，不按主题分支手写。
+
 克制表按实际倍率分组，包含中性、抗性和免疫；特性产生的 1.5×、0.75× 等
 数值也单独显示，不归并为整数倍率。盲点页的打击盲点、联防盲点均显示在顶部。
 克制、伤害、盲点的配置固定为左进攻方、右防守方；能力值页可切换编辑哪一方，
@@ -197,6 +230,7 @@ anything that is not inside a deep card.
 | --- | --- |
 | Determinate progress (downloads, installs, sync) | `TitoProgressBar` |
 | Whole section / page waiting | `TitoLoadingPanel` or `TitoPokeballLoading` |
+| Small inline slot (picker row, status dot, short list) | `TitoInlineLoading` (waits 160 ms) |
 | Image / sprite placeholder | `TitoSkeletonBox` |
 
 No bare `CircularProgressIndicator` in feature code.
@@ -422,3 +456,148 @@ The companion Settings icon uses the same outlined Poké Ball family as other
 icons. App-update progress and actions live in Settings → About. Custom form
 and exact-game/DLC choice sheets retain themed spacing, selection and large-text
 behavior; Android installer and launcher confirmation remain system surfaces.
+
+## Layout and motion assessment (2026-11-04)
+
+本节按 Hero Section、Bento Grid、Masonry、Split Screen、Sidebar、Full-width，
+以及 Stagger、Spring、Skeleton、Count Up、Typewriter、Marquee 评估现有页面。
+结论：App 整体结构继续沿用掌机仪表盘与规则网格。用户已确认“自适应分栏”原型；
+本地 `code/app-adaptive-layout` 候选实现队伍页宽屏分栏、常用资料响应式列数、
+首页一次入场和同页能力值变化过渡。该候选尚未发布。
+
+**证据与范围：**正式 App 源码基线为 `main` / `33dbb4b`，主题预览为
+`codex/theme-refresh` / `fce207e`。初次评估检查源码与既有记录，并提供首页、队伍
+宽屏分栏和资料页响应式布局的交互原型。原型用于评审布局取舍；后续批准的本地
+实现与 Flutter 验证记录见本节末，仍未进行 RG 设备复测。Launcher 已独立到 [Tito-XD/tito-dex-launcher](https://github.com/Tito-XD/tito-dex-launcher)，
+当前 `main` / `acdb92f` 为 `0.3.2-adaptive.8` / code 14，已有分方向布局、系统安全
+留边和可替换/隐藏的主应用入口。本仓库 `launcher/` 是旧副本，不能据此判断新项目
+的布局缺陷；Launcher 原型和页面评估转到独立项目按最新源码重新进行。下文的
+页面表保留最初评估基线，已批准的本地实现与验证范围见本节末；其余候选不自动进入本轮。
+这里的 Hero Section 指首屏大图与文案，不等同于 Flutter 的 `Hero` 共享元素过渡。
+
+### A. 六种布局的取舍
+
+| 模式 | 适用页面与当前状态 | 判断 |
+| --- | --- | --- |
+| Hero Section | 核心页面目前优先放进度、搜索和操作；图鉴详情只有紧凑图文头 | 不增加大图标语首屏，避免把队伍、搜索或版本条件推到屏外。说明型首启页也应优先保证操作入口可见 |
+| Bento Grid | Home 的训练家/旅程/队伍分区 | 已有合适实现，保留主次层级；同级宝可梦条目继续规则等高，不为装饰改变大小 |
+| Masonry | 图鉴编号和队伍槽需要稳定的同行比较及方向键顺序 | 本轮不采用；瀑布流不能改善这些核心任务 |
+| Split Screen | Home 方屏分区、对战攻守配置已在使用 | 队伍页是首选候选：宽屏左队伍、右详情/编辑。窄屏和大字回退纵向 |
+| Sidebar | 当前路由层级较浅，已有返回、分段导航和设置子页 | 暂无需要增加常驻侧栏的证据；仅在以后宽屏信息层级明显增长时再评估 |
+| Full-width | 搜索框、回答正文、旅程时间线、对战结果、设置分组 | 保留通栏阅读与一个主纵向滚动区；通栏仍需页面边距、系统安全区与合理文字行宽，不是文字贴屏边 |
+
+### 页面级判断
+
+| 页面 | 当前布局 | 本轮建议 | 优先级 |
+| --- | --- | --- | --- |
+| App 首页 | 自适应 Bento 式分区；竖屏纵向，方屏/短横屏左右分区，宽屏有限宽 | 保留布局。训练家、旅程、六个队伍槽和三个快捷入口优先可见；整合已验证的主题入场节奏时不扩大头图 | 保留；动效整合次于主题功能对齐 |
+| 队伍 | 摘要 → 3×2 队伍板 → 所选成员详情/编辑器；始终纵向 | 宽屏限制队伍板宽度并尝试左队伍/右详情。窄屏保留单列，在确认选中后提供清楚的详情入口或滚动定位；仅移动方向键焦点不自动跳动页面 | 第一优先设计候选 |
+| 图鉴列表 | 3–6 列等高网格与有限错峰呈现 | 保留规则网格和稳定编号次序，避免 Masonry 和不等大卡片 | 保留 |
+| 图鉴详情 | 紧凑图文头、形态/游戏选择、通栏正文、底部四段导航 | 掌机保持现状。只有宽屏确有长行/留白问题时再试图文分栏，保留版本条件与连续阅读 | 后续候选，无需立即改版 |
+| 搜索及常用资料 | 查询优先、两个等高出口、按需查询提示、规则资料格 | 保留搜索首位。常用资料目前只按宽度选 2/3 列；宽屏可试限制内容宽度或按最小卡宽增加列数，大字需一起验证 | 第二优先适配候选 |
+| Journey / Settings | 通栏状态、事实格/时间线，以及设置分组与子页 | 保留任务和时间顺序，不改为瀑布流；无需为了风格新增侧栏 | 保留 |
+| Ask TitoDex | 状态/会话入口、连续回答区域和底部输入 | 保留正文阅读空间与稳定输入区，引用/实体入口从属于回答；不增加大图 Hero | 保留 |
+| 对战工具 | 结果在前、攻守参数并列、整页连续滚动、结果离屏后摘要 | 保留结果通栏与比较关系；不把结果/参数拆成互相争抢的两个纵向滚动区 | 保留 |
+
+### 调整候选的源码依据
+
+1. **队伍页宽屏：**`flutter/lib/pages/team_page.dart` 的 `TeamSummaryCard`、
+   `PartyTeamBoard`、详情/编辑器顺序固定，`_selectMember` 只更新状态。
+   `flutter/lib/widgets/party_team_list.dart` 的队伍格默认高度由宽度除以 `.92`
+   得出，Team 没有开启 `adaptiveHeight`；宽屏会同步增高两行队伍板。
+   建议在两个面板都能保持最小可读宽度时分栏，限制左栏宽度，并保证确认选中、
+   编辑保存/取消及返回后的焦点位置清楚。断点由逻辑宽度和字号共同决定，不能只判断横屏。
+2. **常用资料宽屏：**`flutter/lib/pages/search_reference_page.dart` 的
+   `_ReferenceCatalogGrid` 在 300 逻辑像素以上固定 3 列。可验证宽屏限制总宽或
+   增列是否改善扫读；仍保持同级入口等大，列数和文字缩放共同决定卡片尺寸。
+
+**Launcher 旧副本线索：**此前从本仓库 `launcher/` 的 `ui/Edit.kt` 读到固定
+`300.dp` 编辑控制区，并推算 480×320dp 下只余 156dp 预览宽度。这只描述
+`b2566d0` 的历史代码，不是独立项目 `acdb92f` 的当前缺陷或本轮调整依据。
+最新布局、动效及原型取舍应从独立项目的
+[ADAPTIVE_LAYOUT.md](https://github.com/Tito-XD/tito-dex-launcher/blob/main/ADAPTIVE_LAYOUT.md)
+和实际源码重新核对；旧版本 RG 验收也不能替代新版设备验证。
+
+这些优先级表示设计收益排序，不是缺陷严重等级。实现前以三主题、方屏、窄横屏、
+宽屏、手机竖屏和中英文大字原型确认；没有新证据前，不把所有页面列为待重做。
+
+### B. 六种动效的取舍
+
+| 动效 | 已有实现 | 判断 |
+| --- | --- | --- |
+| Stagger | 正式版列表/图鉴已有有限延迟和滚回不重播；主题预览新增首页六区共用一次入场 | 保留并整合已有方案。页面切回、数据刷新和布局变化不应全页重播，点击/按键不等待入场完成 |
+| Spring | 正式 App 常规按压主要是短缓出下沉；主题预览有短曲线回弹/轻压缩 | 用在按压释放等有动作原因的位置。预览 App 的曲线回弹不等同于物理 SpringSimulation；不增加所有卡片持续弹跳 |
+| Skeleton | 正式版已有主题色静态占位，可选轻微脉冲；Ask 等待区已有扫光 | 保持真实等待反馈与尺寸稳定。普通图片不统一改成灰色扫光；慢加载沿用 160ms 延迟与共享加载器，减少动画时静态显示 |
+| Count Up / 数值滚动 | 能力值计算使用同一指标的数值过渡；属性格与伤害结果倍率使用准确旧文案→新文案的滚轮切换 | 不从零入场。整数、小数、分数均可滚动；离散倍率不生成虚构的中间值。连续修改可中断，系统/App 减少动画、隐藏页直接收束；无障碍、摘要与计算始终读取最终值。固定倍率分组的标题保持不动 |
+| Typewriter | 正式 Ask 已有提示/回答逐步呈现和减少动画处理 | 限于 Ask 的既有语义呈现，不扩展到菜单、普通资料、数值或操作说明；不人为拖慢已完成内容的访问 |
+| Marquee | 核心界面无相应需求 | 不新增持续滚动。长标签用换行、展开或完整详情；搜索快捷词保留用户主动横向滚动 |
+
+动效证据入口：`flutter/lib/widgets/tito_list_reveal.dart`、
+`flutter/lib/widgets/tito_skeleton.dart`、`flutter/lib/widgets/sticker_pressable.dart`、
+`flutter/lib/widgets/ask/ask_answer_card.dart`、
+`flutter/lib/features/journey/ask_titodex_reveal_controller.dart`。
+主题分支的 `TitoEntrance` 和释放节奏没有整文件合并。本地 App 候选单独实现
+`HomeEntrance`，保留正式主线的按钮、表面令牌和可见焦点实现。
+
+### 实施顺序与验收边界
+
+1. 先完成主题变化与 v0.9.24 的差异核对；从当前正式源线移植所需动效和视觉调整。
+   不用旧主题分支整文件覆盖正式主线的 `handheld_input.dart`、按钮与表面实现，以免回退
+   v0.9.23 的可见控件焦点、`TitoSurfaceTokens` 或 v0.9.24 的搜索/会话能力。
+2. 首先验证队伍页分栏候选，再验证常用资料宽屏密度。Launcher 在独立项目另行评估。
+   每次保留清楚的窄屏回退、一个主要阅读方向，以及当前形态/游戏范围的可见性。
+3. 每次真实实现后覆盖三主题、方/横/竖屏、文字放大、中英文、触控与 D-pad。
+   检查点击区/焦点与动画后位置一致、返回保留上下文、快速反复开合/取消、系统和
+   App 减少动画、后台停止无意义 ticker。不能用截图或模拟按键替代实体手柄体验。
+4. 数据显示和加载仍需即时、真实；新增 App 布局不自动完成现有的覆盖升级、Android 15
+   后台下载及实体手柄验收。App 待办以
+   [ROADMAP.md](../ROADMAP.md#development-tracks-and-follow-ups-reviewed-2026-11-04) 为准；
+   Launcher 的小组件、重启、长期帧率与功耗等验收以独立项目当前清单为准。
+
+### Approved App implementation (2026-11-04)
+
+本地分支 `code/app-adaptive-layout` 落实用户确认的“自适应分栏”方案：
+
+- **队伍：**内容限宽 1120 逻辑像素；实际可用宽度能同时容纳队伍栏
+  `300 × 文字倍率`、14px 间距与详情栏 `340 × 文字倍率` 时分栏。
+  左侧约占 44%，上限 `390 × 文字倍率`；不足则同一组控件纵向换行。
+  六格使用内容高度，不随宽屏无限变高。编辑、交换、删除、存档差异与
+  详情折叠沿用现有业务逻辑；布局切换不替换编辑器的状态和焦点节点。
+- **资料：**每格以 `132 × 文字倍率` 为参考最小宽度，选择 2–4 列；
+  按最长的本地化标签测量等高卡片，不用截断掩盖英文或大字号溢出。
+  保留一个页面滚动区、原有全部入口及方向键遍历。
+- **搜索：**最近/建议查询在聚焦空输入框时直接展开在搜索框下，把「常用资料」
+  「对战资料」两个出口推到下方；输入查询后结果紧接搜索框，两个出口收起且不可
+  获得焦点，清空输入后原位恢复。
+- **首页：**保留训练家、旅程、队伍和三个快捷入口的原布局。
+  六区共用一条有限时间线，首次数据就绪时错峰进入；刷新、旋转、返回
+  不重播。交互立即结束装饰动效，系统/App 减少动画和后台状态直接收束。
+- **数字：**能力值计算的大数字在同一攻守方、宝可梦与能力项下，从旧值
+  过渡到新值，时长 220ms；快速修改从当前显示值继续。首次呈现、换对象/
+  指标、持键更新直接给最终值。无障碍语义、摘要和后续伤害计算始终使用
+  最新计算结果；隐藏页与减少动画不补播。
+- **倍率：**属性格和伤害结果中的倍率在同一显示槽位内用 220ms 垂直滚动
+  切换准确旧值与新值，支持整数、小数、分数与免疫 `0`；不插出第三个倍率。
+  保留 `1/2`、`1/4` 格式，特性产生的 `1.25`、`2.5`、`0.125` 等按实际值
+  显示；本系加成保留太晶化加适应力的准确 `2.25`，不再舍入为 `2.3`。
+  标签保持稳定，最多保留两层数值；快速更改可接续或反向，减少动画、
+  隐藏页和持键更新直接给最终值，读屏立即读取最终结果。
+  按倍率分组的克制表标题不滚动，以免改变类型与固定分组的对应含义。
+
+这是本地实现候选，不表示新 APK 已发布，也不替代 RG 实体手柄、签名覆盖升级
+或 Android 系统行为验收。
+
+**本地验证（2026-11-04）：**Flutter 3.44.6 / Dart 3.12.2；
+`flutter analyze --no-pub` 无问题；完整 `flutter test --no-pub` 为
+992 项通过、2 项条件跳过。队伍、首页及资料页回归覆盖三主题、390×844 竖屏、
+480×480 方屏、600×360/800×480 横屏、受限父容器、英文大字号，以及
+草稿/焦点保留、触控边沿与方向键。数字回归覆盖中途帧、打断、最终语义、
+持键即时值与系统/App 减少动画、后台不补播；倍率回归另覆盖整数/小数/分数、
+真实特性计算、`2.25` 本系加成、快速反转不重叠与系统粗体。实际 Flutter 截图使用隔离
+样例数据与测试字体；截图不是 RG 设备截图，也不验证实体控制器或 APK 升级。
+
+相关新增回归：`team_page_test.dart`、`search_reference_layout_test.dart`、
+`home_entrance_test.dart`、`tito_animated_number_test.dart`、
+`tito_rolling_value_test.dart`、`type_multiplier_roll_test.dart`、
+`quick_damage_rolling_test.dart`；既有
+`battle_tools_layout_test.dart` 验证动画未完成时仍将最终能力值传给伤害计算。

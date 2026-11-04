@@ -27,6 +27,7 @@ import '../features/journey/ask_titodex_sessions.dart';
 import '../widgets/ask/ask_paper_style.dart';
 import '../widgets/ask_titodex_loading.dart';
 import '../widgets/secondary_page_scaffold.dart';
+import '../theme/secondary_typography.dart';
 
 export '../widgets/ask/ask_answer_sources.dart' show AskTitoDexSourceOpener;
 
@@ -858,7 +859,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                       child: Text(
                         _notice!,
                         key: const Key('ask-titodex-notice'),
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: SecondaryTypography.onPage(context).small12,
                       ),
                     ),
                   ),

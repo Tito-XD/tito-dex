@@ -4,8 +4,10 @@ import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import 'tito_segmented_control.dart';
+import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
+import 'tito_loading_panel.dart';
+import 'tito_segmented_control.dart';
 import 'type_badge.dart';
 
 String battleMatchupCompactLabel(Map<String, double> multipliers) {
@@ -15,8 +17,112 @@ String battleMatchupCompactLabel(Map<String, double> multipliers) {
   }
   final values = counts.keys.toList()..sort((a, b) => b.compareTo(a));
   return values
-      .map((v) => '${v == v.roundToDouble() ? v.toInt() : v}×: ${counts[v]}')
+      .map((v) => '${formatTypeMultiplier(v)}×: ${counts[v]}')
       .join(' · ');
+}
+
+/// Text roles on battle result cards. The deep "display" card carries one
+/// computed value; every list or table result sits on a cream card.
+abstract final class BattleResultText {
+  /// Small label above a display value.
+  static TextStyle get eyebrow =>
+      SecondaryTypography.onGradient.small12.copyWith(
+        fontWeight: TitoTypography.weight(FontWeight.w800),
+        color: TitoColors.skyBlue,
+      );
+
+  /// The one large number on a display card.
+  static TextStyle get hero =>
+      SecondaryTypography.onGradient.h34.copyWith(color: TitoColors.softYellow);
+
+  /// Secondary facts beside or below the hero value.
+  static TextStyle get meta => SecondaryTypography.onGradient.small12.copyWith(
+    fontWeight: TitoTypography.weight(FontWeight.w700),
+    color: TitoColors.skyBlue,
+  );
+
+  /// Body copy on a display card.
+  static TextStyle get displayBody => SecondaryTypography.onGradient.body14;
+
+  /// Title of a list/table result card.
+  static TextStyle get title => SecondaryTypography.onCard.h15;
+}
+
+/// One result surface for every battle tool: the same padding, title style
+/// and spacing. [display] picks the deep card for a single computed value.
+class BattleResultCard extends StatelessWidget {
+  const BattleResultCard({
+    super.key,
+    required this.child,
+    this.title,
+    this.display = false,
+  });
+
+  final String? title;
+  final bool display;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => StickerCard(
+    variant: display ? StickerVariant.deep : StickerVariant.cream,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (title != null) ...[
+          Text(
+            title!,
+            style: display ? BattleResultText.eyebrow : BattleResultText.title,
+          ),
+          SizedBox(height: display ? 10 : 8),
+        ],
+        child,
+      ],
+    ),
+  );
+}
+
+/// Result slot while type data loads. Keeps the page in its result layout so
+/// nothing jumps when the real result arrives.
+class BattleResultLoading extends StatelessWidget {
+  const BattleResultLoading({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      TitoLoadingPanel(message: AppZh.companionLoading, compact: true);
+}
+
+/// Result slot when type data failed to load.
+class BattleResultError extends StatelessWidget {
+  const BattleResultError({
+    super.key,
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => BattleResultCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          message,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            color: TitoTypography.mutedColor,
+            height: 1.45,
+          ),
+        ),
+        const SizedBox(height: 8),
+        FilledButton.icon(
+          onPressed: onRetry,
+          icon: const Icon(Icons.refresh_rounded, size: 18),
+          label: Text(AppZh.dexRetry),
+        ),
+      ],
+    ),
+  );
 }
 
 /// The tool rail and scope selector use the shared capsule geometry.
@@ -100,41 +206,27 @@ class BattleMatchupSummary extends StatelessWidget {
       groups.putIfAbsent(entry.value, () => []).add(entry.key);
     }
     final values = groups.keys.toList()..sort((a, b) => b.compareTo(a));
-    return StickerCard(
-      padding: const EdgeInsets.all(12),
+    return BattleResultCard(
+      title: AppZh.battleMatchupSummary,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            AppZh.battleMatchupSummary,
-            style: SecondaryTypography.onCard.h15,
-          ),
-          const SizedBox(height: 8),
-          for (final value in values)
-            Container(
+          for (final (index, value) in values.indexed) ...[
+            // Same theme divider as the blind-spot summary.
+            if (index > 0) const Divider(height: 1),
+            Padding(
               key: ValueKey('matchup-multiplier-$value'),
               padding: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: TitoColors.deepBlue.withValues(alpha: .10),
-                  ),
-                ),
-              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     width: 52,
                     child: Text(
-                      '${_multiplierLabel(value)}×',
+                      '${formatTypeMultiplier(value)}×',
                       style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: value > 1
-                            ? TitoColors.danger
-                            : value > 0 && value < 1
-                            ? TitoColors.success
-                            : TitoColors.deepBlue,
+                        fontWeight: TitoTypography.weight(FontWeight.w800),
+                        color: typeMultiplierColor(value),
                       ),
                     ),
                   ),
@@ -154,6 +246,7 @@ class BattleMatchupSummary extends StatelessWidget {
                 ],
               ),
             ),
+          ],
           if (note != null && note!.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(note!, style: SecondaryTypography.onCard.small12),
@@ -162,15 +255,6 @@ class BattleMatchupSummary extends StatelessWidget {
       ),
     );
   }
-
-  String _multiplierLabel(double value) => switch (value) {
-    .5 => '½',
-    .25 => '¼',
-    _ =>
-      value == value.roundToDouble()
-          ? value.toInt().toString()
-          : value.toString(),
-  };
 }
 
 class BattleBlindSpotSummary extends StatelessWidget {
@@ -186,8 +270,7 @@ class BattleBlindSpotSummary extends StatelessWidget {
   final String? note;
 
   @override
-  Widget build(BuildContext context) => StickerCard(
-    padding: const EdgeInsets.all(12),
+  Widget build(BuildContext context) => BattleResultCard(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -205,7 +288,7 @@ class BattleBlindSpotSummary extends StatelessWidget {
   Widget _row(String label, List<String> types) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: SecondaryTypography.onCard.h15),
+      Text(label, style: BattleResultText.title),
       const SizedBox(height: 6),
       if (types.isEmpty)
         Text(AppZh.dexNone, style: SecondaryTypography.onCard.body14)

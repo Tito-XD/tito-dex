@@ -5,6 +5,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_surface_tokens.dart';
+import '../theme/tito_typography.dart';
 
 /// One vertical scroll surface. The small overlay never changes input geometry.
 /// Its result boundary is measured, so long teams and scaled text work alike.
@@ -229,7 +230,9 @@ class _BattleResultScrollState extends State<BattleResultScroll>
                                                     .copyWith(
                                                       color: surface.foreground,
                                                       fontWeight:
-                                                          FontWeight.w700,
+                                                          TitoTypography.weight(
+                                                            FontWeight.w700,
+                                                          ),
                                                     ),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,

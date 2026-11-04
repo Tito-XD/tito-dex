@@ -384,7 +384,8 @@ void main() {
               find.ancestor(of: status, matching: find.byType(Container)).first,
             );
             final fill = (backing.decoration! as BoxDecoration).color;
-            final background = fill == null
+            // Flat draws the label bare (no fill or a transparent one).
+            final background = fill == null || fill.a == 0
                 ? TitoColors.flatSurface
                 : Color.alphaBlend(fill, TitoColors.shellGradientBottom);
             expect(

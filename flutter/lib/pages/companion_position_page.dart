@@ -6,15 +6,13 @@ import '../features/companion/companion_media.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../theme/tito_surface_tokens.dart';
 
 /// Drag-to-position page for the home standby companion.
 ///
@@ -83,15 +81,10 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
       right: square ? 8 : (compact ? 6 : 10),
       bottom: DeviceLayout.companionOverlayBottom(context),
     );
-    final scheme = Theme.of(context).colorScheme;
-    // The drag canvas is a faint frame over the page background; Flat UI uses
-    // its own surface tones while the gradient themes keep the cream tint.
-    final (canvasFill, canvasOutline) = appVisualStyle.usesFlatUi
-        ? (scheme.surfaceContainerLow, scheme.outlineVariant)
-        : (
-            TitoColors.cream.withValues(alpha: 0.16),
-            TitoColors.card.withValues(alpha: 0.35),
-          );
+    // The drag canvas is a faint frame over the page background.
+    final canvas = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.pageWell);
 
     return Padding(
       padding: pagePadding,
@@ -107,16 +100,7 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
             fit: StackFit.expand,
             children: [
               DecoratedBox(
-                decoration: BoxDecoration(
-                  color: canvasFill,
-                  border: Border.all(
-                    color: canvasOutline,
-                    width: appVisualStyle.usesTrainerJournal
-                        ? TitoBorders.journalHairline
-                        : TitoBorders.element,
-                  ),
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                ),
+                decoration: canvas.decoration(),
                 child: GestureDetector(
                   key: const ValueKey('companion-position-canvas'),
                   behavior: HitTestBehavior.opaque,
@@ -203,35 +187,15 @@ class _PositionHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final Color fill;
-    final Color outline;
-    final double outlineWidth;
-    final List<BoxShadow> shadow;
-    if (appVisualStyle.usesFlatUi) {
-      fill = scheme.surfaceContainerHigh;
-      outline = scheme.outlineVariant;
-      outlineWidth = TitoBorders.element;
-      shadow = TitoShadows.stickerSmall;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      fill = Colors.white.withValues(alpha: 0.85);
-      outline = Colors.white.withValues(alpha: 0.85);
-      outlineWidth = TitoBorders.glass;
-      shadow = SolidPlasticShadows.stickerSmall;
-    } else {
-      fill = TrainerJournal.paper;
-      outline = TrainerJournal.edge;
-      outlineWidth = TitoBorders.journalElement;
-      shadow = const <BoxShadow>[];
-    }
+    final tokens = TitoSurfaceTokens.of(context);
     return Container(
       width: diameter,
       height: diameter,
       decoration: BoxDecoration(
-        color: fill,
+        color: tokens.surface(TitoSurfaceRole.avatar).fill,
         shape: BoxShape.circle,
-        border: Border.all(color: outline, width: outlineWidth),
-        boxShadow: retroStyle.enabled ? shadow : null,
+        border: Border.fromBorderSide(tokens.flatCardOutline),
+        boxShadow: retroStyle.enabled ? tokens.elementShadow : null,
       ),
       clipBehavior: Clip.antiAlias,
       padding: const EdgeInsets.all(4),

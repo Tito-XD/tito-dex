@@ -14,6 +14,7 @@ import '../widgets/journey_assistant_panel.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_fact_grid.dart';
+import '../theme/tito_typography.dart';
 
 class JourneyPage extends StatelessWidget {
   const JourneyPage({
@@ -67,7 +68,7 @@ class JourneyPage extends StatelessWidget {
                 style: SecondaryTypography.onGradient.small12.copyWith(
                   color: TitoColors.skyBlue,
                   letterSpacing: 0.8,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: TitoTypography.weight(FontWeight.w700),
                 ),
               ),
               const SizedBox(height: 4),
@@ -106,7 +107,7 @@ class JourneyPage extends StatelessWidget {
                 Text(
                   AppZh.askTitoDexEntryHint,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -273,7 +274,7 @@ class _SummaryMeta extends StatelessWidget {
               label,
               style: SecondaryTypography.onGradient.small12.copyWith(
                 color: TitoColors.skyBlue,
-                fontWeight: FontWeight.w700,
+                fontWeight: TitoTypography.weight(FontWeight.w700),
               ),
             ),
             const SizedBox(height: 2),

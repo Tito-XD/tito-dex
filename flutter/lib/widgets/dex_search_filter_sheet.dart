@@ -15,6 +15,8 @@ import '../theme/tito_colors.dart';
 import 'dex_shape_icon.dart';
 import 'type_badge.dart';
 import 'tito_pokeball_loading.dart';
+import '../theme/tito_typography.dart';
+import '../navigation/tito_page_transition.dart';
 
 class DexSearchFilterSelection {
   const DexSearchFilterSelection(
@@ -35,11 +37,9 @@ Future<DexSearchFilterSelection?> showDexSearchFilterSheet(
   required DexBrowseScope scope,
   required DexEncounterFilter encounter,
   bool journeyOnly = false,
-}) => showModalBottomSheet<DexSearchFilterSelection>(
+}) => showTitoModalBottomSheet<DexSearchFilterSelection>(
   context: context,
-  showDragHandle: true,
   isScrollControlled: true,
-  useSafeArea: true,
   builder: (context) => DexSearchFilterSheet(
     filter: filter,
     scope: scope,
@@ -312,276 +312,272 @@ class _DexSearchFilterSheetState extends State<DexSearchFilterSheet> {
     final size = MediaQuery.sizeOf(context);
     final height = (size.height * .88 - keyboard).clamp(0.0, size.height);
     final compact = height < 300;
-    return Padding(
-      padding: EdgeInsets.only(bottom: keyboard),
-      child: SizedBox(
-        height: height,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (compact)
-              const SizedBox(height: 8)
-            else
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        AppZh.dexSearchSheetTitle,
-                        style: SecondaryTypography.onCard.h15,
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: AppZh.close,
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close_rounded),
-                    ),
-                  ],
-                ),
-              ),
+    // showTitoModalBottomSheet already lifts the sheet above the keyboard;
+    // only shrink the height here.
+    return SizedBox(
+      height: height,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (compact)
+            const SizedBox(height: 8)
+          else
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                controller: _query,
-                textInputAction: TextInputAction.search,
-                onSubmitted: (_) => _apply(),
-                decoration: InputDecoration(
-                  isDense: compact,
-                  hintText: AppZh.dexSearchSheetHint,
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  suffixIcon: IconButton(
-                    tooltip: AppZh.dexSearchClearQuery,
-                    onPressed: _query.clear,
-                    icon: const Icon(Icons.clear_rounded),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
+              child: Row(
                 children: [
-                  _select(AppZh.dexSearchScopeField, _journeyOnly, {
-                    false: AppZh.dexSearchAllPokemon,
-                    true: AppZh.dexTabJourney,
-                  }, (v) => _journeyOnly = v),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _select(
-                          AppZh.searchHubRegionalDex,
-                          _scope.region!,
-                          {
-                            for (final region in DexRegionalPokedex.values)
-                              region: AppZh.dexRegionalDexTitle(region.labelZh),
-                          },
-                          (v) => _scope = DexBrowseScope.region(v),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _select(
-                          AppZh.dexSearchGenerationField,
-                          _generation ?? 0,
-                          {
-                            0: AppZh.dexSearchAllGenerations,
-                            for (
-                              var generation = 1;
-                              generation <= 9;
-                              generation++
-                            )
-                              generation: generationLabelZh(generation),
-                          },
-                          (v) => _generation = v == 0 ? null : v,
-                        ),
-                      ),
-                    ],
+                  Expanded(
+                    child: Text(
+                      AppZh.dexSearchSheetTitle,
+                      style: SecondaryTypography.onCard.h15,
+                    ),
                   ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _select(
-                          AppZh.dexSearchTagField,
-                          _tag ?? '',
-                          {
-                            '': AppZh.dexSearchAllPokemon,
-                            'legendary': AppZh.dexSearchTagLegendary,
-                            'mythical': AppZh.dexSearchTagMythical,
-                            'pseudo-legendary':
-                                AppZh.dexSearchTagPseudoLegendary,
-                            'baby': AppZh.dexSearchTagBaby,
-                          },
-                          (v) => _tag = v.isEmpty ? null : v,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _select(AppZh.dexSearchFormField, _forms, {
-                          DexFormDisplay.base: AppZh.dexDetailBaseForm,
-                          DexFormDisplay.all: AppZh.dexFormDisplayAll,
-                          DexFormDisplay.alternate:
-                              AppZh.dexFormDisplayAlternate,
-                        }, (v) => _forms = v),
-                      ),
-                    ],
+                  IconButton(
+                    tooltip: AppZh.close,
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded),
                   ),
-                  const SizedBox(height: 14),
-                  _chips(
-                    AppZh.dexSearchTypesField,
-                    _typesAll,
-                    _types,
-                    typeNameZh,
-                    (v) {
-                      if (!_types.remove(v)) _types.add(v);
-                    },
-                    avatar: _typeAvatar,
-                  ),
-                  const Divider(),
-                  ExpansionTile(
-                    tilePadding: EdgeInsets.zero,
-                    title: Text(AppZh.dexSearchSpeciesAxesTitle),
-                    initiallyExpanded:
-                        _shape != null || _colors.isNotEmpty || _size != null,
-                    children: [
-                      _chips(
-                        AppZh.dexSearchShapeField,
-                        kDexShapeSlugs,
-                        {if (_shape != null) _shape!},
-                        (v) => dexShapeLabelZh(v) ?? v,
-                        (v) => _shape = _shape == v ? null : v,
-                        avatar: (v) => DexShapeIcon(slug: v, size: 22),
-                      ),
-                      const SizedBox(height: 12),
-                      _chips(
-                        AppZh.dexSearchColorField,
-                        kDexColorSlugs,
-                        _colors,
-                        (v) => dexColorLabelZh(v) ?? v,
-                        (v) {
-                          if (!_colors.remove(v)) _colors.add(v);
-                        },
-                        avatar: (v) => Container(
-                          width: 18,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            color: _swatches[v],
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: TitoColors.ink.withValues(alpha: 0.25),
-                              width: TitoBorders.glass,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _chips(
-                        AppZh.dexSpeciesFilterSize,
-                        DexSizeBucket.values.map((b) => b.slug).toList(),
-                        {if (_size != null) _size!},
-                        (v) => DexSizeBucket.fromSlug(v)!.label,
-                        (v) => _size = _size == v ? null : v,
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                  ExpansionTile(
-                    tilePadding: EdgeInsets.zero,
-                    title: Text(AppZh.dexSearchReferenceTitle),
-                    onExpansionChanged: (open) {
-                      if (open) _loadReferences();
-                    },
-                    children: [
-                      if (_referencesLoading) const TitoPokeballLoading(),
-                      if (_referenceError)
-                        TextButton(
-                          onPressed: _loadReferences,
-                          child: Text(AppZh.dexSearchReferenceRetry),
-                        ),
-                      if (_referencesLoaded) ...[
-                        _ReferenceSearch(
-                          key: ValueKey('ability-$_resetKey'),
-                          label: AppZh.dexAbilities,
-                          selected: _ability,
-                          values: {for (final a in _abilities) a.id: a.nameZh},
-                          onChanged: (id) => _ability = id,
-                          onValidityChanged: (valid) =>
-                              setState(() => _abilityValid = valid),
-                        ),
-                        const SizedBox(height: 12),
-                        _ReferenceSearch(
-                          key: ValueKey('move-$_resetKey'),
-                          label: AppZh.dexTabMoves,
-                          selected: _move,
-                          values: {for (final m in _moves) m.id: m.nameZh},
-                          onChanged: (id) => _move = id,
-                          onValidityChanged: (valid) =>
-                              setState(() => _moveValid = valid),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                      _select(
-                        AppZh.dexSearchEggGroupField,
-                        _egg ?? '',
-                        {'': AppZh.dexSearchAllEggGroups, ..._eggs},
-                        (v) => _egg = v.isEmpty ? null : v,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        AppZh.dexSearchReferenceNote,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  _select(AppZh.dexSearchEncounterField, _encounter, {
-                    DexEncounterFilter.all: AppZh.dexFilterAll,
-                    DexEncounterFilter.caught: AppZh.dexFilterCaught,
-                    DexEncounterFilter.seen: AppZh.dexEncounterSeen,
-                    DexEncounterFilter.unseen: AppZh.dexEncounterUnseen,
-                    DexEncounterFilter.evolutionOrTrade:
-                        AppZh.dexEncounterEvolutionOrTrade,
-                  }, (v) => _encounter = v),
-                  const SizedBox(height: 16),
                 ],
               ),
             ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  12,
-                  compact ? 2 : 8,
-                  16,
-                  compact ? 2 : 12,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TextField(
+              controller: _query,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _apply(),
+              decoration: InputDecoration(
+                isDense: compact,
+                hintText: AppZh.dexSearchSheetHint,
+                prefixIcon: const Icon(Icons.search_rounded),
+                suffixIcon: IconButton(
+                  tooltip: AppZh.dexSearchClearQuery,
+                  onPressed: _query.clear,
+                  icon: const Icon(Icons.clear_rounded),
                 ),
-                child: Row(
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                _select(AppZh.dexSearchScopeField, _journeyOnly, {
+                  false: AppZh.dexSearchAllPokemon,
+                  true: AppZh.dexTabJourney,
+                }, (v) => _journeyOnly = v),
+                const SizedBox(height: 14),
+                Row(
                   children: [
-                    TextButton(
-                      onPressed: _reset,
-                      child: Text(AppZh.dexSearchReset),
-                    ),
-                    const SizedBox(width: 12),
                     Expanded(
-                      child: FilledButton(
-                        onPressed: _abilityValid && _moveValid ? _apply : null,
-                        child: Text(AppZh.dexSpeciesFilterApply),
+                      child: _select(
+                        AppZh.searchHubRegionalDex,
+                        _scope.region!,
+                        {
+                          for (final region in DexRegionalPokedex.values)
+                            region: AppZh.dexRegionalDexTitle(region.labelZh),
+                        },
+                        (v) => _scope = DexBrowseScope.region(v),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _select(
+                        AppZh.dexSearchGenerationField,
+                        _generation ?? 0,
+                        {
+                          0: AppZh.dexSearchAllGenerations,
+                          for (
+                            var generation = 1;
+                            generation <= 9;
+                            generation++
+                          )
+                            generation: generationLabelZh(generation),
+                        },
+                        (v) => _generation = v == 0 ? null : v,
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _select(
+                        AppZh.dexSearchTagField,
+                        _tag ?? '',
+                        {
+                          '': AppZh.dexSearchAllPokemon,
+                          'legendary': AppZh.dexSearchTagLegendary,
+                          'mythical': AppZh.dexSearchTagMythical,
+                          'pseudo-legendary': AppZh.dexSearchTagPseudoLegendary,
+                          'baby': AppZh.dexSearchTagBaby,
+                        },
+                        (v) => _tag = v.isEmpty ? null : v,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _select(AppZh.dexSearchFormField, _forms, {
+                        DexFormDisplay.base: AppZh.dexDetailBaseForm,
+                        DexFormDisplay.all: AppZh.dexFormDisplayAll,
+                        DexFormDisplay.alternate: AppZh.dexFormDisplayAlternate,
+                      }, (v) => _forms = v),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                _chips(
+                  AppZh.dexSearchTypesField,
+                  _typesAll,
+                  _types,
+                  typeNameZh,
+                  (v) {
+                    if (!_types.remove(v)) _types.add(v);
+                  },
+                  avatar: _typeAvatar,
+                ),
+                const Divider(),
+                ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: Text(AppZh.dexSearchSpeciesAxesTitle),
+                  initiallyExpanded:
+                      _shape != null || _colors.isNotEmpty || _size != null,
+                  children: [
+                    _chips(
+                      AppZh.dexSearchShapeField,
+                      kDexShapeSlugs,
+                      {if (_shape != null) _shape!},
+                      (v) => dexShapeLabelZh(v) ?? v,
+                      (v) => _shape = _shape == v ? null : v,
+                      avatar: (v) => DexShapeIcon(slug: v, size: 22),
+                    ),
+                    const SizedBox(height: 12),
+                    _chips(
+                      AppZh.dexSearchColorField,
+                      kDexColorSlugs,
+                      _colors,
+                      (v) => dexColorLabelZh(v) ?? v,
+                      (v) {
+                        if (!_colors.remove(v)) _colors.add(v);
+                      },
+                      avatar: (v) => Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: _swatches[v],
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: TitoColors.ink.withValues(alpha: 0.25),
+                            width: TitoBorders.glass,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _chips(
+                      AppZh.dexSpeciesFilterSize,
+                      DexSizeBucket.values.map((b) => b.slug).toList(),
+                      {if (_size != null) _size!},
+                      (v) => DexSizeBucket.fromSlug(v)!.label,
+                      (v) => _size = _size == v ? null : v,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+                ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: Text(AppZh.dexSearchReferenceTitle),
+                  onExpansionChanged: (open) {
+                    if (open) _loadReferences();
+                  },
+                  children: [
+                    if (_referencesLoading) const TitoPokeballLoading(),
+                    if (_referenceError)
+                      TextButton(
+                        onPressed: _loadReferences,
+                        child: Text(AppZh.dexSearchReferenceRetry),
+                      ),
+                    if (_referencesLoaded) ...[
+                      _ReferenceSearch(
+                        key: ValueKey('ability-$_resetKey'),
+                        label: AppZh.dexAbilities,
+                        selected: _ability,
+                        values: {for (final a in _abilities) a.id: a.nameZh},
+                        onChanged: (id) => _ability = id,
+                        onValidityChanged: (valid) =>
+                            setState(() => _abilityValid = valid),
+                      ),
+                      const SizedBox(height: 12),
+                      _ReferenceSearch(
+                        key: ValueKey('move-$_resetKey'),
+                        label: AppZh.dexTabMoves,
+                        selected: _move,
+                        values: {for (final m in _moves) m.id: m.nameZh},
+                        onChanged: (id) => _move = id,
+                        onValidityChanged: (valid) =>
+                            setState(() => _moveValid = valid),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                    _select(
+                      AppZh.dexSearchEggGroupField,
+                      _egg ?? '',
+                      {'': AppZh.dexSearchAllEggGroups, ..._eggs},
+                      (v) => _egg = v.isEmpty ? null : v,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      AppZh.dexSearchReferenceNote,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoTypography.mutedColor,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                _select(AppZh.dexSearchEncounterField, _encounter, {
+                  DexEncounterFilter.all: AppZh.dexFilterAll,
+                  DexEncounterFilter.caught: AppZh.dexFilterCaught,
+                  DexEncounterFilter.seen: AppZh.dexEncounterSeen,
+                  DexEncounterFilter.unseen: AppZh.dexEncounterUnseen,
+                  DexEncounterFilter.evolutionOrTrade:
+                      AppZh.dexEncounterEvolutionOrTrade,
+                }, (v) => _encounter = v),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                12,
+                compact ? 2 : 8,
+                16,
+                compact ? 2 : 12,
+              ),
+              child: Row(
+                children: [
+                  TextButton(
+                    onPressed: _reset,
+                    child: Text(AppZh.dexSearchReset),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _abilityValid && _moveValid ? _apply : null,
+                      child: Text(AppZh.dexSpeciesFilterApply),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -4,6 +4,7 @@ import '../theme/tito_surface_tokens.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/trainer_journal.dart';
+import '../theme/tito_typography.dart';
 
 /// Aligned cells that grow with their contents instead of clipping long values.
 class TitoFactGrid extends StatelessWidget {
@@ -84,7 +85,7 @@ class TitoFactTile extends StatelessWidget {
         ? scheme.onSurfaceVariant
         : journal
         ? TrainerJournal.muted
-        : TitoColors.mutedInk;
+        : TitoTypography.mutedColor;
     final radius = BorderRadius.circular(TitoRadii.sm);
     return Material(
       color: surface.fill,

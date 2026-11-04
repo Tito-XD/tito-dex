@@ -1,6 +1,22 @@
 # TitoDex Launcher — 设计与触屏体验交接
 
-更新时间：2026-10-18（Asia/Shanghai）。
+仓库信息复核：2026-11-04（Asia/Singapore）；下方设备验收记录属于 2026-10-18 的历史版本。
+
+## 当前项目已迁移
+
+Launcher 已独立为 [Tito-XD/tito-dex-launcher](https://github.com/Tito-XD/tito-dex-launcher)，
+Compose 工程位于新仓库根目录。2026-11-04 核对的 `main` 为 `acdb92f`，
+版本 `0.3.2-adaptive.8` / code 14，已有方/横/竖独立布局、系统安全留边，以及
+可替换或隐藏的主应用入口；该版 README 明确尚未在 RG 上验证。
+
+当前开发、原型与验收请从新项目的
+[AI_CONTEXT.md](https://github.com/Tito-XD/tito-dex-launcher/blob/main/docs/AI_CONTEXT.md)
+和 [HANDOFF.md](https://github.com/Tito-XD/tito-dex-launcher/blob/main/HANDOFF.md) 接续。
+本目录和 `codex/titodex-launcher` / `b2566d0` 保留旧实现与交接史，不是待合入 App
+主线的当前 Launcher 项目。以下 `0.3.1-motion.1`、50 项检查及 RG 验收只对应旧版本；
+旧布局/固定入口/动效说明不能直接当作新项目现状或最新验收结果。
+
+以下为 2026-10-18 历史交接原文。
 
 ## 当前接续状态
 

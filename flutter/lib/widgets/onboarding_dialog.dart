@@ -180,7 +180,7 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
                       children: [
                         Text(
                           titles[step],
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: SecondaryTypography.onCard.h15,
                         ),
                         const SizedBox(height: 12),
                         if (step == 0) ...[

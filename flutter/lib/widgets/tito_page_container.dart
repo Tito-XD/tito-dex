@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_surface_tokens.dart';
 import 'liquid_glass.dart';
 
 /// Opaque Material surface matching [DeviceShell] so route transitions never
@@ -14,8 +14,9 @@ class TitoPageContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final flatUi = appVisualStyle.usesFlatUi;
-    if (appVisualStyle.usesSolidPlastic) {
+    final finish = TitoSurfaceTokens.of(context).finish;
+    final flatUi = finish == TitoSurfaceFinish.material;
+    if (finish == TitoSurfaceFinish.plastic) {
       return Scaffold(
         backgroundColor: TitoColors.glassBackgroundBottom,
         body: BackdropGroup(

@@ -20,6 +20,8 @@ import '../../widgets/sticker_pressable.dart';
 import '../../widgets/tito_list_reveal.dart';
 import '../../widgets/tito_loading_panel.dart';
 import '../../widgets/type_badge.dart';
+import '../../theme/tito_typography.dart';
+import '../../navigation/tito_page_transition.dart';
 
 typedef DexReferenceFilter<T> = bool Function(T entry, String query);
 
@@ -372,7 +374,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                   Text(
                     AppZh.dexLoadFailed,
                     style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -440,7 +442,9 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                                         widget.primaryLabel(entry),
                                         style: SecondaryTypography.onCard.body14
                                             .copyWith(
-                                              fontWeight: FontWeight.w800,
+                                              fontWeight: TitoTypography.weight(
+                                                FontWeight.w800,
+                                              ),
                                             ),
                                       ),
                                       const SizedBox(height: 4),
@@ -450,7 +454,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                                             .onCard
                                             .small12
                                             .copyWith(
-                                              color: TitoColors.mutedInk,
+                                              color: TitoTypography.mutedColor,
                                             ),
                                       ),
                                       if (initialScopeNotice != null) ...[
@@ -465,16 +469,19 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                                               .small12
                                               .copyWith(
                                                 color: TitoColors.coral,
-                                                fontWeight: FontWeight.w800,
+                                                fontWeight:
+                                                    TitoTypography.weight(
+                                                      FontWeight.w800,
+                                                    ),
                                               ),
                                         ),
                                       ],
                                     ],
                                   ),
                                 ),
-                                const Icon(
+                                Icon(
                                   Icons.chevron_right_rounded,
-                                  color: TitoColors.mutedInk,
+                                  color: TitoTypography.mutedColor,
                                 ),
                               ],
                             ),
@@ -499,7 +506,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                       allVisible.length,
                     ),
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                 ),
@@ -516,10 +523,9 @@ void showMoveDetailSheet(
   CachedMove move, {
   String? scopeNotice,
 }) {
-  showModalBottomSheet<void>(
+  showTitoModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    useSafeArea: true,
     builder: (context) {
       return SafeArea(
         child: Padding(
@@ -536,13 +542,13 @@ void showMoveDetailSheet(
                 Text(
                   move.nameZh,
                   style: SecondaryTypography.onCard.h15.copyWith(
-                    fontWeight: FontWeight.w900,
+                    fontWeight: TitoTypography.weight(FontWeight.w900),
                   ),
                 ),
                 Text(
                   move.nameEn,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -594,10 +600,9 @@ void showAbilityDetailSheet(
   CachedAbility ability, {
   String? scopeNotice,
 }) {
-  showModalBottomSheet<void>(
+  showTitoModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    useSafeArea: true,
     builder: (context) {
       final pokemonCount = ability.pokemonIds.length;
       return SafeArea(
@@ -615,13 +620,13 @@ void showAbilityDetailSheet(
                 Text(
                   ability.nameZh,
                   style: SecondaryTypography.onCard.h15.copyWith(
-                    fontWeight: FontWeight.w900,
+                    fontWeight: TitoTypography.weight(FontWeight.w900),
                   ),
                 ),
                 Text(
                   ability.nameEn,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -636,8 +641,8 @@ void showAbilityDetailSheet(
                   Text(
                     AppZh.dexReferencePokemonCount(pokemonCount),
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
-                      fontWeight: FontWeight.w700,
+                      color: TitoTypography.mutedColor,
+                      fontWeight: TitoTypography.weight(FontWeight.w700),
                     ),
                   ),
                 ],
@@ -715,7 +720,7 @@ class _GridItemCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: TitoTypography.weight(FontWeight.w700),
                   ),
                 ),
               ),
@@ -729,7 +734,7 @@ class _GridItemCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: SecondaryTypography.onCard.small12.copyWith(
                     color: TitoColors.coral,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
               ],

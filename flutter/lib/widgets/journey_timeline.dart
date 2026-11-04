@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/trainer_journal.dart';
 import 'sticker_card.dart';
+import '../theme/tito_typography.dart';
+import '../theme/tito_surface_tokens.dart';
 
 class JourneyTimeline extends StatelessWidget {
   const JourneyTimeline({super.key, required this.entries, this.nextReminder});
@@ -28,7 +29,7 @@ class JourneyTimeline extends StatelessWidget {
               Text(
                 AppZh.journeyTimelineEmpty,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoTypography.mutedColor,
                 ),
               )
             else
@@ -58,39 +59,22 @@ class _ReminderBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color background;
-    final Color foreground;
-    final BoxBorder? border;
-    if (appVisualStyle.usesFlatUi) {
-      final scheme = Theme.of(context).colorScheme;
-      background = scheme.tertiaryContainer;
-      foreground = scheme.onTertiaryContainer;
-      border = null;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      background = TitoColors.softYellow.withValues(alpha: 0.88);
-      foreground = TitoColors.ink;
-      border = Border.all(
-        color: Colors.white.withValues(alpha: 0.78),
-        width: TitoBorders.glass,
-      );
-    } else {
-      background = TitoColors.softYellow;
-      foreground = TrainerJournal.ink;
-      border = null;
-    }
+    // Same highlight recipe as the level pill: tertiary container in Flat,
+    // soft yellow with a glass edge in Plastic, warm fill in the Journal.
+    final banner = TitoSurfaceTokens.of(context).surface(TitoSurfaceRole.level);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: background,
+        color: banner.fill,
         borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: border,
+        border: banner.border,
       ),
       child: Text(
         text,
         style: SecondaryTypography.onCard.body14.copyWith(
-          fontWeight: FontWeight.w700,
-          color: foreground,
+          fontWeight: TitoTypography.weight(FontWeight.w700),
+          color: banner.foreground,
         ),
       ),
     );
@@ -121,12 +105,9 @@ class _TimelineEntryTile extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: TitoColors.coral,
                     shape: BoxShape.circle,
-                    border: appVisualStyle.usesTrainerJournal
-                        ? Border.all(
-                            color: TrainerJournal.smallEdge,
-                            width: TitoBorders.journalHairline,
-                          )
-                        : null,
+                    border: Border.fromBorderSide(
+                      TitoSurfaceTokens.of(context).elementOutline,
+                    ),
                   ),
                 ),
                 // Connector rule between timeline dots (a line, not an
@@ -150,9 +131,7 @@ class _TimelineEntryTile extends StatelessWidget {
                         entry.at!,
                         style: SecondaryTypography.onCard.small12.copyWith(
                           fontWeight: TrainerJournal.weight(FontWeight.w800),
-                          color: appVisualStyle.usesTrainerJournal
-                              ? TrainerJournal.muted
-                              : TitoColors.mutedInk,
+                          color: TitoTypography.mutedColor,
                         ),
                       ),
                     ),

@@ -51,26 +51,26 @@ String? typeEnForZh(String labelZh) {
 /// PokeAPI's `type` sprites only ship English *name* badges
 /// (`name_icon`), so TitoDex draws its own sticker-style symbols instead.
 IconData typeIconData(String type) => switch (type) {
-      'normal' => Icons.circle_outlined,
-      'fire' => Icons.local_fire_department,
-      'water' => Icons.water_drop,
-      'electric' => Icons.bolt,
-      'grass' => Icons.grass,
-      'ice' => Icons.ac_unit,
-      'fighting' => Icons.sports_mma,
-      'poison' => Icons.science,
-      'ground' => Icons.terrain,
-      'flying' => Icons.air,
-      'psychic' => Icons.psychology,
-      'bug' => Icons.bug_report,
-      'rock' => Icons.diamond,
-      'ghost' => Icons.blur_on,
-      'dragon' => Icons.cyclone,
-      'dark' => Icons.dark_mode,
-      'steel' => Icons.shield,
-      'fairy' => Icons.auto_awesome,
-      _ => Icons.help_outline,
-    };
+  'normal' => Icons.circle_outlined,
+  'fire' => Icons.local_fire_department,
+  'water' => Icons.water_drop,
+  'electric' => Icons.bolt,
+  'grass' => Icons.grass,
+  'ice' => Icons.ac_unit,
+  'fighting' => Icons.sports_mma,
+  'poison' => Icons.science,
+  'ground' => Icons.terrain,
+  'flying' => Icons.air,
+  'psychic' => Icons.psychology,
+  'bug' => Icons.bug_report,
+  'rock' => Icons.diamond,
+  'ghost' => Icons.blur_on,
+  'dragon' => Icons.cyclone,
+  'dark' => Icons.dark_mode,
+  'steel' => Icons.shield,
+  'fairy' => Icons.auto_awesome,
+  _ => Icons.help_outline,
+};
 
 /// Pastel tile palette for the 18 types, keyed by lowercase slug.
 ///
@@ -100,7 +100,8 @@ const Map<String, Color> typeTileColors = {
 /// Tile color for unknown type slugs.
 const Color typeTileColorFallback = Color(0xFFB8D8F0);
 
-Color typeTileColor(String type) => typeTileColors[type] ?? typeTileColorFallback;
+Color typeTileColor(String type) =>
+    typeTileColors[type] ?? typeTileColorFallback;
 
 /// Defensive profile: how incoming attack types interact with [defenderTypes].
 class DefensiveProfile {
@@ -199,7 +200,10 @@ Map<String, double> computeDefensiveMultipliersWithAbility({
   required Map<String, TypeDamageRelations> relationsByType,
   String? defenderAbilitySlug,
 }) {
-  final multipliers = computeDefensiveMultipliers(defenderTypes, relationsByType);
+  final multipliers = computeDefensiveMultipliers(
+    defenderTypes,
+    relationsByType,
+  );
   applyAbilityTypeModifiers(multipliers, defenderAbilitySlug);
   return multipliers;
 }
@@ -208,19 +212,21 @@ String formatTypeMultiplier(double multiplier) {
   if (multiplier == 0) {
     return '0';
   }
-  if (multiplier <= 0.25) {
+  if (multiplier == 0.25) {
     return '1/4';
   }
-  if (multiplier <= 0.5) {
+  if (multiplier == 0.5) {
     return '1/2';
   }
-  if (multiplier >= 4) {
-    return '4';
+  if (multiplier == multiplier.truncateToDouble()) {
+    return multiplier.toStringAsFixed(0);
   }
-  if (multiplier >= 2) {
-    return '2';
-  }
-  return '1';
+  // Ability and STAB modifiers can produce values outside the base type chart
+  // (1.25, 2.25, 0.625…). Trim float noise without rounding real precision.
+  return multiplier
+      .toStringAsFixed(4)
+      .replaceFirst(RegExp(r'0+$'), '')
+      .replaceFirst(RegExp(r'\.$'), '');
 }
 
 /// Stable display order for the 18-type effectiveness grid.

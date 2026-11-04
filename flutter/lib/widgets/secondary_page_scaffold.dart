@@ -3,14 +3,14 @@ import 'package:go_router/go_router.dart';
 
 import '../l10n/app_zh.dart';
 import '../navigation/back_navigation.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_surface_tokens.dart';
 import 'battle_result_scroll.dart';
 import 'battle_content_fade.dart';
 import 'handheld_input.dart';
-import 'liquid_glass.dart';
+import 'tito_header_button.dart';
 
 /// Standard shell for N3 secondary routes with shared top navigation.
 class SecondaryPageScaffold extends StatelessWidget {
@@ -110,13 +110,12 @@ class SecondaryPageSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Text(
       text,
       style: SecondaryTypography.onCard.body14.copyWith(
-        color: appVisualStyle.usesFlatUi
-            ? scheme.onSurfaceVariant
-            : TitoColors.card,
+        color: TitoSurfaceTokens.of(
+          context,
+        ).surface(TitoSurfaceRole.pageSubtle).foreground,
       ),
     );
   }
@@ -187,7 +186,7 @@ class _BackTitleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = TitoRadii.md;
-    final scheme = Theme.of(context).colorScheme;
+    final tokens = TitoSurfaceTokens.of(context);
     // Solid Plastic intentionally shares this plain back-title row: the glossy
     // title pill was removed so secondary headers stay matte like the rest of
     // the theme's surfaces.
@@ -208,9 +207,9 @@ class _BackTitleButton extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.arrow_back_rounded,
-                    color: appVisualStyle.usesFlatUi
-                        ? scheme.primary
-                        : TitoColors.card,
+                    color: tokens
+                        .surface(TitoSurfaceRole.pageAction)
+                        .foreground,
                     size: iconSize,
                   ),
                   SizedBox(width: iconSize * 0.15),
@@ -220,9 +219,9 @@ class _BackTitleButton extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SecondaryTypography.onGradient.title.copyWith(
-                        color: appVisualStyle.usesFlatUi
-                            ? scheme.onSurface
-                            : TitoColors.card,
+                        color: tokens
+                            .surface(TitoSurfaceRole.pageChrome)
+                            .foreground,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -250,35 +249,12 @@ class _SecondaryHeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = DeviceLayout.headerIconSize(context);
-    // Same glyph ratio as the home header's settings button (app_header.dart)
-    // so the gear reads at one size on every title bar.
-    final iconSize = size * 0.62;
-    final scheme = Theme.of(context).colorScheme;
-
-    if (appVisualStyle.usesSolidPlastic) {
-      return LiquidGlassRoundButton(
-        size: size,
-        semanticLabel: label,
-        onTap: onTap,
-        child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-      );
-    }
-
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: IconButton.filledTonal(
-        tooltip: label,
-        onPressed: onTap,
-        padding: EdgeInsets.zero,
-        constraints: BoxConstraints.tightFor(width: size, height: size),
-        style: IconButton.styleFrom(
-          backgroundColor: scheme.secondaryContainer,
-          foregroundColor: scheme.onSecondaryContainer,
-        ),
-        icon: Icon(icon, size: iconSize),
-      ),
+    // Same button as the home header's settings gear (app_header.dart).
+    return TitoHeaderIconButton(
+      icon: icon,
+      label: label,
+      onTap: onTap,
+      size: DeviceLayout.headerIconSize(context),
     );
   }
 }

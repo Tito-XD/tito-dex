@@ -22,6 +22,7 @@ import 'ask_answer_sources.dart';
 import 'ask_answer_text.dart';
 import 'ask_entity_links.dart';
 import 'ask_paper_style.dart';
+import '../../theme/tito_typography.dart';
 
 class AskLiveAnswerCard extends StatefulWidget {
   const AskLiveAnswerCard({
@@ -123,7 +124,7 @@ class _LiveAnswerCardState extends State<AskLiveAnswerCard>
     },
     style: SecondaryTypography.onCard.small12.copyWith(
       color: TitoColors.deepBlue,
-      fontWeight: FontWeight.w900,
+      fontWeight: TitoTypography.weight(FontWeight.w900),
     ),
   );
 
@@ -187,7 +188,7 @@ class _LiveAnswerCardState extends State<AskLiveAnswerCard>
           key: const Key('ask-titodex-active-answer-surface'),
           padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
           radius: TitoRadii.lg,
-          borderColor: askPaperOutline(0.24),
+          borderColor: askPaperOutline(context, 0.24),
           child: _MotionAwareAnimatedSize(
             onEnd: widget.onContentSettled,
             child: completed == null
@@ -226,12 +227,12 @@ class _LiveAnswerCardState extends State<AskLiveAnswerCard>
                             : Shimmer.fromColors(
                                 key: const ValueKey('answer-skeleton'),
                                 enabled: !reduceMotion,
-                                baseColor: usesAskPaperLook
+                                baseColor: usesAskPaperLook(context)
                                     ? askAssistantSkeleton
                                     : Theme.of(
                                         context,
                                       ).colorScheme.surfaceContainerHighest,
-                                highlightColor: usesAskPaperLook
+                                highlightColor: usesAskPaperLook(context)
                                     ? askAssistantPaper
                                     : Theme.of(context).colorScheme.surface,
                                 child: const Column(
@@ -538,7 +539,7 @@ class _AnswerCardContent extends StatelessWidget {
               key: const Key('ask-titodex-fallback-trace'),
               style: SecondaryTypography.onCard.small12.copyWith(
                 color: TitoColors.deepBlue,
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
           ],
@@ -547,8 +548,8 @@ class _AnswerCardContent extends StatelessWidget {
             Text(
               AppZh.askTitoDexClarificationPrompt,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w800,
+                color: TitoTypography.mutedColor,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
             const SizedBox(height: 6),
@@ -585,7 +586,7 @@ class _AnswerCardContent extends StatelessWidget {
             AppZh.askTitoDexUnknownWarning,
             style: SecondaryTypography.onCard.small12.copyWith(
               color: TitoColors.deepBlue,
-              fontWeight: FontWeight.w800,
+              fontWeight: TitoTypography.weight(FontWeight.w800),
             ),
           ),
         ],

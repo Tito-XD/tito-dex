@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_zh.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/tito_typography.dart';
 import 'tito_pokeball_loading.dart';
 import 'sticker_card.dart';
 import 'tito_progress_bar.dart';
 import 'tito_skeleton.dart';
 import 'tito_delayed_loading.dart';
+import '../theme/tito_surface_tokens.dart';
 
 /// In-card loading panel — delayed pale ball or immediate measured progress.
 ///
@@ -35,7 +35,9 @@ class TitoLoadingPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final outlinedBall = onLightSurface || appVisualStyle.usesFlatUi;
+    // Flat pages are light, so the ball keeps its faint outline there too.
+    final outlinedBall =
+        onLightSurface || TitoSurfaceTokens.of(context).usesMaterial;
     final panel = StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,7 +46,7 @@ class TitoLoadingPanel extends StatelessWidget {
             Text(
               message!,
               style: context.tito.cardBodyStrong.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
             SizedBox(height: compact ? 10 : 14),
@@ -72,6 +74,43 @@ class TitoLoadingPanel extends StatelessWidget {
             placeholder: const SizedBox(height: 64),
             child: panel,
           );
+  }
+}
+
+/// Indeterminate wait inside an existing card or row: the same delayed pale
+/// Poké Ball as [TitoLoadingPanel], without nesting a second card.
+class TitoInlineLoading extends StatelessWidget {
+  const TitoInlineLoading({
+    super.key,
+    this.size = 28,
+    this.height,
+    this.onLightSurface = true,
+  });
+
+  final double size;
+
+  /// Reserved slot height; defaults to [size].
+  final double? height;
+
+  /// Pass `false` on deep / type-tinted cards (see [TitoLoadingPanel]).
+  final bool onLightSurface;
+
+  @override
+  Widget build(BuildContext context) {
+    final slot = height ?? size;
+    return TitoDelayedLoading(
+      placeholder: SizedBox(height: slot),
+      child: SizedBox(
+        height: slot,
+        child: Center(
+          child: TitoPokeballLoading(
+            size: size,
+            onLight:
+                onLightSurface || TitoSurfaceTokens.of(context).usesMaterial,
+          ),
+        ),
+      ),
+    );
   }
 }
 

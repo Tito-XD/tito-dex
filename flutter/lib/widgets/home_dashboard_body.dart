@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
+import 'home_entrance.dart';
 import 'journey_card.dart';
 import 'party_strip.dart';
 import 'tito_skeleton.dart';
@@ -29,23 +30,26 @@ class HomeDashboardBody extends StatelessWidget {
     // Square handhelds AND regular landscape screens (tablets, rotated
     // phones) share the horizontal composition: portrait's fixed-height
     // stack would clip the party card and force scrolling there.
-    if (DeviceLayout.useSquareDashboard(context) ||
-        DeviceLayout.isLandscape(context)) {
-      return _HorizontalHomeLayout(
-        journey: journey,
-        saveLinked: saveLinked,
-        onJourneyOpen: onJourneyOpen,
-        quickActions: quickActions,
-        bootstrapping: bootstrapping,
-      );
-    }
-
-    return _PortraitHomeLayout(
-      journey: journey,
-      saveLinked: saveLinked,
-      onJourneyOpen: onJourneyOpen,
-      quickActions: quickActions,
-      bootstrapping: bootstrapping,
+    final horizontal =
+        DeviceLayout.useSquareDashboard(context) ||
+        DeviceLayout.isLandscape(context);
+    return HomeEntrance(
+      ready: !bootstrapping,
+      child: horizontal
+          ? _HorizontalHomeLayout(
+              journey: journey,
+              saveLinked: saveLinked,
+              onJourneyOpen: onJourneyOpen,
+              quickActions: quickActions,
+              bootstrapping: bootstrapping,
+            )
+          : _PortraitHomeLayout(
+              journey: journey,
+              saveLinked: saveLinked,
+              onJourneyOpen: onJourneyOpen,
+              quickActions: quickActions,
+              bootstrapping: bootstrapping,
+            ),
     );
   }
 }
@@ -92,17 +96,23 @@ class _PortraitHomeLayout extends StatelessWidget {
                   SizedBox(height: gap),
                   SizedBox(
                     height: journeyHeight,
-                    child: JourneyCard(
-                      journey: journey,
-                      onOpenDetail: onJourneyOpen,
-                      compact: compact,
+                    child: HomeEntranceItem(
+                      index: 1,
+                      child: JourneyCard(
+                        journey: journey,
+                        onOpenDetail: onJourneyOpen,
+                        compact: compact,
+                      ),
                     ),
                   ),
                 ],
                 SizedBox(height: gap),
                 SizedBox(
                   height: partyHeight,
-                  child: PartyStrip(party: journey.party, compact: compact),
+                  child: HomeEntranceItem(
+                    index: 2,
+                    child: PartyStrip(party: journey.party, compact: compact),
+                  ),
                 ),
                 SizedBox(height: gap),
                 quickActions,
@@ -212,11 +222,14 @@ class _HorizontalHomeLayout extends StatelessWidget {
                                   ignoring: bootstrapping,
                                   child: Opacity(
                                     opacity: bootstrapping ? 0.0 : 1.0,
-                                    child: JourneyCard(
-                                      journey: journey,
-                                      onOpenDetail: onJourneyOpen,
-                                      compact: true,
-                                      dense: true,
+                                    child: HomeEntranceItem(
+                                      index: 1,
+                                      child: JourneyCard(
+                                        journey: journey,
+                                        onOpenDetail: onJourneyOpen,
+                                        compact: true,
+                                        dense: true,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -231,11 +244,14 @@ class _HorizontalHomeLayout extends StatelessWidget {
                             ignoring: bootstrapping,
                             child: Opacity(
                               opacity: bootstrapping ? 0.0 : 1.0,
-                              child: PartyStrip(
-                                party: journey.party,
-                                compact: true,
-                                square: true,
-                                gridMode: true,
+                              child: HomeEntranceItem(
+                                index: 2,
+                                child: PartyStrip(
+                                  party: journey.party,
+                                  compact: true,
+                                  square: true,
+                                  gridMode: true,
+                                ),
                               ),
                             ),
                           ),
@@ -258,12 +274,15 @@ class _HorizontalHomeLayout extends StatelessWidget {
                             ignoring: bootstrapping,
                             child: Opacity(
                               opacity: bootstrapping ? 0.0 : 1.0,
-                              child: PartyStrip(
-                                party: journey.party,
-                                compact: true,
-                                square: true,
-                                gridMode: true,
-                                stripMode: true,
+                              child: HomeEntranceItem(
+                                index: 2,
+                                child: PartyStrip(
+                                  party: journey.party,
+                                  compact: true,
+                                  square: true,
+                                  gridMode: true,
+                                  stripMode: true,
+                                ),
                               ),
                             ),
                           ),
@@ -326,11 +345,14 @@ class _WideRowsContent extends StatelessWidget {
                 SizedBox(width: gap),
                 Expanded(
                   child: hideWhileBootstrapping(
-                    JourneyCard(
-                      journey: journey,
-                      onOpenDetail: onJourneyOpen,
-                      compact: true,
-                      dense: true,
+                    HomeEntranceItem(
+                      index: 1,
+                      child: JourneyCard(
+                        journey: journey,
+                        onOpenDetail: onJourneyOpen,
+                        compact: true,
+                        dense: true,
+                      ),
                     ),
                   ),
                 ),
@@ -348,12 +370,15 @@ class _WideRowsContent extends StatelessWidget {
         SizedBox(
           height: 200,
           child: hideWhileBootstrapping(
-            PartyStrip(
-              party: journey.party,
-              compact: true,
-              square: true,
-              gridMode: true,
-              stripMode: true,
+            HomeEntranceItem(
+              index: 2,
+              child: PartyStrip(
+                party: journey.party,
+                compact: true,
+                square: true,
+                gridMode: true,
+                stripMode: true,
+              ),
             ),
           ),
         ),
@@ -375,11 +400,14 @@ class _TrainerCardSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TrainerCard(
-      journey: journey,
-      compact: true,
-      dense: dense,
-      avatarPlaceholder: bootstrapping,
+    return HomeEntranceItem(
+      index: 0,
+      child: TrainerCard(
+        journey: journey,
+        compact: true,
+        dense: dense,
+        avatarPlaceholder: bootstrapping,
+      ),
     );
   }
 }

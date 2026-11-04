@@ -11,6 +11,7 @@ import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 import 'tito_loading_panel.dart';
 import 'tito_fact_grid.dart';
+import '../theme/tito_typography.dart';
 
 class JourneyAssistantPanel extends StatelessWidget {
   const JourneyAssistantPanel({super.key, required this.future});
@@ -110,7 +111,7 @@ class _NearbyCard extends StatelessWidget {
             Text(
               AppZh.journeyAssistantNearbyCount(data.nearbyUncaughtCount),
               style: SecondaryTypography.onCard.body14.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoTypography.mutedColor,
               ),
             ),
             const SizedBox(height: 4),
@@ -232,7 +233,7 @@ class _SectionTitle extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoTypography.mutedColor,
               ),
             ),
           ),
@@ -262,7 +263,7 @@ class _PokemonRow extends StatelessWidget {
         title: Text(
           pokemon.nameZh,
           style: SecondaryTypography.onCard.body14.copyWith(
-            fontWeight: FontWeight.w700,
+            fontWeight: TitoTypography.weight(FontWeight.w700),
           ),
         ),
         trailing: const Icon(Icons.chevron_right_rounded),

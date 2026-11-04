@@ -68,6 +68,7 @@ R2-proxy Worker lives in `cloudflare/dex-cdn/` (legacy deploy branch `deploy/dex
 - Follow the commit attribution policy in `AGENTS.md`: use the maintainer's Git identity; do not add AI authors, co-authors, generated-by or session trailers. Preserve real human attribution. Push a `code/` branch and pass `Commit authorship` before updating `main`.
 
 - Product work lives in **`flutter/`**, including Android native code when needed; prefer small focused diffs matching existing patterns.
+- UI changes follow `docs/DESIGN_SYSTEM.md` → 新增 UI 前必读; `flutter/test/ui_consistency_budget_test.dart` ratchets ad-hoc theme branches, colour literals, raw sheets/loaders and inline copy.
 - Default UI copy in **Chinese** (`app_zh.dart`, `game_zh.dart`). Commits and PRs use English; GitHub Release titles/bodies and the root README use Simplified Chinese by default per `docs/RELEASES.md`.
 - **Never** paste production CDN URLs into README / release notes / user-facing copy.
 - No runtime 52poke/PokeAPI fetches for the zh catalog in the app; hand-drawn nav icons ship as APK assets only, never on CDN.

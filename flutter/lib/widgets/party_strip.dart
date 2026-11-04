@@ -10,7 +10,6 @@ import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_surface_tokens.dart';
@@ -181,7 +180,7 @@ class _EmptyPartyGridSlot extends StatelessWidget {
               child: Icon(
                 Icons.catching_pokemon_rounded,
                 size: spriteSize * 0.7,
-                color: TitoColors.mutedInk.withValues(alpha: 0.38),
+                color: TitoTypography.mutedColor.withValues(alpha: 0.38),
               ),
             ),
             SizedBox(width: gap),
@@ -198,7 +197,7 @@ class _PartyTextPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lineColor = TitoColors.mutedInk.withValues(alpha: 0.2);
+    final lineColor = TitoTypography.mutedColor.withValues(alpha: 0.2);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,7 +299,8 @@ class _PartyGridCell extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final nameStyle = context.titoHome.captionStrong;
-          final nameH = appVisualStyle.usesTrainerJournal
+          final nameH =
+              TitoSurfaceTokens.of(context).finish == TitoSurfaceFinish.paper
               ? MediaQuery.textScalerOf(
                   context,
                 ).scale((nameStyle.fontSize ?? 11) * (nameStyle.height ?? 1.4))
@@ -440,7 +440,7 @@ class _EmptyPartySlot extends StatelessWidget {
   Widget build(BuildContext context) {
     return Icon(
       Icons.add_circle_outline_rounded,
-      color: TitoColors.mutedInk.withValues(alpha: 0.65),
+      color: TitoTypography.mutedColor.withValues(alpha: 0.65),
       size: 16,
     );
   }

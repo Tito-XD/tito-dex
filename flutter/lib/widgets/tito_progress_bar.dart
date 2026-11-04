@@ -40,7 +40,9 @@ class TitoProgressBar extends StatelessWidget {
         if (label != null) ...[
           Text(
             label!,
-            style: context.tito.cardMuted.copyWith(fontWeight: FontWeight.w700),
+            style: context.tito.cardMuted.copyWith(
+              fontWeight: TitoTypography.weight(FontWeight.w700),
+            ),
           ),
           const SizedBox(height: 6),
         ],

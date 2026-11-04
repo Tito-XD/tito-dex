@@ -6,6 +6,7 @@ import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import 'sticker_card.dart';
 import 'tito_pokeball_loading.dart';
+import '../theme/tito_typography.dart';
 
 /// Reference drill-down filter banner for [DexPage].
 class DexFilterBanner extends StatelessWidget {
@@ -75,7 +76,7 @@ class DexFilterBanner extends StatelessWidget {
             child: Text(
               _label,
               style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
           ),
@@ -84,7 +85,7 @@ class DexFilterBanner extends StatelessWidget {
             child: Text(
               AppZh.dexFilterClear,
               style: SecondaryTypography.onCard.small12.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
           ),

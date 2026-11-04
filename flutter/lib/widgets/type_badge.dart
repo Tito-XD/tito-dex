@@ -118,3 +118,13 @@ class TitoTypeBadgeRow extends StatelessWidget {
     );
   }
 }
+
+/// One colour rule for every displayed type multiplier (detail grid, battle
+/// matchup summary): weak = danger, resisted = resist blue, immune = muted.
+/// Exact ability values (1.25, 0.75…) follow the same direction as 2× / ½×.
+Color typeMultiplierColor(double multiplier) {
+  if (multiplier > 1) return TitoColors.danger;
+  if (multiplier <= 0) return TitoTypography.mutedColor;
+  if (multiplier < 1) return TitoColors.effectivenessResist;
+  return TitoColors.ink;
+}

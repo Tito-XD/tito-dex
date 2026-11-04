@@ -7,11 +7,11 @@ import '../features/game/game_edition.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/localized_names.dart';
 import '../navigation/tito_page_transition.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
+import '../theme/tito_typography.dart';
+import '../theme/tito_surface_tokens.dart';
 
 /// Reference scopes include the explicitly named DLC encounter ranges as well
 /// as the base releases. These choices stay local to the detail page.
@@ -180,9 +180,7 @@ class _PickerFrame extends StatelessWidget {
                 child: Text(
                   title,
                   style: SecondaryTypography.onCard.h15.copyWith(
-                    color: appVisualStyle.usesFlatUi
-                        ? Theme.of(context).colorScheme.onSurface
-                        : TitoColors.ink,
+                    color: TitoTypography.inkColor,
                   ),
                 ),
               ),
@@ -208,9 +206,7 @@ class _PickerFrame extends StatelessWidget {
                 child: Text(
                   description!,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: appVisualStyle.usesFlatUi
-                        ? Theme.of(context).colorScheme.onSurfaceVariant
-                        : TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
               );
@@ -242,43 +238,15 @@ class _ChoiceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final flat = appVisualStyle.usesFlatUi;
-    final plastic = appVisualStyle.usesSolidPlastic;
-    final foreground = flat
-        ? (selected ? scheme.onSecondaryContainer : scheme.onSurface)
-        : TitoColors.ink;
-    final fill = flat
-        ? (selected ? scheme.secondaryContainer : scheme.surfaceContainerHigh)
-        : plastic
-        ? (selected
-              ? TitoColors.softYellow.withValues(alpha: .85)
-              : Colors.white.withValues(alpha: .8))
-        : (selected ? TitoColors.softYellow : TrainerJournal.paper);
-    final outline = flat
-        ? (selected ? scheme.primary : scheme.outlineVariant)
-        : plastic
-        ? Colors.white.withValues(alpha: .85)
-        : (selected ? TrainerJournal.edge : TrainerJournal.smallEdge);
+    final tile = titoChoiceTile(context, selected: selected);
+    final foreground = tile.foreground;
     final radius = BorderRadius.circular(TitoRadii.md);
     return Semantics(
       selected: selected,
       button: true,
       child: Material(
-        color: fill,
-        shape: RoundedRectangleBorder(
-          borderRadius: radius,
-          side: BorderSide(
-            color: outline,
-            width: plastic
-                ? TitoBorders.glass
-                : appVisualStyle.usesTrainerJournal
-                ? (selected
-                      ? TitoBorders.journalCard
-                      : TitoBorders.journalElement)
-                : (selected ? TitoBorders.card : TitoBorders.element),
-          ),
-        ),
+        color: tile.fill,
+        shape: RoundedRectangleBorder(borderRadius: radius, side: tile.outline),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
@@ -304,9 +272,7 @@ class _ChoiceTile extends StatelessWidget {
                           Text(
                             subtitle!,
                             style: SecondaryTypography.onCard.small12.copyWith(
-                              color: flat
-                                  ? scheme.onSurfaceVariant
-                                  : TitoColors.mutedInk,
+                              color: TitoTypography.mutedColor,
                             ),
                           ),
                         ],

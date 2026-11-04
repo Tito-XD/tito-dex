@@ -823,6 +823,9 @@ const kAppEn = <String, String>{
   'companionDamagePercent': 'About {min}% ~ {max}% of HP',
   'companionDamageOffense': 'Offense',
   'companionDamageDefense': 'Defense',
+  'companionDamageTypeLabel': 'Type',
+  'companionDamageStabLabel': 'STAB',
+  'companionDamageRandomRoll': 'roll 85%–100%',
   'companionDamageModifiers': 'Type ×{type} · STAB ×{stab} · roll 85%–100%',
   'recentTimeline': 'Recent activity',
   'nextPrefix': 'Next:',
@@ -1351,14 +1354,16 @@ const kAppEn = <String, String>{
   'askTitoDexCapDexFacts': 'Dex data · TitoDex Bundle',
   'askTitoDexCapReviewedHints': 'Reviewed hints · AI Search',
   'askTitoDexNewTopic': 'New conversation',
-  'askTitoDexNewTopicStarted': 'New conversation started. Use the conversation bar to switch back.',
+  'askTitoDexNewTopicStarted':
+      'New conversation started. Use the conversation bar to switch back.',
   'askTitoDexStoppedWaiting': 'Stopped waiting. Your draft is kept.',
   'askTitoDexStopWaiting': 'Stop waiting',
   'askTitoDexSendQuestion': 'Send question',
   'askTitoDexAnswerDetails': 'Answer details',
   'askTitoDexCopyAnswer': 'Copy answer',
   'askTitoDexAnswerCopied': 'Answer and source links copied.',
-  'askTitoDexCopyFailed': 'Unable to copy. Long-press the answer to select text.',
+  'askTitoDexCopyFailed':
+      'Unable to copy. Long-press the answer to select text.',
   'askTitoDexCopySources': 'Sources',
   'askTitoDexExampleTitle': 'Try asking',
   'askTitoDexExampleGeneralEvolution': 'What are Eevee’s evolutions?',
@@ -1373,15 +1378,20 @@ const kAppEn = <String, String>{
   'askTitoDexDeleteSession': 'Delete conversation',
   'askTitoDexChooseSessionDelete': 'Choose a conversation to delete',
   'askTitoDexSessionLimitTitle': '20 conversations saved',
-  'askTitoDexSessionLimitBody': 'Make room before starting another conversation. Delete the oldest one or choose one yourself.',
+  'askTitoDexSessionLimitBody':
+      'Make room before starting another conversation. Delete the oldest one or choose one yourself.',
   'askTitoDexDeleteOldestSession': 'Delete oldest conversation',
   'askTitoDexPickSessionDelete': 'Choose one to delete',
-  'askTitoDexSessionSaveFailed': 'Unable to save the conversation. Try again later.',
-  'askTitoDexDeleteSessionBody': 'All messages in this conversation will be deleted from this device.',
-  'askTitoDexSessionSemantics': 'Current conversation {title}, switch conversations',
+  'askTitoDexSessionSaveFailed':
+      'Unable to save the conversation. Try again later.',
+  'askTitoDexDeleteSessionBody':
+      'All messages in this conversation will be deleted from this device.',
+  'askTitoDexSessionSemantics':
+      'Current conversation {title}, switch conversations',
   'askTitoDexSessionsCount': 'Conversations · {count}/20',
   'askTitoDexSessionTurns': '{count} Q&A pairs',
-  'askTitoDexOtherGameNoLocal': 'Local notes do not cover this game. Search online for relevant sources.',
+  'askTitoDexOtherGameNoLocal':
+      'Local notes do not cover this game. Search online for relevant sources.',
   'askTitoDexSessionSummary': '{count} Q&A pairs · {time}',
   'askTitoDexBasicOutline': 'Basic overview · reference sources',
 };

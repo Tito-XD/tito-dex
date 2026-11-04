@@ -4,6 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../features/app_update/app_update_service.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
+import '../theme/tito_typography.dart';
+import 'retro_forms.dart';
 import 'sticker_card.dart';
 import 'tito_progress_bar.dart';
 
@@ -59,12 +61,37 @@ class _AppUpdateCardState extends State<AppUpdateCard> {
                   style: SecondaryTypography.onCard.small12,
                 )
               else ...[
-                SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(AppZh.appUpdateAutomatic),
-                  subtitle: Text(AppZh.appUpdateAutomaticHint),
-                  value: service.automatic,
-                  onChanged: service.setAutomatic,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppZh.appUpdateAutomatic,
+                              style: SecondaryTypography.onCard.body14,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              AppZh.appUpdateAutomaticHint,
+                              style: SecondaryTypography.onCard.small12
+                                  .copyWith(
+                                    color: TitoTypography.mutedColor,
+                                    height: 1.3,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      StickerSwitch(
+                        value: service.automatic,
+                        onChanged: service.setAutomatic,
+                      ),
+                    ],
+                  ),
                 ),
                 if (release != null) ...[
                   const Divider(),

@@ -18,7 +18,7 @@ import '../../theme/secondary_typography.dart';
 import '../../widgets/companion_tool_fields.dart';
 import '../../widgets/battle_tool_panels.dart';
 import '../../widgets/secondary_page_scaffold.dart';
-import '../../widgets/sticker_card.dart';
+import '../../widgets/tito_animated_number.dart';
 
 class StatCalcPage extends StatefulWidget {
   const StatCalcPage({
@@ -131,34 +131,31 @@ class _StatCalcPageState extends State<StatCalcPage> {
                   party: widget.journey.party,
                   generation: scope.generation,
                 )
-              : StickerCard(
-                  variant: StickerVariant.deep,
-                  padding: const EdgeInsets.all(12),
+              : BattleResultCard(
+                  display: true,
+                  title: AppZh.companionStatResultTitle,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        AppZh.companionStatResultTitle,
-                        style: SecondaryTypography.onGradient.small12,
-                      ),
                       Row(
                         children: [
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  '$result',
-                                  key: const ValueKey('battle-stat-value'),
-                                  style: SecondaryTypography.onGradient.h15
-                                      .copyWith(
-                                        fontSize: 36,
-                                        fontWeight: FontWeight.w800,
-                                      ),
+                                TitoAnimatedNumber(
+                                  value: result,
+                                  identity: (
+                                    _editingDefender,
+                                    _combatant.pokemonId,
+                                    _stat,
+                                  ),
+                                  textKey: const ValueKey('battle-stat-value'),
+                                  style: BattleResultText.hero,
                                 ),
                                 Text(
                                   _stat.label,
-                                  style: SecondaryTypography.onGradient.body14,
+                                  style: BattleResultText.displayBody,
                                 ),
                               ],
                             ),
@@ -178,7 +175,7 @@ class _StatCalcPageState extends State<StatCalcPage> {
                       const SizedBox(height: 6),
                       Text(
                         AppZh.companionStatResultHint,
-                        style: SecondaryTypography.onGradient.small12,
+                        style: BattleResultText.meta,
                       ),
                     ],
                   ),

@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · Lite `0.9.18+204` · Offline `0.9.18-offline+205`.
+> **Latest stable release:** [v0.9.24](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.24) · Lite `0.9.24+216` · Offline `0.9.24-offline+217`.
 >
-> **Current `main`:** v0.9.18 with App updates, first-run setup, trainer shortcuts, structured-data-first answers, compact grids and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.24 with compact Search, Exa/Ask sessions, visible handheld focus, shared battle tools and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,11 +14,56 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree, Journey counterpart completion grids and Team evolution details |
 | “Ask TitoDex” blocker Q&A | Built into the host; reviewed local hints and deterministic existing-resource queries, move/ability reverse filters, bounded retrieval and Qwen with final fact protection |
-| Offline data | Live bundle v20; v0.9.18 Offline embeds the verified v20 archive |
+| Offline data | Live bundle v20; v0.9.24 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Development tracks and follow-ups (reviewed 2026-11-04)
+
+This is a repository/release-record review. Historical test and RG installation
+evidence below was not rerun, and current device or production state was not
+re-tested. Stable App and theme preview remain in this repository; Launcher
+continues in the independent [TitoDex Launcher repository](https://github.com/Tito-XD/tito-dex-launcher).
+
+| Track | Verified repository / release record | Remaining work |
+| --- | --- | --- |
+| Stable App | `main` at `33dbb4b`; v0.9.24 published from `75304f9`, with successful release-source CI | Physical RG/controller, browser-owned citation experience and signed upgrade acceptance; see the maintenance checklist below |
+| Independent Launcher | [Tito-XD/tito-dex-launcher](https://github.com/Tito-XD/tito-dex-launcher), `main` at `acdb92f`; README/build source records `0.3.2-adaptive.8` / code 14, with the Compose project at repository root | Continue layout assessment and device acceptance in that project. Its README states this version has not been validated on RG |
+| Historical Launcher snapshot | This repository's `codex/titodex-launcher` / `b2566d0` and `launcher/` preserve [0.3.1-motion.1](https://github.com/Tito-XD/tito-dex/releases/tag/launcher-v0.3.1-motion.1), published from `db779e5`; its record includes 50 checks and RG touch/simulated-key acceptance | Historical evidence only; it neither validates the independent project's latest version nor represents work to merge into App main |
+| App themes | `codex/theme-refresh` at `fce207e`; local `0.9.6-motion.2` / code 194 records analysis, 660 passing tests / 6 conditional skips and RG checks | Transfer the desired changes onto v0.9.24 while preserving current features. Public [theme prerelease](https://github.com/Tito-XD/tito-dex/releases/tag/app-theme-v0.9.6-motion.1) remains motion.1; motion.2 has no new online release |
+| Historical workspace | `codex/workspace-sync-20261016` at `14f9169` retains the old workspace | Compare useful unpublished changes individually. Main already contains Exa/Ask and type-picker improvements; neither the whole snapshot nor every divergent commit is an outstanding feature |
+
+The theme preview uses `com.tito.titodex.themepreview` and a 0.9.6 feature
+baseline. It is not an upgrade to the stable App. The theme APK and independent
+Launcher's current preview use development signing. App integration must preserve
+current history and must not merge pre-cleanup history back into main; follow
+[CONTRIBUTING.md](docs/CONTRIBUTING.md). Launcher already has independent square,
+landscape and portrait layouts, system safe insets, and a replaceable/hideable
+primary app entry. Its current source, prototypes and follow-ups belong in its
+[own development context](https://github.com/Tito-XD/tito-dex-launcher/blob/main/docs/AI_CONTEXT.md).
+
+The review found no open GitHub PRs or issues in `Tito-XD/tito-dex`. Its three registered worktrees
+were clean and no stash was present before this documentation update. These
+are dated observations, not ongoing guarantees. The outdated v0.9.18 roadmap
+header is corrected in this update.
+
+The approved adaptive App layout is implemented locally on
+`code/app-adaptive-layout`: Team split panes, responsive reference cards, bounded
+Home entrance, same-metric stat transitions and exact-value multiplier rolling.
+Local analysis is clean and the
+full Flutter suite passed 992 tests with 2 conditional skips. It is not a published release.
+Implementation and validation scope are recorded in
+[DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md#layout-and-motion-assessment-2026-11-04).
+Remaining theme-preview differences still need selective review; physical-device
+acceptance and useful historical snapshot changes remain separate follow-ups.
+
+## Prepared for v0.9.25
+
+- Adaptive Team panes, 2–4 column reference cards, one bounded Home entrance and exact-value battle transitions.
+- Battle-tool loading and errors stay in the fixed result slot; Search results follow the field while hub exits collapse.
+- One design system across the three themes: page roles and shared header/scroll-to-top buttons replace per-theme branches (ratchet at 0).
 
 ## Completed in v0.9.24
 
@@ -197,7 +242,7 @@
 - Expand English runtime coverage across all three themes and phone/handheld layouts. Known leftovers for a later pass: companion stored `nameZh`, Journey Assistant Worker answers (remain zh), Dex flavor / location / move-ability prose fallbacks. Search aliases and parser matching stay Chinese on purpose. Reference prose and assistant answers are not claimed to be fully translated.
 
 1. Add reviewed real-save fixtures as the maintainer completes more versions. Do not promote an experimental adapter to fixture-verified before that.
-2. Run the release checklist on a physical RG device and Android 15 phone: Offline first unpack, background notification, cancellation, task removal and service timeout. For v0.9.18 also check signed App upgrade, installer permission denial/return, first-run migration/replay and trainer shortcut pin/rename on each launcher.
+2. Close v0.9.24 device acceptance on a physical RG and Android 15 phone: actual controller navigation, browser-owned citation opening/return, signed App upgrade, Offline first unpack, background notification, cancellation, task removal and service timeout. Include the updater/onboarding cases introduced in v0.9.18: installer permission denial/return, first-run migration/replay and trainer shortcut pin/rename on each launcher. Launcher preview checks do not establish these stable-App release checks.
 3. Refresh upstream form media periodically. Six Koraidon/Miraidon ride-mode static gaps remain intentionally honest until a verified distinct source exists.
 4. Keep encounter overlays, item/form audits and Chinese catalogs current through versioned bundle releases.
 5. Promote useful trial answers into AI Search only through revision-locked, independently reviewed original facts; keep transient web text out of R2 and APK data.

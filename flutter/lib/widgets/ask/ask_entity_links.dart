@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/journey/ask_titodex_entity_links.dart';
 import '../../l10n/app_zh.dart';
 import '../../theme/secondary_typography.dart';
-import '../../theme/tito_colors.dart';
+import '../../theme/tito_typography.dart';
 
 class AskEntityLinkCards extends StatefulWidget {
   const AskEntityLinkCards({
@@ -68,8 +68,8 @@ class _AskEntityLinkCardsState extends State<AskEntityLinkCards> {
             Text(
               AppZh.askTitoDexContinueInApp,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w900,
+                color: TitoTypography.mutedColor,
+                fontWeight: TitoTypography.weight(FontWeight.w900),
               ),
             ),
             const SizedBox(height: 6),

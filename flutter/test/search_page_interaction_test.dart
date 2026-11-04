@@ -356,4 +356,41 @@ void main() {
     await openHelp(tester);
     expectSingleRow(tester, suggestions);
   });
+
+  testWidgets('typed results follow the field and hub exits collapse', (
+    tester,
+  ) async {
+    final referenceEntry = find.byKey(const ValueKey('search-reference-entry'));
+    final battleEntry = find.byKey(const ValueKey('search-battle-entry'));
+    await host(tester);
+    expect(referenceEntry, findsOneWidget);
+    expect(battleEntry, findsOneWidget);
+
+    await openHelp(tester);
+    // Recent and suggested queries open between the field and the hubs.
+    expect(
+      tester.getTopLeft(suggestions).dy,
+      lessThan(tester.getTopLeft(referenceEntry).dy),
+    );
+
+    await tester.enterText(field, 'charmander');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    final result = find.byKey(const ValueKey('search-result-charmander-4'));
+    expect(result, findsOneWidget);
+    expect(referenceEntry, findsNothing);
+    expect(battleEntry, findsNothing);
+    expect(
+      tester.getTopLeft(result).dy,
+      greaterThan(tester.getBottomLeft(field).dy),
+    );
+
+    await tester.enterText(field, '');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    expect(result, findsNothing);
+    expect(referenceEntry, findsOneWidget);
+    expect(battleEntry, findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

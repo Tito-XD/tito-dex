@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/trainer_journal.dart';
 import 'liquid_glass.dart';
 
@@ -26,7 +26,7 @@ class AssistantSurface extends StatelessWidget {
   });
 
   /// Warm assistant paper used by Trainer's Journal when no [color] is given.
-  static const paper = Color(0xFFFFFBF2);
+  static const paper = TitoColors.assistantPaper;
 
   final Widget child;
   final Color? color;
@@ -40,7 +40,8 @@ class AssistantSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final borderRadius = BorderRadius.circular(radius);
-    if (appVisualStyle.usesSolidPlastic) {
+    final finish = TitoSurfaceTokens.of(context).finish;
+    if (finish == TitoSurfaceFinish.plastic) {
       return ListenableBuilder(
         listenable: retroStyle,
         builder: (context, content) => LiquidGlassSurface(
@@ -58,7 +59,7 @@ class AssistantSurface extends StatelessWidget {
         child: child,
       );
     }
-    if (appVisualStyle.usesTrainerJournal) {
+    if (finish == TitoSurfaceFinish.paper) {
       // Hard offset shadow lives on the outer box; the Material keeps ink
       // ripples and clipping for the content exactly as before.
       return ListenableBuilder(

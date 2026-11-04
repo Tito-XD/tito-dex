@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
+import '../theme/tito_typography.dart';
 
 /// Collapsible block for long settings sections (Sleep links, cache filters, …).
 class SettingsExpandableSection extends StatefulWidget {
@@ -33,13 +32,8 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final chevronColor = appVisualStyle.usesFlatUi
-        ? scheme.onSurface
-        : TitoColors.ink;
-    final subtitleColor = appVisualStyle.usesFlatUi
-        ? scheme.onSurfaceVariant
-        : TitoColors.mutedInk;
+    final chevronColor = TitoTypography.inkColor;
+    final subtitleColor = TitoTypography.mutedColor;
     return StickerCard(
       variant: widget.variant,
       child: Column(
@@ -86,10 +80,7 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
               ),
             ),
           ),
-          if (_expanded) ...[
-            const SizedBox(height: 12),
-            widget.child,
-          ],
+          if (_expanded) ...[const SizedBox(height: 12), widget.child],
         ],
       ),
     );

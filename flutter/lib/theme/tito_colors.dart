@@ -107,6 +107,15 @@ abstract final class SolidPlasticShadows {
   ];
 }
 
+/// The Flat UI Material scheme. ThemeData and theme-blind typography share
+/// this one instance so Flat text never mixes Material and sticker greys.
+final ColorScheme titoFlatColorScheme = ColorScheme.fromSeed(
+  seedColor: TitoColors.flatSeed,
+  brightness: Brightness.light,
+  secondary: TitoColors.coral,
+  surface: TitoColors.flatSurface,
+);
+
 abstract final class TitoColors {
   /// Flat UI seed and neutral surfaces for this experimental branch.
   static const flatSeed = Color(0xFF415F91);
@@ -145,6 +154,21 @@ abstract final class TitoColors {
 
   /// Selected-state ink on pastel fills (chip/toggle labels).
   static const selectionInk = Color(0xFF08402F);
+
+  /// Pastel chip fills for type matchups on Pokémon cards.
+  static const matchupWeakTint = Color(0xFFFFD6C8);
+  static const matchupResistTint = Color(0xFFD4E9FF);
+  static const matchupImmuneTint = Color(0xFFE6E0F0);
+
+  /// Home quick-action tiles (Team / Dex / Search) on the gradient themes.
+  static const homeTeamTile = Color(0xFFFBEFC3);
+  static const homeDexTile = Color(0xFFF9DEDC);
+  static const homeSearchTile = Color(0xFFDFF1F9);
+
+  /// Ask TitoDex paper: warm answer sheet, cool canvas and skeleton bars.
+  static const assistantPaper = Color(0xFFFFFBF2);
+  static const assistantCanvas = Color(0xFFF5F6F3);
+  static const assistantSkeleton = Color(0xFFDCE5E5);
 
   // Solid Plastic keeps a cool hardware shell underneath the optical layers.
   // The accents are deliberately milky instead of neon so translucent edges

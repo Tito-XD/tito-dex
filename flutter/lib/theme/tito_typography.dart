@@ -9,6 +9,32 @@ import 'trainer_journal.dart';
 abstract final class TitoTypography {
   static const fontFamily = 'Nunito';
 
+  /// Theme-correct body ink: Journal gray-blue, Flat `onSurface`.
+  static Color get inkColor => resolveColor(TitoColors.ink);
+
+  /// Theme-correct secondary text / icon gray. Use instead of the fixed
+  /// [TitoColors.mutedInk] so Flat UI never shows two different grays.
+  static Color get mutedColor => resolveColor(TitoColors.mutedInk);
+
+  /// Weight for styles built outside [style] (e.g. `copyWith`): Trainer's
+  /// Journal maps onto the Nunito cuts that actually ship.
+  static FontWeight weight(FontWeight requested) =>
+      TrainerJournal.weight(requested);
+
+  /// Maps the two shared sticker inks onto the active theme's equivalents.
+  static Color resolveColor(Color color) {
+    if (appVisualStyle.usesTrainerJournal) {
+      if (color == TitoColors.ink) return TrainerJournal.ink;
+      if (color == TitoColors.mutedInk) return TrainerJournal.muted;
+    } else if (appVisualStyle.usesFlatUi) {
+      if (color == TitoColors.ink) return titoFlatColorScheme.onSurface;
+      if (color == TitoColors.mutedInk) {
+        return titoFlatColorScheme.onSurfaceVariant;
+      }
+    }
+    return color;
+  }
+
   static TextStyle style({
     double fontSize = 14,
     FontWeight fontWeight = FontWeight.w600,
@@ -32,14 +58,7 @@ abstract final class TitoTypography {
     double? height,
     double? letterSpacing,
   }) {
-    final journal = appVisualStyle.usesTrainerJournal;
-    final resolvedColor = !journal
-        ? color
-        : color == TitoColors.ink
-        ? TrainerJournal.ink
-        : color == TitoColors.mutedInk
-        ? TrainerJournal.muted
-        : color;
+    final resolvedColor = resolveColor(color);
     return TextStyle(
       fontFamily: fontFamily,
       fontFamilyFallback: const [

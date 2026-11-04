@@ -12,11 +12,12 @@ import '../features/journey/ask_titodex_service.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'assistant_surface.dart';
 import 'fallback_sprite_image.dart';
+import '../theme/tito_typography.dart';
+import 'ask/ask_paper_style.dart';
 
 /// Trainer's Journal paper tone shared with the Ask TitoDex answer cards.
 const _assistantPaper = AssistantSurface.paper;
@@ -198,7 +199,7 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
         final bundled = bundledCompanionGifAsset(speciesId);
         // The sky-tinted paper card is part of the Trainer's Journal look;
         // other themes let AssistantSurface pick its own surface and outline.
-        final paperLook = appVisualStyle.usesTrainerJournal;
+        final paperLook = usesAskPaperLook(context);
         final scheme = Theme.of(context).colorScheme;
         final sources = <String>[
           if (choice?.animationSourceUrl case final source?) source,
@@ -342,7 +343,7 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: SecondaryTypography.onCard.small12
-                                    .copyWith(color: TitoColors.mutedInk),
+                                    .copyWith(color: TitoTypography.mutedColor),
                               ),
                             ],
                           ),

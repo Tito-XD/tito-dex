@@ -20,11 +20,9 @@ import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../navigation/tito_route_work.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import '../widgets/dex_filter_banner.dart';
 import '../widgets/dex_search_filter_sheet.dart';
 import '../widgets/handheld_input.dart';
@@ -32,8 +30,11 @@ import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
+import '../widgets/tito_scroll_to_top_button.dart';
 import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_skeleton.dart';
+import '../theme/tito_typography.dart';
+import '../theme/tito_surface_tokens.dart';
 
 class DexPage extends StatefulWidget {
   const DexPage({
@@ -973,7 +974,10 @@ class _DexPageState extends State<DexPage> {
                                                 .onCard
                                                 .body14
                                                 .copyWith(
-                                                  fontWeight: FontWeight.w800,
+                                                  fontWeight:
+                                                      TitoTypography.weight(
+                                                        FontWeight.w800,
+                                                      ),
                                                 ),
                                           ),
                                           const SizedBox(height: 8),
@@ -983,7 +987,8 @@ class _DexPageState extends State<DexPage> {
                                                 .onCard
                                                 .small12
                                                 .copyWith(
-                                                  color: TitoColors.mutedInk,
+                                                  color:
+                                                      TitoTypography.mutedColor,
                                                   height: 1.45,
                                                 ),
                                           ),
@@ -1023,7 +1028,9 @@ class _DexPageState extends State<DexPage> {
                                         _emptyMessageForMode(),
                                         style: SecondaryTypography.onCard.body14
                                             .copyWith(
-                                              fontWeight: FontWeight.w700,
+                                              fontWeight: TitoTypography.weight(
+                                                FontWeight.w700,
+                                              ),
                                             ),
                                       ),
                                     ),
@@ -1139,7 +1146,10 @@ class _DexPageState extends State<DexPage> {
             child: AnimatedOpacity(
               opacity: _showScrollToTop ? 1 : 0,
               duration: const Duration(milliseconds: 180),
-              child: _ScrollToTopButton(onTap: _scrollToTop),
+              child: TitoScrollToTopButton(
+                label: AppZh.dexScrollToTop,
+                onTap: _scrollToTop,
+              ),
             ),
           ),
         ),
@@ -1169,55 +1179,6 @@ class _DexPageState extends State<DexPage> {
     final viewport = MediaQuery.sizeOf(context).height;
     final rows = (viewport / rowExtent).ceil().clamp(2, 12);
     return rows * columns;
-  }
-}
-
-/// Scroll-to-top action. Trainer's Journal / Solid Plastic keep the
-/// soft-yellow sticker disc with a themed stroke; Flat UI uses the stock
-/// small Material FAB so it matches the rest of the Material surface.
-class _ScrollToTopButton extends StatelessWidget {
-  const _ScrollToTopButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  static String get _label => AppZh.dexScrollToTop;
-
-  @override
-  Widget build(BuildContext context) {
-    if (appVisualStyle.usesFlatUi) {
-      return FloatingActionButton.small(
-        heroTag: null,
-        tooltip: _label,
-        onPressed: onTap,
-        child: const Icon(Icons.vertical_align_top_rounded),
-      );
-    }
-    final side = appVisualStyle.usesSolidPlastic
-        ? BorderSide(
-            color: Colors.white.withValues(alpha: 0.8),
-            width: TitoBorders.glass,
-          )
-        : TrainerJournal.cardSide;
-    return Semantics(
-      button: true,
-      label: _label,
-      child: Material(
-        color: TitoColors.softYellow,
-        shape: CircleBorder(side: side),
-        child: InkWell(
-          onTap: onTap,
-          customBorder: const CircleBorder(),
-          child: const SizedBox(
-            width: 44,
-            height: 44,
-            child: Icon(
-              Icons.vertical_align_top_rounded,
-              color: TitoColors.deepBlue,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 
@@ -1260,18 +1221,12 @@ class _DexTopBarAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(TitoRadii.md);
-    final scheme = Theme.of(context).colorScheme;
-    final shellColor = appVisualStyle.usesFlatUi
-        ? scheme.primary
-        : TitoColors.card;
-    // Outline pill on the page header: card-weight stroke in the cream
-    // themes, plastic hairline in Solid Plastic (colour stays the shell tint
-    // so the label and icon read as one control).
-    final strokeWidth = appVisualStyle.usesSolidPlastic
-        ? TitoBorders.glass
-        : appVisualStyle.usesTrainerJournal
-        ? TitoBorders.journalCard
-        : TitoBorders.card;
+    // Outline pill on the page header; stroke, icon and label share the page
+    // action tint so they read as one control.
+    final action = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.pageAction);
+    final shellColor = action.foreground;
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: radius,
@@ -1289,7 +1244,7 @@ class _DexTopBarAction extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: radius,
-                border: Border.all(color: shellColor, width: strokeWidth),
+                border: Border.fromBorderSide(action.outline),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1300,7 +1255,7 @@ class _DexTopBarAction extends StatelessWidget {
                     label,
                     style: SecondaryTypography.onPage(context).small12.copyWith(
                       color: shellColor,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                 ],

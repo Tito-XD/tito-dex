@@ -14,7 +14,6 @@ import '../features/game/game_edition_repository.dart';
 import '../features/journey/ask_titodex_settings.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
@@ -30,6 +29,7 @@ import '../widgets/tito_animated_size_switcher.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_motion.dart';
 import '../widgets/search_query_section.dart';
+import '../theme/tito_typography.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({
@@ -269,7 +269,7 @@ class _SearchPageState extends State<SearchPage> {
                     spellCheckConfiguration:
                         const SpellCheckConfiguration.disabled(),
                     style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                     // Fill, outline, and focus colour come from the theme's
                     // inputDecorationTheme so every field reads the same.
@@ -290,36 +290,53 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ),
       const SizedBox(height: 12),
-      IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: _HubExitTile(
-                key: const ValueKey('search-reference-entry'),
-                title: AppZh.searchHubReference,
-                subtitle: AppZh.searchHubReferenceHint,
-                onTap: () => context.push('/search/reference'),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _HubExitTile(
-                key: const ValueKey('search-battle-entry'),
-                title: AppZh.searchHubBattle,
-                subtitle: AppZh.searchHubBattleHint,
-                onTap: () => context.push('/search/companion'),
-              ),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 16),
+      // Results follow the field directly. While a query is active the two
+      // hub exits collapse; clearing the field brings them back in place.
       TitoAnimatedSizeSwitcher(
         switchKey: _searchResultsSwitchKey,
         child: _searchResultsBody(context, query),
       ),
+      _hubExits(context, visible: query.isEmpty),
     ];
+  }
+
+  Widget _hubExits(BuildContext context, {required bool visible}) {
+    return ExcludeFocus(
+      excluding: !visible,
+      child: IgnorePointer(
+        ignoring: !visible,
+        child: TitoAnimatedSizeSwitcher(
+          switchKey: ValueKey<bool>(visible),
+          child: visible
+              ? IntrinsicHeight(
+                  key: const ValueKey('search-hub-exits'),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: _HubExitTile(
+                          key: const ValueKey('search-reference-entry'),
+                          title: AppZh.searchHubReference,
+                          subtitle: AppZh.searchHubReferenceHint,
+                          onTap: () => context.push('/search/reference'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _HubExitTile(
+                          key: const ValueKey('search-battle-entry'),
+                          title: AppZh.searchHubBattle,
+                          subtitle: AppZh.searchHubBattleHint,
+                          onTap: () => context.push('/search/companion'),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
+      ),
+    );
   }
 
   void _setSearchHelpActive(bool active) {
@@ -412,14 +429,14 @@ class _SearchPageState extends State<SearchPage> {
             Text(
               AppZh.dexLoadFailed,
               style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _error!,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoTypography.mutedColor,
                 height: 1.45,
               ),
             ),
@@ -441,7 +458,7 @@ class _SearchPageState extends State<SearchPage> {
         child: Text(
           AppZh.searchNoResults,
           style: SecondaryTypography.onCard.body14.copyWith(
-            fontWeight: FontWeight.w700,
+            fontWeight: TitoTypography.weight(FontWeight.w700),
           ),
         ),
       );
@@ -497,7 +514,7 @@ class _SearchPageState extends State<SearchPage> {
           Text(
             AppZh.extensionSearchAskHint,
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoTypography.mutedColor,
             ),
           ),
         ],
@@ -526,7 +543,6 @@ class _HubExitTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final radius = BorderRadius.circular(TitoRadii.md);
     return HandheldFocusDecorator(
       onActivate: onTap,
@@ -549,9 +565,7 @@ class _HubExitTile extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: appVisualStyle.usesFlatUi
-                        ? scheme.onSurfaceVariant
-                        : TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
               ],
@@ -616,7 +630,9 @@ class _SearchResultRow extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: SecondaryTypography.onCard.body14.copyWith(
-                              fontWeight: FontWeight.w800,
+                              fontWeight: TitoTypography.weight(
+                                FontWeight.w800,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 6),

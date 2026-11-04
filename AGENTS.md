@@ -9,6 +9,7 @@
 - **Latest release:** v0.9.24 · Lite `0.9.24+216`; Offline `0.9.24-offline+217`
 - **Offline data:** CDN bundle v20 live; Offline APK embeds the complete verified v20 reference/gameplay archive (`/v5/`; `/v4/` rollback)
 - **Tests:** `cd flutter && flutter test`
+- **UI work:** read [DESIGN_SYSTEM.md → 新增 UI 前必读](docs/DESIGN_SYSTEM.md#新增-ui-前必读) first; `flutter/test/ui_consistency_budget_test.dart` fails when feature code bypasses the shared tokens, sheets, loaders or copy
 
 ## Cloud VM
 

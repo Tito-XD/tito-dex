@@ -363,7 +363,13 @@ void main() {
       final journal = style == AppVisualStyle.classic;
       final date = tester.widget<Text>(find.text('2026-09-10')).style!;
       expect(date.fontWeight, journal ? FontWeight.w700 : FontWeight.w800);
-      expect(date.color, journal ? TrainerJournal.muted : TitoColors.mutedInk);
+      // Muted text follows the active theme: Journal gray-blue, Flat Material
+      // onSurfaceVariant, Plastic the shared sticker muted ink.
+      expect(date.color, switch (style) {
+        AppVisualStyle.classic => TrainerJournal.muted,
+        AppVisualStyle.flatUi => titoFlatColorScheme.onSurfaceVariant,
+        AppVisualStyle.solidPlastic => TitoColors.mutedInk,
+      });
       expect(
         tester.widget<Text>(find.text('W')).style!.fontWeight,
         journal ? FontWeight.w700 : FontWeight.w900,

@@ -5,14 +5,12 @@ import '../features/game/game_catalog.dart';
 import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import '../theme/tito_typography.dart';
-import 'handheld_input.dart';
+import '../theme/tito_surface_tokens.dart';
 import 'handheld_status_icons.dart';
-import 'liquid_glass.dart';
+import 'tito_header_button.dart';
 
 class AppHeader extends StatelessWidget {
   const AppHeader({
@@ -33,16 +31,16 @@ class AppHeader extends StatelessWidget {
     final compact = DeviceLayout.isCompact(context);
     final square = DeviceLayout.useSquareDashboard(context);
     final barHeight = DeviceLayout.headerBarHeight(context);
-    final scheme = Theme.of(context).colorScheme;
+    final chrome = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.pageChrome);
 
     return Padding(
       padding: EdgeInsets.only(bottom: square ? 2 : (compact ? 4 : 8)),
       child: SizedBox(
         height: barHeight,
         child: Material(
-          color: appVisualStyle.usesFlatUi
-              ? scheme.surface
-              : Colors.transparent,
+          color: chrome.fill,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -52,9 +50,7 @@ class AppHeader extends StatelessWidget {
                   child: Text(
                     AppZh.displayTitleForTrainer(trainerName ?? ''),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: appVisualStyle.usesFlatUi
-                          ? scheme.onSurface
-                          : TitoColors.card,
+                      color: chrome.foreground,
                       fontSize: DeviceLayout.headerTitleSize(context),
                       letterSpacing: -0.3,
                     ),
@@ -107,7 +103,6 @@ class _GameBadgeButton extends StatelessWidget {
     final asset = edition.iconAsset;
     final accent = edition.accentColor;
     final darkAccent = accent.computeLuminance() < 0.4;
-    final scheme = Theme.of(context).colorScheme;
 
     final content = asset != null
         ? Padding(
@@ -125,42 +120,13 @@ class _GameBadgeButton extends StatelessWidget {
           )
         : _letterContent(size, accent, darkAccent);
 
-    if (appVisualStyle.usesSolidPlastic) {
-      return LiquidGlassRoundButton(
-        size: size,
-        semanticLabel: '$semanticLabel · ${edition.label}',
-        onTap: onTap,
-        tint: asset != null ? TitoColors.card : accent,
-        opacity: asset != null ? 0.92 : 0.95,
-        child: content,
-      );
-    }
-
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: Semantics(
-        button: onTap != null,
-        label: '$semanticLabel · ${edition.label}',
-        child: Material(
-          color: asset != null
-              ? (appVisualStyle.usesFlatUi
-                    ? scheme.primaryContainer
-                    : TitoColors.card)
-              : accent,
-          shape: CircleBorder(
-            side: appVisualStyle.usesFlatUi
-                ? BorderSide.none
-                : TrainerJournal.cardSide,
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: SizedBox(width: size, height: size, child: content),
-          ),
-        ),
-      ),
+    return TitoHeaderRoundButton(
+      size: size,
+      semanticLabel: '$semanticLabel · ${edition.label}',
+      onTap: onTap,
+      fill: asset != null ? null : accent,
+      glassOpacity: asset != null ? 0.92 : 0.95,
+      child: content,
     );
   }
 
@@ -198,44 +164,11 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = DeviceLayout.headerIconSize(context);
-    final iconSize = size * 0.62;
-    final scheme = Theme.of(context).colorScheme;
-
-    if (appVisualStyle.usesSolidPlastic) {
-      return LiquidGlassRoundButton(
-        size: size,
-        semanticLabel: label,
-        onTap: onTap,
-        child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-      );
-    }
-
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: IconButton(
-        tooltip: label,
-        onPressed: onTap,
-        padding: EdgeInsets.zero,
-        constraints: BoxConstraints.tightFor(width: size, height: size),
-        style: IconButton.styleFrom(
-          backgroundColor: appVisualStyle.usesFlatUi
-              ? scheme.secondaryContainer
-              : TitoColors.card,
-          foregroundColor: appVisualStyle.usesFlatUi
-              ? scheme.onSecondaryContainer
-              : TitoColors.deepBlue,
-          side: appVisualStyle.usesFlatUi
-              ? BorderSide.none
-              : const BorderSide(
-                  color: TrainerJournal.edge,
-                  width: TitoBorders.journalCard,
-                ),
-          shape: const CircleBorder(),
-        ),
-        icon: Icon(icon, size: iconSize),
-      ),
+    return TitoHeaderIconButton(
+      icon: icon,
+      label: label,
+      onTap: onTap,
+      size: DeviceLayout.headerIconSize(context),
     );
   }
 }

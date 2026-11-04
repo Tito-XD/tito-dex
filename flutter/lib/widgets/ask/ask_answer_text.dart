@@ -3,6 +3,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/tito_typography.dart';
 
 class AskBlinkingMarkdown extends StatefulWidget {
   const AskBlinkingMarkdown({super.key, required this.data});
@@ -127,15 +128,15 @@ class AskAssistantMarkdown extends StatelessWidget {
   Widget build(BuildContext context) {
     final body = SecondaryTypography.onCard.body14.copyWith(
       height: 1.45,
-      color: TitoColors.ink,
+      color: TitoTypography.inkColor,
     );
     final compact = SecondaryTypography.onCard.small12.copyWith(
       height: 1.35,
-      color: TitoColors.ink,
+      color: TitoTypography.inkColor,
     );
     final heading = SecondaryTypography.onCard.h15.copyWith(
       color: TitoColors.deepBlue,
-      fontWeight: FontWeight.w900,
+      fontWeight: TitoTypography.weight(FontWeight.w900),
     );
     final headingPadding = const EdgeInsets.only(top: 7, bottom: 4);
     return MarkdownBody(
@@ -157,16 +158,18 @@ class AskAssistantMarkdown extends StatelessWidget {
         h2Padding: headingPadding,
         h3: body.copyWith(
           color: TitoColors.deepBlue,
-          fontWeight: FontWeight.w900,
+          fontWeight: TitoTypography.weight(FontWeight.w900),
         ),
         h3Padding: headingPadding,
-        h4: body.copyWith(fontWeight: FontWeight.w900),
+        h4: body.copyWith(fontWeight: TitoTypography.weight(FontWeight.w900)),
         h4Padding: headingPadding,
-        h5: body.copyWith(fontWeight: FontWeight.w900),
+        h5: body.copyWith(fontWeight: TitoTypography.weight(FontWeight.w900)),
         h5Padding: headingPadding,
-        h6: body.copyWith(fontWeight: FontWeight.w900),
+        h6: body.copyWith(fontWeight: TitoTypography.weight(FontWeight.w900)),
         h6Padding: headingPadding,
-        strong: body.copyWith(fontWeight: FontWeight.w900),
+        strong: body.copyWith(
+          fontWeight: TitoTypography.weight(FontWeight.w900),
+        ),
         em: body.copyWith(fontStyle: FontStyle.italic),
         a: body.copyWith(
           color: TitoColors.deepBlue,
@@ -178,11 +181,13 @@ class AskAssistantMarkdown extends StatelessWidget {
         ),
         blockSpacing: 8,
         listIndent: 18,
-        listBullet: body.copyWith(fontWeight: FontWeight.w900),
+        listBullet: body.copyWith(
+          fontWeight: TitoTypography.weight(FontWeight.w900),
+        ),
         listBulletPadding: const EdgeInsets.only(right: 6),
         tableHead: compact.copyWith(
           color: TitoColors.deepBlue,
-          fontWeight: FontWeight.w900,
+          fontWeight: TitoTypography.weight(FontWeight.w900),
         ),
         tableBody: compact,
         tableHeadAlign: TextAlign.left,
@@ -199,7 +204,7 @@ class AskAssistantMarkdown extends StatelessWidget {
         tableHeadCellsDecoration: BoxDecoration(
           color: TitoColors.skyBlue.withValues(alpha: 0.22),
         ),
-        blockquote: body.copyWith(color: TitoColors.mutedInk),
+        blockquote: body.copyWith(color: TitoTypography.mutedColor),
         blockquotePadding: const EdgeInsets.fromLTRB(10, 6, 8, 6),
         blockquoteDecoration: BoxDecoration(
           color: TitoColors.skyBlue.withValues(alpha: 0.16),

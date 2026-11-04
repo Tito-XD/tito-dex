@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../services/device_status_service.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_surface_tokens.dart';
 
 /// Real Wi-Fi and battery indicators for RG / native handheld.
 class HandheldStatusIcons extends StatelessWidget {
@@ -100,9 +100,7 @@ class _BatteryIndicator extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: borderColor,
-                      width: appVisualStyle.usesTrainerJournal
-                          ? TitoBorders.journalHairline
-                          : TitoBorders.element,
+                      width: titoHairlineWidth(context),
                     ),
                     borderRadius: BorderRadius.circular(2),
                   ),
