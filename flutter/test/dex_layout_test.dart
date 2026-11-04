@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/l10n/app_zh.dart';
+import 'package:titodex/theme/app_visual_style.dart';
 import 'package:titodex/theme/device_layout.dart';
 import 'package:titodex/theme/tito_colors.dart';
+import 'package:titodex/theme/tito_theme.dart';
 import 'package:titodex/widgets/handheld_input.dart';
 import 'package:titodex/widgets/pokemon_card.dart';
 import 'package:titodex/widgets/pokemon_detail_sections.dart';
@@ -157,6 +159,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: buildTitoTheme(AppVisualStyle.classic),
         home: Scaffold(
           body: SizedBox(
             width: 120,

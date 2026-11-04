@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -5,7 +7,6 @@ import '../features/game/game_edition_repository.dart';
 import '../features/journey/ask_titodex_settings.dart';
 import '../l10n/app_zh.dart';
 import '../pages/dex/dex_json_reference_page.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
@@ -14,6 +15,8 @@ import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sleep_tools_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
+import '../theme/tito_typography.dart';
+import '../theme/tito_surface_tokens.dart';
 
 class SearchReferencePage extends StatelessWidget {
   const SearchReferencePage({
@@ -173,23 +176,64 @@ class _ReferenceCatalogGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth < 300 ? 2 : 3;
+        const gap = 8.0;
+        final textScaler = MediaQuery.textScalerOf(context);
+        // Text normally inherits Material's line height and letter spacing.
+        // Resolve them before measuring, then render that same complete style.
+        final labelStyle = DefaultTextStyle.of(context).style
+            .merge(
+              SecondaryTypography.onCard.small12.copyWith(
+                fontWeight: TitoTypography.weight(FontWeight.w800),
+              ),
+            )
+            // Text applies the system bold-text setting itself; measure it too.
+            .merge(
+              MediaQuery.boldTextOf(context)
+                  ? const TextStyle(fontWeight: FontWeight.bold)
+                  : null,
+            )
+            .copyWith(inherit: false);
+        final fontSize = labelStyle.fontSize ?? 12;
+        final textScale = math.max(1.0, textScaler.scale(fontSize) / fontSize);
+        final columns = ((constraints.maxWidth + gap) / (132 * textScale + gap))
+            .floor()
+            .clamp(2, 4);
+        final cardWidth =
+            (constraints.maxWidth - gap * (columns - 1)) / columns;
+        var labelHeight = 0.0;
+        for (final entry in entries) {
+          final painter = TextPainter(
+            text: TextSpan(text: entry.label, style: labelStyle),
+            textDirection: Directionality.of(context),
+            textScaler: textScaler,
+          )..layout(maxWidth: math.max(1.0, cardWidth - 16));
+          labelHeight = math.max(labelHeight, painter.height);
+          painter.dispose();
+        }
+        // Equal cells grow to the longest localized label rather than hiding
+        // its end. The outer page remains the only vertical scroll owner.
+        final cardHeight = math.max(
+          80.0,
+          16 + 22 + 4 + labelHeight.ceilToDouble(),
+        );
         return GridView.builder(
+          key: const Key('reference-catalog-grid'),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: entries.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: columns,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            mainAxisExtent:
-                80 * MediaQuery.textScalerOf(context).scale(12) / 12,
+            mainAxisSpacing: gap,
+            crossAxisSpacing: gap,
+            mainAxisExtent: cardHeight,
           ),
           itemBuilder: (context, index) {
             final entry = entries[index];
             return _ReferenceGridCard(
+              key: ValueKey('reference-entry-$index'),
               icon: entry.icon,
               label: entry.label,
+              labelStyle: labelStyle,
               onTap: entry.onTap,
             );
           },
@@ -201,22 +245,24 @@ class _ReferenceCatalogGrid extends StatelessWidget {
 
 class _ReferenceGridCard extends StatelessWidget {
   const _ReferenceGridCard({
+    super.key,
     required this.icon,
     required this.label,
+    required this.labelStyle,
     required this.onTap,
   });
 
   final IconData icon;
   final String label;
+  final TextStyle labelStyle;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final radius = BorderRadius.circular(TitoRadii.md);
-    final iconColor = appVisualStyle.usesFlatUi
-        ? scheme.primary
-        : TitoColors.deepBlue;
+    final iconColor = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.accent).foreground;
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: radius,
@@ -233,15 +279,7 @@ class _ReferenceGridCard extends StatelessWidget {
               children: [
                 Icon(icon, size: 22, color: iconColor),
                 const SizedBox(height: 4),
-                Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                Text(label, textAlign: TextAlign.center, style: labelStyle),
               ],
             ),
           ),

@@ -6,8 +6,9 @@ import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
-import 'sticker_card.dart';
+import 'battle_tool_panels.dart';
 import 'type_badge.dart';
+import 'tito_loading_panel.dart';
 
 class BattleTeamPanel extends StatefulWidget {
   const BattleTeamPanel({
@@ -32,10 +33,10 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: SecondaryTypography.onGradient.small12),
+        Text(title, style: SecondaryTypography.onCard.small12),
         const SizedBox(height: 5),
         if (counts.isEmpty)
-          Text(AppZh.dexNone, style: SecondaryTypography.onGradient.small12)
+          Text(AppZh.dexNone, style: SecondaryTypography.onCard.small12)
         else
           Wrap(
             spacing: 6,
@@ -48,7 +49,7 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
                     TitoTypeBadge(typeEn: entry.key, size: TypeBadgeSize.small),
                     Text(
                       ' ×${entry.value}',
-                      style: SecondaryTypography.onGradient.small12,
+                      style: SecondaryTypography.onCard.small12,
                     ),
                   ],
                 ),
@@ -59,13 +60,13 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
   );
 
   @override
-  Widget build(BuildContext context) => StickerCard(
-    variant: StickerVariant.deep,
-    padding: const EdgeInsets.all(12),
+  Widget build(BuildContext context) => BattleResultCard(
     child: FutureBuilder<List<BattlePartyEntry>>(
       future: widget.session.partyEntries(widget.party),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const LinearProgressIndicator();
+        if (!snapshot.hasData) {
+          return const TitoInlineLoading(height: 64);
+        }
         final entries = snapshot.data!;
         final members = [
           for (final entry in entries)
@@ -87,17 +88,14 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
           children: [
             Text(
               '${AppZh.battleTeamAnalysis} · ${members.length}/${entries.length}',
-              style: SecondaryTypography.onGradient.h15,
+              style: BattleResultText.title,
             ),
             if (members.length != entries.length) ...[
               Text(
                 AppZh.battleTeamIncomplete,
-                style: SecondaryTypography.onGradient.small12,
+                style: SecondaryTypography.onCard.small12,
               ),
               TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: SecondaryTypography.onGradient.h15.color,
-                ),
                 onPressed: () async {
                   for (final entry in entries.where(
                     (e) => e.combatant.selectionFailed,
@@ -111,12 +109,12 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
             if (members.any((m) => m.abilitySlug == null))
               Text(
                 AppZh.battleTeamUnknownAbility,
-                style: SecondaryTypography.onGradient.small12,
+                style: SecondaryTypography.onCard.small12,
               ),
             if (members.isEmpty)
               Text(
                 AppZh.battlePartyEmpty,
-                style: SecondaryTypography.onGradient.body14,
+                style: SecondaryTypography.onCard.body14,
               )
             else ...[
               _group(AppZh.battleTeamWeaknesses, analysis.sharedWeaknesses),
@@ -125,14 +123,11 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
               const SizedBox(height: 10),
               Text(
                 AppZh.companionOffensiveBlindSpots,
-                style: SecondaryTypography.onGradient.small12,
+                style: SecondaryTypography.onCard.small12,
               ),
               const SizedBox(height: 5),
               if (analysis.offensiveBlindSpots.isEmpty)
-                Text(
-                  AppZh.dexNone,
-                  style: SecondaryTypography.onGradient.small12,
-                )
+                Text(AppZh.dexNone, style: SecondaryTypography.onCard.small12)
               else
                 Wrap(
                   spacing: 6,

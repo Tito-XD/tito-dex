@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../features/app_shortcuts/app_shortcuts.dart';
 import '../l10n/app_zh.dart';
+import '../theme/secondary_typography.dart';
+import '../theme/tito_typography.dart';
 
 class TrainerShortcutButton extends StatefulWidget {
   const TrainerShortcutButton({super.key, required this.trainerName});
@@ -25,7 +27,9 @@ class _TrainerShortcutButtonState extends State<TrainerShortcutButton> {
               children: [
                 Text(
                   AppZh.trainerShortcutHint,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoTypography.mutedColor,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 OutlinedButton.icon(

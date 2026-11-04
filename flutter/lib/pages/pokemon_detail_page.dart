@@ -14,7 +14,6 @@ import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/localized_names.dart';
 import '../navigation/tito_route_work.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -34,6 +33,7 @@ import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_skeleton_gate.dart';
 import '../widgets/tito_animated_size_switcher.dart';
 import '../widgets/tito_segmented_control.dart';
+import '../theme/tito_typography.dart';
 
 enum _MoveMethodFilter { level, machine, egg, tutor }
 
@@ -456,9 +456,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     // Status labels need a dark backing on both blue shell gradients; cream
     // text alone cannot meet AA at the light end of the gradient.
     final pageStyle = SecondaryTypography.onPage(context).small12;
-    final statusColor = appVisualStyle.usesFlatUi
-        ? Theme.of(context).colorScheme.tertiary
-        : TitoColors.card;
+    final badge = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.pageBadge);
+    final statusColor = badge.foreground;
     final statusLabels = pokemonFormStatusLabels(
       form,
       versionGroup: _gameEdition.dataVersionGroupKey,
@@ -486,29 +487,28 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         for (final label in statusLabels)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-            decoration: BoxDecoration(
-              color: appVisualStyle.usesFlatUi
-                  ? null
-                  : TitoColors.deepBlue.withValues(alpha: .88),
-              borderRadius: BorderRadius.circular(TitoRadii.sm),
-            ),
+            decoration: badge.decoration(),
             child: Text(
               '· $label',
               style: pageStyle.copyWith(
                 color: statusColor,
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
           ),
         if (qualityCopy != null)
           Text(
             qualityCopy,
-            style: pageStyle.copyWith(fontWeight: FontWeight.w700),
+            style: pageStyle.copyWith(
+              fontWeight: TitoTypography.weight(FontWeight.w700),
+            ),
           ),
         if (introduced != null)
           Text(
             introduced,
-            style: pageStyle.copyWith(fontWeight: FontWeight.w700),
+            style: pageStyle.copyWith(
+              fontWeight: TitoTypography.weight(FontWeight.w700),
+            ),
           ),
       ],
     );
@@ -586,7 +586,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       child: Text(
         AppZh.dexApiNote,
         style: SecondaryTypography.onCard.small12.copyWith(
-          color: TitoColors.mutedInk,
+          color: TitoTypography.mutedColor,
           height: 1.4,
         ),
       ),
@@ -669,7 +669,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           child: Text(
             AppZh.dexObtainEmptyVersion,
             style: SecondaryTypography.onCard.body14.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoTypography.mutedColor,
             ),
           ),
         ),
@@ -793,7 +793,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           child: Text(
             AppZh.dexNoMoveData,
             style: SecondaryTypography.onCard.body14.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoTypography.mutedColor,
             ),
           ),
         ),
@@ -832,9 +832,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           AppZh.dexDataFallbackNote(
             gameEditionLabelForVersionGroup(moveSetSourceKey),
           ),
-          style: SecondaryTypography.onPage(
-            context,
-          ).small12.copyWith(fontWeight: FontWeight.w700),
+          style: SecondaryTypography.onPage(context).small12.copyWith(
+            fontWeight: TitoTypography.weight(FontWeight.w700),
+          ),
         ),
       ],
       const SizedBox(height: 8),
@@ -980,7 +980,9 @@ class _MoveMethodFilterBar extends StatelessWidget {
                             _labels[entry]!,
                             textAlign: TextAlign.center,
                             style: SecondaryTypography.onCard.small12.copyWith(
-                              fontWeight: FontWeight.w800,
+                              fontWeight: TitoTypography.weight(
+                                FontWeight.w800,
+                              ),
                               color: Color.lerp(
                                 palette.restingText,
                                 palette.selectedText,
@@ -1083,14 +1085,14 @@ class _ErrorBody extends StatelessWidget {
               Text(
                 copy.$1,
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 copy.$2,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoTypography.mutedColor,
                   height: 1.45,
                 ),
               ),

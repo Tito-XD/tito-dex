@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../../features/journey/progression_hints.dart';
 import '../../features/journey/ask_titodex_source_browser.dart';
 import '../../l10n/app_zh.dart';
-import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
-import '../../theme/trainer_journal.dart';
+import '../../theme/tito_surface_tokens.dart';
 import 'ask_paper_style.dart';
+import '../../theme/tito_typography.dart';
+import '../../navigation/tito_page_transition.dart';
 
 typedef AskTitoDexSourceOpener = Future<bool> Function(Uri uri);
 
@@ -26,14 +27,7 @@ class _StatusPill extends StatelessWidget {
             ? TitoColors.skyBlue.withValues(alpha: 0.38)
             : TitoColors.cardWarm,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: appVisualStyle.usesTrainerJournal
-              ? TrainerJournal.smallEdge
-              : TitoColors.ink.withValues(alpha: 0.62),
-          width: appVisualStyle.usesTrainerJournal
-              ? TitoBorders.journalHairline
-              : TitoBorders.element,
-        ),
+        border: Border.fromBorderSide(titoInkOutline(context, alpha: 0.62)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -41,13 +35,13 @@ class _StatusPill extends StatelessWidget {
           Icon(
             enabled ? Icons.check_circle_rounded : Icons.remove_circle_outline,
             size: 11,
-            color: enabled ? TitoColors.deepBlue : TitoColors.mutedInk,
+            color: enabled ? TitoColors.deepBlue : TitoTypography.mutedColor,
           ),
           const SizedBox(width: 3),
           Text(
             label,
             style: SecondaryTypography.onCard.small12.copyWith(
-              fontWeight: FontWeight.w800,
+              fontWeight: TitoTypography.weight(FontWeight.w800),
             ),
           ),
         ],
@@ -111,13 +105,8 @@ class AskAnswerEvidenceSummary extends StatelessWidget {
             decoration: BoxDecoration(
               color: TitoColors.skyBlue.withValues(alpha: 0.28),
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(
-                color: appVisualStyle.usesTrainerJournal
-                    ? TrainerJournal.smallEdge
-                    : TitoColors.ink.withValues(alpha: 0.45),
-                width: appVisualStyle.usesTrainerJournal
-                    ? TitoBorders.journalElement
-                    : 1,
+              border: Border.fromBorderSide(
+                titoInkOutline(context, alpha: 0.45),
               ),
             ),
             child: Row(
@@ -135,7 +124,7 @@ class AskAnswerEvidenceSummary extends StatelessWidget {
                     label,
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.deepBlue,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: TitoTypography.weight(FontWeight.w900),
                     ),
                   ),
                 ),
@@ -143,8 +132,8 @@ class AskAnswerEvidenceSummary extends StatelessWidget {
                   Text(
                     AppZh.viewAction,
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
-                      fontWeight: FontWeight.w800,
+                      color: TitoTypography.mutedColor,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                   const SizedBox(width: 2),
@@ -166,11 +155,9 @@ Future<void> showAskAnswerSources(
   required AskTitoDexSourceOpener sourceOpener,
   AskTitoDexResult? result,
 }) {
-  return showModalBottomSheet<void>(
+  return showTitoModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    showDragHandle: true,
-    useSafeArea: true,
     builder: (sheetContext) => DraggableScrollableSheet(
       key: const Key('ask-titodex-source-sheet'),
       expand: false,
@@ -207,7 +194,7 @@ Future<void> showAskAnswerSources(
               child: Text(
                 AppZh.askTitoDexSourceSheetHint,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoTypography.mutedColor,
                   height: 1.35,
                 ),
               ),
@@ -317,14 +304,14 @@ class _SourceReferenceTile extends StatelessWidget {
             textAlign: TextAlign.center,
             style: SecondaryTypography.onCard.small12.copyWith(
               color: TitoColors.deepBlue,
-              fontWeight: FontWeight.w900,
+              fontWeight: TitoTypography.weight(FontWeight.w900),
             ),
           ),
         ),
         title: Text(
           source.title,
           style: SecondaryTypography.onCard.body14.copyWith(
-            fontWeight: FontWeight.w900,
+            fontWeight: TitoTypography.weight(FontWeight.w900),
           ),
         ),
         subtitle: Column(
@@ -336,7 +323,7 @@ class _SourceReferenceTile extends StatelessWidget {
                   ? host
                   : AppZh.askTitoDexSourceAccessed(host, accessedAt),
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoTypography.mutedColor,
               ),
             ),
             const SizedBox(height: 2),
@@ -345,7 +332,9 @@ class _SourceReferenceTile extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: uri == null ? TitoColors.mutedInk : TitoColors.deepBlue,
+                color: uri == null
+                    ? TitoTypography.mutedColor
+                    : TitoColors.deepBlue,
                 decoration: uri == null
                     ? TextDecoration.none
                     : TextDecoration.underline,
@@ -439,7 +428,7 @@ class _AnswerMetaLabel extends StatelessWidget {
         Text(
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            color: emphasized ? TitoColors.deepBlue : TitoColors.mutedInk,
+            color: emphasized ? TitoColors.deepBlue : TitoTypography.mutedColor,
             fontWeight: emphasized ? FontWeight.w800 : FontWeight.w700,
           ),
         ),

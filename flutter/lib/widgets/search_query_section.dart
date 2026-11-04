@@ -4,6 +4,7 @@ import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_motion.dart';
 import 'sticker_card.dart';
+import '../theme/tito_typography.dart';
 
 /// Search shortcuts appear as one scrollable row until explicitly expanded.
 class SearchQuerySection extends StatefulWidget {
@@ -58,7 +59,7 @@ class _SearchQuerySectionState extends State<SearchQuerySection> {
                 onPressed: widget.onClear,
                 style: TextButton.styleFrom(
                   textStyle: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                   minimumSize: const Size(44, 44),
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -70,7 +71,7 @@ class _SearchQuerySectionState extends State<SearchQuerySection> {
                 onPressed: () => setState(() => _expanded = !_expanded),
                 style: TextButton.styleFrom(
                   textStyle: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                   minimumSize: const Size(44, 44),
                   padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -99,7 +100,7 @@ class _SearchQuerySectionState extends State<SearchQuerySection> {
                   tooltip: query,
                   labelStyle: SecondaryTypography.onCard.small12.copyWith(
                     color: Theme.of(context).chipTheme.labelStyle?.color,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                   label: ConstrainedBox(
                     constraints: BoxConstraints(

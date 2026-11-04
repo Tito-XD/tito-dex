@@ -8,13 +8,14 @@ import '../features/dex/type_chart.dart';
 import '../l10n/app_locale.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_surface_tokens.dart';
 import '../widgets/sticker_card.dart';
 import 'dex_sprite_image.dart';
 import 'type_badge.dart';
+import '../theme/tito_typography.dart';
+import '../navigation/tito_page_transition.dart';
 
 enum DexReferenceKind {
   nature,
@@ -246,19 +247,13 @@ void showJsonReferenceDetailSheet(
   required DexReferenceKind kind,
   String? scopeNotice,
 }) {
-  showModalBottomSheet<void>(
+  showTitoModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    useSafeArea: true,
     builder: (context) {
       return SafeArea(
         child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            0,
-            16,
-            16 + MediaQuery.viewInsetsOf(context).bottom,
-          ),
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -301,7 +296,7 @@ class ReferenceScopeNotice extends StatelessWidget {
             child: Text(
               message,
               style: SecondaryTypography.onCard.small12.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
           ),
@@ -360,14 +355,14 @@ class _ReferenceHeader extends StatelessWidget {
         Text(
           referencePrimaryLabel(entry),
           style: SecondaryTypography.onCard.h15.copyWith(
-            fontWeight: FontWeight.w900,
+            fontWeight: TitoTypography.weight(FontWeight.w900),
           ),
         ),
         if (entry['nameEn'] != null)
           Text(
             entry['nameEn'] as String,
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoTypography.mutedColor,
             ),
           ),
       ],
@@ -402,14 +397,14 @@ class NatureReferenceDetail extends StatelessWidget {
               Text(
                 AppZh.dexReferenceNatureStats,
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 statLine,
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: TitoTypography.weight(FontWeight.w700),
                 ),
               ),
             ],
@@ -425,7 +420,7 @@ class NatureReferenceDetail extends StatelessWidget {
                 Text(
                   AppZh.dexReferenceNatureFlavors,
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -523,7 +518,7 @@ class ItemReferenceDetail extends StatelessWidget {
                 ? AppZh.referenceAvailableNotShop(gameLabel)
                 : '$gameLabel · $priceLabel',
             style: SecondaryTypography.onCard.body14.copyWith(
-              fontWeight: FontWeight.w700,
+              fontWeight: TitoTypography.weight(FontWeight.w700),
             ),
           ),
           const SizedBox(height: 8),
@@ -536,7 +531,7 @@ class ItemReferenceDetail extends StatelessWidget {
               Text(
                 AppZh.dexReferenceItemEffect,
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
                 ),
               ),
               const SizedBox(height: 8),
@@ -688,8 +683,8 @@ class AbilityReferenceDetail extends StatelessWidget {
           Text(
             AppZh.dexReferencePokemonCount(pokemonCount),
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              fontWeight: FontWeight.w700,
+              color: TitoTypography.mutedColor,
+              fontWeight: TitoTypography.weight(FontWeight.w700),
             ),
           ),
         ],
@@ -720,7 +715,7 @@ class ReferenceTypeModifierChips extends StatelessWidget {
           Text(
             AppZh.dexReferenceTypeModifiers,
             style: SecondaryTypography.onCard.body14.copyWith(
-              fontWeight: FontWeight.w800,
+              fontWeight: TitoTypography.weight(FontWeight.w800),
             ),
           ),
           const SizedBox(height: 8),
@@ -767,14 +762,14 @@ class _TypeModifierChip extends StatelessWidget {
           Text(
             typeNameZh(type),
             style: SecondaryTypography.onCard.small12.copyWith(
-              fontWeight: FontWeight.w800,
+              fontWeight: TitoTypography.weight(FontWeight.w800),
             ),
           ),
           const SizedBox(width: 4),
           Text(
             label,
             style: SecondaryTypography.onCard.small12.copyWith(
-              fontWeight: FontWeight.w900,
+              fontWeight: TitoTypography.weight(FontWeight.w900),
               color: color,
             ),
           ),
@@ -787,29 +782,20 @@ class _TypeModifierChip extends StatelessWidget {
     if (multiplier == 0) {
       return '⊘';
     }
-    if (multiplier >= 2) {
-      return '×2';
-    }
-    if (multiplier <= 0.5) {
-      return '×0.5';
-    }
-    if (multiplier > 1) {
-      return '×${multiplier.toStringAsFixed(1)}';
-    }
-    return '×1';
+    return '×${formatTypeMultiplier(multiplier)}';
   }
 
   Color _modifierColor(double multiplier) {
-    if (multiplier >= 2) {
+    if (multiplier > 1) {
       return TitoColors.success;
     }
     if (multiplier <= 0) {
-      return TitoColors.mutedInk;
+      return TitoTypography.mutedColor;
     }
-    if (multiplier <= 0.5) {
-      return const Color(0xFFE07B35);
+    if (multiplier < 1) {
+      return TitoColors.effectivenessResist;
     }
-    return TitoColors.ink;
+    return TitoTypography.inkColor;
   }
 }
 
@@ -820,24 +806,21 @@ class _CategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final flat = appVisualStyle.usesFlatUi;
+    final badge = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.selectionActive);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: flat
-            ? scheme.secondaryContainer
-            : appVisualStyle.usesSolidPlastic
-            ? TitoColors.softYellow.withValues(alpha: 0.9)
-            : TitoColors.softYellow,
+        color: badge.fill,
         borderRadius: BorderRadius.circular(TitoRadii.sm),
         border: _referenceBadgeBorder(context),
       ),
       child: Text(
         label,
         style: SecondaryTypography.onCard.small12.copyWith(
-          fontWeight: FontWeight.w800,
-          color: flat ? scheme.onSecondaryContainer : null,
+          fontWeight: TitoTypography.weight(FontWeight.w800),
+          color: badge.foreground,
         ),
       ),
     );
@@ -877,12 +860,9 @@ class MoveStatRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final foreground = appVisualStyle.usesFlatUi
-        ? scheme.onSurface
-        : TitoColors.ink;
+    final foreground = TitoTypography.inkColor;
     final style = SecondaryTypography.onCard.body14.copyWith(
-      fontWeight: FontWeight.w700,
+      fontWeight: TitoTypography.weight(FontWeight.w700),
       color: foreground,
     );
 

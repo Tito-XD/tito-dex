@@ -4,6 +4,7 @@ import '../../features/journey/ask_titodex_answer_blocks.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import 'ask_answer_text.dart';
+import '../../theme/tito_typography.dart';
 
 class AskStreamingClarification extends StatelessWidget {
   const AskStreamingClarification({
@@ -185,7 +186,7 @@ class _AnswerTextPanel extends StatelessWidget {
                   title,
                   style: SecondaryTypography.onCard.h15.copyWith(
                     color: TitoColors.deepBlue,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: TitoTypography.weight(FontWeight.w900),
                   ),
                 ),
               ),
@@ -237,7 +238,7 @@ class _AnswerBulletsBlock extends StatelessWidget {
             title,
             style: SecondaryTypography.onCard.h15.copyWith(
               color: TitoColors.deepBlue,
-              fontWeight: FontWeight.w900,
+              fontWeight: TitoTypography.weight(FontWeight.w900),
             ),
           ),
           const SizedBox(height: 6),
@@ -290,7 +291,7 @@ class _AnswerTableBlock extends StatelessWidget {
       (count, row) => row.length > count ? row.length : count,
     );
     final compact = SecondaryTypography.onCard.small12.copyWith(
-      color: TitoColors.ink,
+      color: TitoTypography.inkColor,
       height: 1.3,
     );
     return Column(
@@ -301,7 +302,7 @@ class _AnswerTableBlock extends StatelessWidget {
             title,
             style: SecondaryTypography.onCard.h15.copyWith(
               color: TitoColors.deepBlue,
-              fontWeight: FontWeight.w900,
+              fontWeight: TitoTypography.weight(FontWeight.w900),
             ),
           ),
           const SizedBox(height: 6),
@@ -347,7 +348,9 @@ class _AnswerTableBlock extends StatelessWidget {
                                   style: rowIndex == 0
                                       ? compact.copyWith(
                                           color: TitoColors.deepBlue,
-                                          fontWeight: FontWeight.w900,
+                                          fontWeight: TitoTypography.weight(
+                                            FontWeight.w900,
+                                          ),
                                         )
                                       : compact,
                                 ),

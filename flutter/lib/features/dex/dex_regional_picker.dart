@@ -4,14 +4,15 @@ import '../../l10n/app_zh.dart';
 import '../../widgets/tito_animated_size_switcher.dart';
 import 'dex_browse_scope.dart';
 import 'dex_game_scope.dart';
+import '../../theme/secondary_typography.dart';
+import '../../navigation/tito_page_transition.dart';
 
 Future<DexBrowseScope?> showDexBrowseScopePicker(
   BuildContext context, {
   required DexBrowseScope selected,
 }) {
-  return showModalBottomSheet<DexBrowseScope>(
+  return showTitoModalBottomSheet<DexBrowseScope>(
     context: context,
-    showDragHandle: true,
     isScrollControlled: true,
     builder: (context) => _DexBrowseScopePicker(selected: selected),
   );
@@ -53,16 +54,11 @@ class _DexBrowseScopePickerState extends State<_DexBrowseScopePicker> {
                     child: TitoAnimatedSizeSwitcher(
                       switchKey: ValueKey<int>(_level.index),
                       alignment: Alignment.centerLeft,
-                      child: Text(
-                        switch (_level) {
-                          _PickerLevel.root => AppZh.dexPickBrowseScope,
-                          _PickerLevel.region => AppZh.dexBrowseByRegion,
-                          _PickerLevel.generation =>
-                            AppZh.dexBrowseByGeneration,
-                        },
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w800),
-                      ),
+                      child: Text(switch (_level) {
+                        _PickerLevel.root => AppZh.dexPickBrowseScope,
+                        _PickerLevel.region => AppZh.dexBrowseByRegion,
+                        _PickerLevel.generation => AppZh.dexBrowseByGeneration,
+                      }, style: SecondaryTypography.onCard.h15),
                     ),
                   ),
                 ],

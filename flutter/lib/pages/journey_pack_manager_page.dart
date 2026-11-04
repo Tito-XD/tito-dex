@@ -10,11 +10,11 @@ import '../features/journey/journey_pack_repository.dart';
 import '../features/journey/progression_hints.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_progress_bar.dart';
+import '../theme/tito_typography.dart';
 
 class JourneyPackManagerPage extends StatefulWidget {
   const JourneyPackManagerPage({
@@ -180,7 +180,7 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
           child: Text(
             AppZh.journeyPackPrivacyNote,
             style: SecondaryTypography.onCard.body14.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoTypography.mutedColor,
             ),
           ),
         ),
@@ -292,8 +292,7 @@ class _JourneyPackCard extends StatelessWidget {
                   style: SecondaryTypography.onCard.h15,
                 ),
               ),
-              if (currentGame)
-                Chip(label: Text(AppZh.settingsCurrentGame)),
+              if (currentGame) Chip(label: Text(AppZh.settingsCurrentGame)),
             ],
           ),
           if (descriptor.descriptionZh case final description?) ...[
@@ -308,7 +307,7 @@ class _JourneyPackCard extends StatelessWidget {
               descriptor.version,
             ),
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoTypography.mutedColor,
             ),
           ),
           if (busy) ...[

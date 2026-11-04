@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../config/app_config.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
 import 'settings_expandable_section.dart';
+import '../theme/tito_typography.dart';
 
 /// Tier A integration: local deterministic helpers plus reference links, with
 /// no Pokémon Sleep account access.
@@ -48,14 +48,14 @@ class _SleepToolsSectionState extends State<SleepToolsSection> {
             title: Text(
               AppZh.sleepToolsOpen,
               style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
             subtitle: Text(
               AppZh.sleepToolsOpenHint,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w700,
+                color: TitoTypography.mutedColor,
+                fontWeight: TitoTypography.weight(FontWeight.w700),
               ),
             ),
             trailing: const Icon(Icons.chevron_right_rounded),
@@ -68,13 +68,13 @@ class _SleepToolsSectionState extends State<SleepToolsSection> {
               title: Text(
                 link.labelZh,
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: TitoTypography.weight(FontWeight.w700),
                 ),
               ),
               subtitle: Text(
                 link.url,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoTypography.mutedColor,
                 ),
               ),
               trailing: const Icon(Icons.content_copy_rounded, size: 18),

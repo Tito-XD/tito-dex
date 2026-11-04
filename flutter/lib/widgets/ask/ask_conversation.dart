@@ -5,17 +5,16 @@ import 'package:flutter/material.dart';
 import '../../features/journey/ask_motion_images.dart';
 import '../../features/journey/ask_motion_theme.dart';
 import '../../l10n/app_zh.dart';
-import '../../theme/app_visual_style.dart';
 import '../../theme/retro_style.dart';
 import '../../theme/tito_surface_tokens.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
-import '../../theme/trainer_journal.dart';
 import '../ask_answer_motion_title.dart';
 import '../assistant_surface.dart';
 import '../retro_forms.dart';
 import 'ask_answer_text.dart';
 import 'ask_game_label.dart';
+import '../../theme/tito_typography.dart';
 
 class AskConversationEmptyState extends StatefulWidget {
   const AskConversationEmptyState({
@@ -145,7 +144,9 @@ class _AskConversationEmptyStateState extends State<AskConversationEmptyState>
       final painter = TextPainter(
         text: TextSpan(
           text: label,
-          style: style.copyWith(fontWeight: FontWeight.w900),
+          style: style.copyWith(
+            fontWeight: TitoTypography.weight(FontWeight.w900),
+          ),
         ),
         textDirection: Directionality.of(context),
         textScaler: scaler,
@@ -171,7 +172,9 @@ class _AskConversationEmptyStateState extends State<AskConversationEmptyState>
                   theme: _themes[_index],
                   prepareImages: widget.prepareImages,
                   height: 22,
-                  style: style.copyWith(fontWeight: FontWeight.w900),
+                  style: style.copyWith(
+                    fontWeight: TitoTypography.weight(FontWeight.w900),
+                  ),
                 ),
               ),
               Text(AppZh.askTitoDexIdleSuffix, style: style),
@@ -245,14 +248,7 @@ class AskQuestionBubble extends StatelessWidget {
               bottomLeft: Radius.circular(TitoRadii.lg),
               bottomRight: Radius.circular(4),
             ),
-            border: Border.all(
-              color: appVisualStyle.usesTrainerJournal
-                  ? TrainerJournal.smallEdge
-                  : TitoColors.ink.withValues(alpha: 0.3),
-              width: appVisualStyle.usesTrainerJournal
-                  ? TitoBorders.journalElement
-                  : TitoBorders.element,
-            ),
+            border: Border.fromBorderSide(titoInkOutline(context, alpha: 0.3)),
             boxShadow: !retroStyle.enabled
                 ? null
                 : TitoSurfaceTokens.of(context).elementShadow,
@@ -267,7 +263,7 @@ class AskQuestionBubble extends StatelessWidget {
                     askGameLabel(game!),
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.deepBlue,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -276,8 +272,8 @@ class AskQuestionBubble extends StatelessWidget {
                   question,
                   key: const Key('ask-titodex-question-bubble'),
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    color: TitoColors.ink,
-                    fontWeight: FontWeight.w800,
+                    color: TitoTypography.inkColor,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
               ],

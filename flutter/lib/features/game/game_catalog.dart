@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_zh.dart';
 import '../../l10n/game_zh.dart';
-import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
-import '../../theme/trainer_journal.dart';
 import '../../theme/tito_typography.dart';
 import 'game_edition.dart';
+import '../../navigation/tito_page_transition.dart';
+import '../../theme/tito_surface_tokens.dart';
 
 /// Playable / upcoming game slots — badge cycles in this order (legacy).
 const gameBadgeCycle = <String>[
@@ -77,15 +77,12 @@ Future<GameEdition?> showGameEditionGridPicker(
   BuildContext context, {
   GameEdition? selected,
 }) {
-  return showModalBottomSheet<GameEdition>(
+  return showTitoModalBottomSheet<GameEdition>(
     context: context,
-    showDragHandle: true,
     isScrollControlled: true,
-    useSafeArea: true,
     builder: (context) {
       final current = selected ?? defaultGameEdition;
       final columns = MediaQuery.sizeOf(context).width >= 520 ? 4 : 3;
-      final scheme = Theme.of(context).colorScheme;
       return SafeArea(
         child: DraggableScrollableSheet(
           expand: false,
@@ -100,9 +97,7 @@ Future<GameEdition?> showGameEditionGridPicker(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                   child: Text(
                     AppZh.pickGameEdition,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: SecondaryTypography.onCard.h15,
                   ),
                 ),
                 Padding(
@@ -132,7 +127,10 @@ Future<GameEdition?> showGameEditionGridPicker(
                       final edition = GameEdition.all[index];
                       final isSelected = edition.slug == current.slug;
                       final displayEdition = isSelected ? current : edition;
-                      final tile = _gridTileStyle(scheme, selected: isSelected);
+                      final tile = titoChoiceTile(
+                        context,
+                        selected: isSelected,
+                      );
                       return Material(
                         color: tile.fill,
                         borderRadius: BorderRadius.circular(TitoRadii.md),
@@ -151,10 +149,7 @@ Future<GameEdition?> showGameEditionGridPicker(
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(TitoRadii.md),
-                              border: Border.all(
-                                color: tile.outline,
-                                width: tile.outlineWidth,
-                              ),
+                              border: Border.fromBorderSide(tile.outline),
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -196,37 +191,6 @@ Future<GameEdition?> showGameEditionGridPicker(
   );
 }
 
-/// Per-theme surface for one grid tile in [showGameEditionGridPicker].
-({Color fill, Color outline, double outlineWidth, Color? foreground})
-_gridTileStyle(ColorScheme scheme, {required bool selected}) {
-  if (appVisualStyle.usesFlatUi) {
-    return (
-      fill: selected ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
-      outline: selected ? scheme.primary : scheme.outlineVariant,
-      outlineWidth: selected ? TitoBorders.card : TitoBorders.element,
-      foreground: selected ? scheme.onSecondaryContainer : scheme.onSurface,
-    );
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return (
-      fill: selected
-          ? TitoColors.softYellow.withValues(alpha: 0.85)
-          : Colors.white.withValues(alpha: 0.8),
-      outline: Colors.white.withValues(alpha: 0.85),
-      outlineWidth: TitoBorders.glass,
-      foreground: null,
-    );
-  }
-  return (
-    fill: selected ? TitoColors.softYellow : TrainerJournal.paper,
-    outline: selected ? TrainerJournal.edge : TrainerJournal.smallEdge,
-    outlineWidth: selected
-        ? TitoBorders.journalCard
-        : TitoBorders.journalElement,
-    foreground: null,
-  );
-}
-
 /// If the edition has multiple flavors, push a secondary flavor picker;
 /// otherwise return the edition itself.
 Future<GameEdition?> _resolveEditionWithFlavor(
@@ -246,11 +210,9 @@ Future<GameEdition?> _showFlavorPicker(
   required GameEdition edition,
   required GameEdition current,
 }) {
-  return showModalBottomSheet<GameEdition>(
+  return showTitoModalBottomSheet<GameEdition>(
     context: context,
-    showDragHandle: true,
     isScrollControlled: true,
-    useSafeArea: true,
     builder: (context) {
       final flavors = edition.flavorVersions;
       return SafeArea(
@@ -267,9 +229,7 @@ Future<GameEdition?> _showFlavorPicker(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                   child: Text(
                     edition.label,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: SecondaryTypography.onCard.h15,
                   ),
                 ),
                 Padding(

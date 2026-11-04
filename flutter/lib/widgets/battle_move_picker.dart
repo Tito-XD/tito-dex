@@ -5,7 +5,7 @@ import '../features/dex/type_chart.dart';
 import '../l10n/app_locale.dart';
 import '../l10n/localized_names.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_surface_tokens.dart';
+import '../navigation/tito_page_transition.dart';
 
 class BattleMovePicker extends StatelessWidget {
   const BattleMovePicker({
@@ -33,10 +33,9 @@ class BattleMovePicker extends StatelessWidget {
       onPressed: detail == null
           ? null
           : () async {
-              final picked = await showModalBottomSheet<CachedMove>(
+              final picked = await showTitoModalBottomSheet<CachedMove>(
                 context: context,
                 isScrollControlled: true,
-                backgroundColor: TitoSurfaceTokens.of(context).cardFill,
                 builder: (context) => _MoveSheet(
                   moves: moves
                       .where(
@@ -80,12 +79,7 @@ class _MoveSheetState extends State<_MoveSheet> {
         .toList();
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          16,
-          16,
-          16,
-          MediaQuery.viewInsetsOf(context).bottom,
-        ),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: SizedBox(
           height: MediaQuery.sizeOf(context).height * .65,
           child: Column(

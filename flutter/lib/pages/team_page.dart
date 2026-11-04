@@ -15,9 +15,9 @@ import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/localized_names.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
+import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/companion_tool_fields.dart';
@@ -29,6 +29,8 @@ import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_sprite_sticker.dart';
 import '../widgets/team_summary_card.dart';
 import 'dex/dex_reference_list.dart';
+import '../theme/tito_typography.dart';
+import '../navigation/tito_page_transition.dart';
 
 class TeamPage extends StatefulWidget {
   const TeamPage({
@@ -275,85 +277,164 @@ class _TeamPageState extends State<TeamPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget details;
+    if (_editingIndex != null) {
+      details = _InlineTeamEditor(
+        key: ValueKey('team-editor-$_editingIndex'),
+        member: _party[_editingIndex!],
+        index: _editingIndex!,
+        canSwapPrev: _editingIndex! > 0,
+        canSwapNext: _editingIndex! < _party.length - 1,
+        onSave: _handleEditorSave,
+        onDelete: _handleEditorDelete,
+        onSwap: _handleEditorSwap,
+        onClose: () => setState(() => _editingIndex = null),
+      );
+    } else if (_selectedIndex != null) {
+      details = _TeamAssistCard(
+        party: _party,
+        detailsFuture: _partyDetailsFuture,
+        selectedIndex: _selectedIndex,
+        onEdit: _openEditor,
+        onCollapse: () => setState(() => _selectedIndex = null),
+      );
+    } else {
+      details = StickerCard(
+        child: Text(
+          _party.isEmpty ? AppZh.teamAssistEmpty : AppZh.teamAssistTapToFill,
+          style: SecondaryTypography.onCard.body14,
+        ),
+      );
+    }
+
     return SecondaryPageScaffold(
       title: AppZh.navTeam,
       padding: DeviceLayout.pagePadding(context),
       children: [
-        if (_showSaveDiffBanner)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: StickerCard(
-              variant: StickerVariant.softYellow,
-              padding: EdgeInsets.zero,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: _confirmSyncFromSave,
-                  borderRadius: BorderRadius.circular(TitoRadii.lg),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.sync_rounded, size: 18),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            AppZh.partySaveDiffBanner,
-                            style: SecondaryTypography.onCard.body14.copyWith(
-                              fontWeight: FontWeight.w800,
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1120),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_showSaveDiffBanner)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: StickerCard(
+                      variant: StickerVariant.softYellow,
+                      padding: EdgeInsets.zero,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _confirmSyncFromSave,
+                          borderRadius: BorderRadius.circular(TitoRadii.lg),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.sync_rounded, size: 18),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    AppZh.partySaveDiffBanner,
+                                    style: SecondaryTypography.onCard.body14
+                                        .copyWith(
+                                          fontWeight: TitoTypography.weight(
+                                            FontWeight.w800,
+                                          ),
+                                        ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: _dismissDiffBanner,
+                                  tooltip: AppZh.partySaveDiffDismiss,
+                                  visualDensity: VisualDensity.compact,
+                                  icon: const Icon(
+                                    Icons.close_rounded,
+                                    size: 18,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        IconButton(
-                          onPressed: _dismissDiffBanner,
-                          tooltip: AppZh.partySaveDiffDismiss,
-                          visualDensity: VisualDensity.compact,
-                          icon: const Icon(Icons.close_rounded, size: 18),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
+                TeamSummaryCard(
+                  party: _party,
+                  detailsFuture: _partyDetailsFuture,
                 ),
-              ),
+                const SizedBox(height: 14),
+                _AdaptiveTeamPanes(
+                  roster: PartyTeamBoard(
+                    party: _party,
+                    detailsFuture: _partyDetailsFuture,
+                    selectedIndex: _selectedIndex,
+                    onSelect: _selectMember,
+                    onEmptySlotTap: _party.length < 6 ? _addMember : null,
+                    adaptiveHeight: true,
+                  ),
+                  details: details,
+                ),
+              ],
             ),
           ),
-        TeamSummaryCard(party: _party, detailsFuture: _partyDetailsFuture),
-        const SizedBox(height: 14),
-        PartyTeamBoard(
-          party: _party,
-          detailsFuture: _partyDetailsFuture,
-          selectedIndex: _selectedIndex,
-          onSelect: _selectMember,
-          onEmptySlotTap: _party.length < 6 ? _addMember : null,
         ),
-        const SizedBox(height: 14),
-        if (_editingIndex != null)
-          _InlineTeamEditor(
-            key: ValueKey('team-editor-$_editingIndex'),
-            member: _party[_editingIndex!],
-            index: _editingIndex!,
-            canSwapPrev: _editingIndex! > 0,
-            canSwapNext: _editingIndex! < _party.length - 1,
-            onSave: _handleEditorSave,
-            onDelete: _handleEditorDelete,
-            onSwap: _handleEditorSwap,
-            onClose: () => setState(() => _editingIndex = null),
-          )
-        else if (_selectedIndex != null)
-          _TeamAssistCard(
-            party: _party,
-            detailsFuture: _partyDetailsFuture,
-            selectedIndex: _selectedIndex,
-            onEdit: _openEditor,
-            onCollapse: () => setState(() => _selectedIndex = null),
-          ),
       ],
     );
   }
 }
 
-/// Inline member editor (team template): expands in place of the tapped
-/// slot. Two-column name/level fields, linked-or-manual types, ability
+/// One stable subtree lets the editor, text selection and focus survive a
+/// resize. Both panes share the page's scroll view; only their width changes.
+class _AdaptiveTeamPanes extends StatelessWidget {
+  const _AdaptiveTeamPanes({required this.roster, required this.details});
+
+  final Widget roster;
+  final Widget details;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = 14.0;
+        final scale = (MediaQuery.textScalerOf(context).scale(14) / 14).clamp(
+          1.0,
+          double.infinity,
+        );
+        final minRosterWidth = 300 * scale;
+        final minDetailsWidth = 340 * scale;
+        final width = constraints.maxWidth;
+        final split = width >= minRosterWidth + gap + minDetailsWidth;
+        final rosterWidth = split
+            ? ((width - gap) * .44).clamp(minRosterWidth, 390 * scale)
+            : width;
+        final detailsWidth = split ? width - gap - rosterWidth : width;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            SizedBox(
+              key: const Key('team-roster-pane'),
+              width: rosterWidth,
+              child: roster,
+            ),
+            SizedBox(
+              key: const Key('team-details-pane'),
+              width: detailsWidth,
+              child: details,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Inline member editor beside or below the selected party board.
+/// Two-column name/level fields, linked-or-manual types, ability
 /// chips, and sticker action buttons (swap warm / delete warn / save coral).
 class _InlineTeamEditor extends StatefulWidget {
   const _InlineTeamEditor({
@@ -467,10 +548,9 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
   Future<void> _pickMoves() async {
     var query = '';
     final working = Set<int>.from(_selectedMoveIds);
-    final picked = await showModalBottomSheet<Set<int>>(
+    final picked = await showTitoModalBottomSheet<Set<int>>(
       context: context,
       isScrollControlled: true,
-      useSafeArea: true,
       builder: (sheetContext) => StatefulBuilder(
         builder: (context, setSheetState) {
           final normalized = query.trim().toLowerCase();
@@ -489,12 +569,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
             child: SizedBox(
               height: MediaQuery.sizeOf(context).height * 0.76,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  16,
-                  8,
-                  16,
-                  12 + MediaQuery.viewInsetsOf(context).bottom,
-                ),
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -653,7 +728,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
             Text(
               AppZh.teamCurrentMoves,
               style: SecondaryTypography.onCard.small12.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
             const SizedBox(height: 8),
@@ -727,15 +802,10 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
             ],
           ),
           const SizedBox(height: 8),
-          FilledButton(
-            // Coral is the editor's existing confirm accent on the sticker
-            // themes; Flat UI keeps the Material primary fill from the theme.
-            style: appVisualStyle.usesFlatUi
-                ? null
-                : FilledButton.styleFrom(
-                    backgroundColor: TitoColors.coral,
-                    foregroundColor: TitoColors.ink,
-                  ),
+          TitoPrimaryButton(
+            label: AppZh.confirm,
+            showArrow: false,
+            expanded: true,
             onPressed: () => widget.onSave(
               widget.index,
               level: int.tryParse(_levelController.text.trim()),
@@ -744,7 +814,6 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
               abilitySlug: _selectedAbility,
               moveIds: _selectedMoveIds.toList(growable: false),
             ),
-            child: Text(AppZh.confirm),
           ),
         ],
       ),
@@ -884,7 +953,7 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
           Text(
             AppZh.teamInspectorHint,
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoTypography.mutedColor,
             ),
           ),
           const SizedBox(height: 8),
@@ -910,14 +979,14 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
                   Text(
                     entry.member.nickname ?? entry.member.species,
                     style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     entry.subtitle,
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                      color: TitoTypography.mutedColor,
                     ),
                   ),
                   if (entry.saveFacts.isNotEmpty) ...[
@@ -957,7 +1026,11 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: SecondaryTypography.onCard.small12
-                                        .copyWith(fontWeight: FontWeight.w800),
+                                        .copyWith(
+                                          fontWeight: TitoTypography.weight(
+                                            FontWeight.w800,
+                                          ),
+                                        ),
                                   ),
                                 ),
                               ),
@@ -973,7 +1046,11 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: SecondaryTypography.onCard.body14
-                                      .copyWith(fontWeight: FontWeight.w800),
+                                      .copyWith(
+                                        fontWeight: TitoTypography.weight(
+                                          FontWeight.w800,
+                                        ),
+                                      ),
                                 ),
                               ),
                             ],

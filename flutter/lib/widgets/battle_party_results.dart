@@ -13,7 +13,8 @@ import '../l10n/app_zh.dart';
 import '../l10n/localized_names.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
-import 'sticker_card.dart';
+import 'battle_tool_panels.dart';
+import 'tito_loading_panel.dart';
 
 class BattlePartyResults extends StatelessWidget {
   const BattlePartyResults({
@@ -94,14 +95,15 @@ class BattlePartyResults extends StatelessWidget {
   @override
   Widget build(BuildContext context) => compact
       ? _compactResult()
-      : StickerCard(
-          padding: const EdgeInsets.all(12),
+      : BattleResultCard(
           child: DefaultTextStyle(
             style: SecondaryTypography.onCard.small12,
             child: FutureBuilder<List<BattlePartyEntry>>(
               future: session.partyEntries(party),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) return const LinearProgressIndicator();
+                if (!snapshot.hasData) {
+                  return const TitoInlineLoading(height: 64);
+                }
                 final entries = snapshot.data!;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -110,9 +112,9 @@ class BattlePartyResults extends StatelessWidget {
                       relations == null
                           ? AppZh.battleTeamStats
                           : AppZh.battleTeamDamage,
-                      style: SecondaryTypography.onCard.h15,
+                      style: BattleResultText.title,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     if (entries.isEmpty)
                       Text(AppZh.battlePartyEmpty)
                     else if (relations == null)

@@ -33,6 +33,38 @@ enum TitoSurfaceRole {
   progress,
   fact,
   emptyTeam,
+
+  /// Header bar behind the page title. [TitoSurfaceRecipe.foreground] is the
+  /// title / icon ink directly on the page (Flat on-surface, gradient cream).
+  pageChrome,
+
+  /// Secondary text on the page itself (subtitles, hints above cards).
+  pageSubtle,
+
+  /// Tappable icons and outlined controls on the page itself (back arrow,
+  /// Dex search pill).
+  pageAction,
+
+  /// Round header buttons and the edition avatar. Solid Plastic draws these
+  /// with `LiquidGlassRoundButton`; the recipe still resolves for previews.
+  headerButton,
+
+  /// Faint frame drawn directly on the page (drag canvas): surface tones in
+  /// Flat, a cream wash with a pale edge over the gradient themes.
+  pageWell,
+
+  /// Focus and selected rings: Flat's primary, soft yellow on the gradient
+  /// themes. Use [TitoSurfaceRecipe.fill] as the ring colour.
+  highlight,
+
+  /// Accent icons on cream cards (catalog tiles): Flat primary, deep blue on
+  /// the gradient themes. Use [TitoSurfaceRecipe.foreground].
+  accent,
+
+  /// Small status labels drawn directly on the page (form flags on the Dex
+  /// detail hero): bare tertiary text in Flat, cream on a deep-blue chip
+  /// over the gradient themes so it meets AA at the light end.
+  pageBadge,
 }
 
 @immutable
@@ -354,6 +386,71 @@ class TitoSurfaceTokens extends ThemeExtension<TitoSurfaceTokens> {
               : TitoColors.softYellow,
           foreground: flat ? scheme.onSecondaryContainer : TitoColors.ink,
         ),
+        TitoSurfaceRole.pageChrome: recipe(
+          flat ? scheme.surface : Colors.transparent,
+          foreground: flat ? scheme.onSurface : TitoColors.card,
+          outline: BorderSide.none,
+        ),
+        TitoSurfaceRole.pageSubtle: recipe(
+          Colors.transparent,
+          foreground: flat ? scheme.onSurfaceVariant : TitoColors.card,
+          outline: BorderSide.none,
+        ),
+        TitoSurfaceRole.pageAction: recipe(
+          Colors.transparent,
+          foreground: flat ? scheme.primary : TitoColors.card,
+          // Outlined page controls (Dex search pill) stroke in the same tint.
+          outline: BorderSide(
+            color: flat ? scheme.primary : TitoColors.card,
+            width: flat
+                ? TitoBorders.card
+                : plastic
+                ? TitoBorders.glass
+                : TitoBorders.journalCard,
+          ),
+        ),
+        TitoSurfaceRole.headerButton: recipe(
+          flat
+              ? scheme.secondaryContainer
+              : plastic
+              ? Colors.white.withValues(alpha: .8)
+              : TitoColors.card,
+          foreground: flat ? scheme.onSecondaryContainer : TitoColors.deepBlue,
+          outline: card,
+          radius: 999,
+        ),
+        TitoSurfaceRole.pageWell: recipe(
+          flat
+              ? scheme.surfaceContainerLow
+              : TitoColors.cream.withValues(alpha: .16),
+          outline: BorderSide(
+            color: flat
+                ? scheme.outlineVariant
+                : TitoColors.card.withValues(alpha: .35),
+            width: flat || plastic
+                ? TitoBorders.element
+                : TitoBorders.journalHairline,
+          ),
+          radius: TitoRadii.md,
+        ),
+        TitoSurfaceRole.highlight: recipe(
+          flat ? scheme.primary : TitoColors.softYellow,
+          foreground: flat ? scheme.onPrimary : TitoColors.ink,
+          outline: BorderSide.none,
+        ),
+        TitoSurfaceRole.accent: recipe(
+          Colors.transparent,
+          foreground: flat ? scheme.primary : TitoColors.deepBlue,
+          outline: BorderSide.none,
+        ),
+        TitoSurfaceRole.pageBadge: recipe(
+          flat
+              ? Colors.transparent
+              : TitoColors.deepBlue.withValues(alpha: .88),
+          foreground: flat ? scheme.tertiary : TitoColors.card,
+          outline: BorderSide.none,
+          radius: TitoRadii.sm,
+        ),
         TitoSurfaceRole.groupLabel: recipe(
           flat ? scheme.secondaryContainer : TitoColors.softYellow,
           foreground: flat
@@ -494,3 +591,101 @@ Map<String, Object> outlineToken(BorderSide side) => {
   'width': side.width,
   'style': side.style.name,
 };
+
+/// One selectable tile on a sheet or card: edition grids, picker forms and
+/// choice rows. Selected tiles take the soft-yellow fill (Flat: secondary
+/// container) and a stronger outline; idle tiles sit on the element tone.
+TitoSurfaceRecipe titoChoiceTile(
+  BuildContext context, {
+  required bool selected,
+}) {
+  final scheme = Theme.of(context).colorScheme;
+  return switch (TitoSurfaceTokens.of(context).finish) {
+    TitoSurfaceFinish.material => TitoSurfaceRecipe(
+      selected ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
+      outline: BorderSide(
+        color: selected ? scheme.primary : scheme.outlineVariant,
+        width: selected ? TitoBorders.card : TitoBorders.element,
+      ),
+      foreground: selected ? scheme.onSecondaryContainer : scheme.onSurface,
+      radius: TitoRadii.md,
+    ),
+    TitoSurfaceFinish.plastic => TitoSurfaceRecipe(
+      selected
+          ? TitoColors.softYellow.withValues(alpha: .85)
+          : Colors.white.withValues(alpha: .8),
+      outline: BorderSide(
+        color: Colors.white.withValues(alpha: .85),
+        width: TitoBorders.glass,
+      ),
+      radius: TitoRadii.md,
+    ),
+    TitoSurfaceFinish.paper => TitoSurfaceRecipe(
+      selected ? TitoColors.softYellow : TrainerJournal.paper,
+      outline: BorderSide(
+        color: selected ? TrainerJournal.edge : TrainerJournal.smallEdge,
+        width: selected ? TitoBorders.journalCard : TitoBorders.journalElement,
+      ),
+      foreground: TrainerJournal.ink,
+      radius: TitoRadii.md,
+    ),
+  };
+}
+
+/// Ring around a colour swatch tile (type grid, colour filters). The selected
+/// swatch always gets a strong ring; idle swatches fade it (Journal), use a
+/// milky hairline (Plastic) or go borderless (Flat).
+BorderSide titoSwatchOutline(BuildContext context, {required bool selected}) {
+  final finish = TitoSurfaceTokens.of(context).finish;
+  if (selected) {
+    return finish == TitoSurfaceFinish.paper
+        ? const BorderSide(
+            color: TrainerJournal.selectedEdge,
+            width: TitoBorders.journalElement,
+          )
+        : const BorderSide(color: TitoColors.ink, width: TitoBorders.element);
+  }
+  return finish == TitoSurfaceFinish.plastic
+      ? BorderSide(
+          color: Colors.white.withValues(alpha: .7),
+          width: TitoBorders.glass,
+        )
+      : BorderSide.none;
+}
+
+/// Hand-drawn sticker edge kept in every theme (speech bubble, Ask source
+/// chips): Journal's gray-blue pencil line, ink elsewhere. [strong] uses the
+/// Journal card edge; [alpha] softens the ink in the other themes.
+BorderSide titoInkOutline(
+  BuildContext context, {
+  bool strong = false,
+  double alpha = 1,
+}) {
+  if (TitoSurfaceTokens.of(context).finish == TitoSurfaceFinish.paper) {
+    return strong
+        ? const BorderSide(
+            color: TrainerJournal.edge,
+            width: TitoBorders.journalElement,
+          )
+        : TrainerJournal.elementSide;
+  }
+  return BorderSide(
+    color: TitoColors.ink.withValues(alpha: alpha),
+    width: TitoBorders.element,
+  );
+}
+
+/// Stroke for tiny outlined marks (status dots, battery frame): the Journal
+/// pencil hairline, the element stroke elsewhere.
+double titoHairlineWidth(BuildContext context) =>
+    TitoSurfaceTokens.of(context).finish == TitoSurfaceFinish.paper
+    ? TitoBorders.journalHairline
+    : TitoBorders.element;
+
+/// Pastel sticker tint for decorative tiles (Home quick actions). Flat UI
+/// keeps its Material surface container, so this returns null there and the
+/// tile falls back to its default fill.
+Color? titoStickerTint(BuildContext context, Color tint) =>
+    TitoSurfaceTokens.of(context).finish == TitoSurfaceFinish.material
+    ? null
+    : tint;

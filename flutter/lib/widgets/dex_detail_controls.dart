@@ -8,6 +8,7 @@ import '../theme/tito_surface_tokens.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'dex_detail_picker_sheet.dart';
+import '../theme/tito_typography.dart';
 
 /// One visible context shared by every bottom tab of a Pokémon detail page.
 class DexDetailControls extends StatelessWidget {
@@ -54,10 +55,12 @@ class DexDetailControls extends StatelessWidget {
             color: scheme.onSurface,
           )
         : SecondaryTypography.onCard.body14.copyWith(fontSize: 13);
-    final labelColor = flat ? scheme.onSurfaceVariant : TitoColors.mutedInk;
+    final labelColor = flat
+        ? scheme.onSurfaceVariant
+        : TitoTypography.mutedColor;
     final disabledTextColor = flat
         ? scheme.onSurfaceVariant
-        : TitoColors.mutedInk;
+        : TitoTypography.mutedColor;
     final fieldSurface = tokens.surface(TitoSurfaceRole.field);
     final fill = fieldSurface.fill;
     final disabledFill = tokens.surface(TitoSurfaceRole.disabledField).fill;

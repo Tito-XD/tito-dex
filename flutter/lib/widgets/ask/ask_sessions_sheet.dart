@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../features/journey/ask_titodex_sessions.dart';
 import '../../l10n/app_zh.dart';
 import '../../theme/secondary_typography.dart';
+import '../../navigation/tito_page_transition.dart';
 
 class AskSessionAction {
   const AskSessionAction(this.kind, [this.id]);
@@ -16,11 +17,9 @@ Future<AskSessionAction?> showAskSessions(
 }) {
   final sessions = [...snapshot.sessions]
     ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-  return showModalBottomSheet<AskSessionAction>(
+  return showTitoModalBottomSheet<AskSessionAction>(
     context: context,
     isScrollControlled: true,
-    showDragHandle: true,
-    useSafeArea: true,
     builder: (sheetContext) => SizedBox(
       height: MediaQuery.sizeOf(sheetContext).height * 0.7,
       child: Column(

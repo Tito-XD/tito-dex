@@ -6,8 +6,9 @@ import '../features/dex/dex_repository.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_surface_tokens.dart';
 import 'party_team_list.dart';
+import 'tito_loading_panel.dart';
+import '../navigation/tito_page_transition.dart';
 
 class BattlePartyPicker extends StatelessWidget {
   const BattlePartyPicker({
@@ -27,10 +28,9 @@ class BattlePartyPicker extends StatelessWidget {
     onPressed: journey.party.isEmpty
         ? null
         : () async {
-            final member = await showModalBottomSheet<PartyMember>(
+            final member = await showTitoModalBottomSheet<PartyMember>(
               context: context,
               isScrollControlled: true,
-              backgroundColor: TitoSurfaceTokens.of(context).cardFill,
               builder: (context) => SafeArea(
                 child: SizedBox(
                   height: MediaQuery.sizeOf(context).height * .6,
@@ -113,7 +113,7 @@ class BattleDraftNotice extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      if (combatant.loading) const LinearProgressIndicator(),
+      if (combatant.loading) const TitoInlineLoading(size: 20),
       if (combatant.selectionFailed)
         Text(
           AppZh.battleSelectionFailed,

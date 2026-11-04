@@ -279,12 +279,7 @@ ThemeData _buildSolidPlasticTheme() {
 /// Flat UI theme: restrained native controls with TitoDex's own surfaces.
 ThemeData _buildFlatUiTheme() {
   const fontFamily = TitoTypography.fontFamily;
-  final colorScheme = ColorScheme.fromSeed(
-    seedColor: TitoColors.flatSeed,
-    brightness: Brightness.light,
-    secondary: TitoColors.coral,
-    surface: TitoColors.flatSurface,
-  );
+  final colorScheme = titoFlatColorScheme;
 
   TextStyle baseStyle({
     double fontSize = 14,

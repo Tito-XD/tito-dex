@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../navigation/back_navigation.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
 import 'handheld_focus_geometry.dart';
 import 'handheld_focus_traversal.dart';
+import '../theme/tito_surface_tokens.dart';
 
 /// D-pad / gamepad focus traversal and A·B actions for RG handhelds.
 class HandheldInputShell extends StatefulWidget {
@@ -179,9 +179,9 @@ class _HandheldInputShellState extends State<HandheldInputShell>
 
   @override
   Widget build(BuildContext context) {
-    final color = appVisualStyle.usesFlatUi
-        ? Theme.of(context).colorScheme.primary
-        : TitoColors.softYellow;
+    final color = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.highlight).fill;
     final disabled = TitoMotion.disabled(context);
     if (disabled && _pulse.isAnimating) _pulse.stop();
     return _HandheldCueHost(
@@ -399,9 +399,9 @@ class _HandheldFocusDecoratorState extends State<HandheldFocusDecorator> {
   Widget build(BuildContext context) {
     // Trainer's Journal and Solid Plastic share the soft-yellow ring; Flat UI
     // uses the scheme primary so the ring matches Material focus colour.
-    final ringColor = appVisualStyle.usesFlatUi
-        ? Theme.of(context).colorScheme.primary
-        : TitoColors.softYellow;
+    final ringColor = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.highlight).fill;
     return Focus(
       onKeyEvent: _trackActivateKey,
       // Skip in traversal (this is a passive listener, not a target) or it

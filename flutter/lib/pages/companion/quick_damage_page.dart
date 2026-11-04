@@ -20,16 +20,15 @@ import '../../features/dex/type_chart.dart';
 import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
-import '../../theme/app_visual_style.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
-import '../../theme/trainer_journal.dart';
 import '../../widgets/companion_tool_fields.dart';
+import '../../theme/tito_surface_tokens.dart';
 import '../../widgets/battle_tool_panels.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
-import '../../widgets/tito_loading_panel.dart';
+import '../../widgets/tito_rolling_value.dart';
 
 class QuickDamagePage extends StatefulWidget {
   const QuickDamagePage({
@@ -281,7 +280,14 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                       ? AppZh.companionDamageResultTitle
                       : '${estimate.minDamage}–${estimate.maxDamage} HP · ${estimate.minPercent.toStringAsFixed(1)}–${estimate.maxPercent.toStringAsFixed(1)}%',
                 ),
-          result: _session.teamMode && relations != null
+          result: _loading
+              ? const BattleResultLoading()
+              : _error != null
+              ? BattleResultError(
+                  message: _error!,
+                  onRetry: _retryLoadRelations,
+                )
+              : _session.teamMode && relations != null
               ? BattlePartyResults(
                   session: _session,
                   party: widget.journey.party,
@@ -294,8 +300,12 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   spread: _isSpreadMove,
                 )
               : estimate != null
-              ? _DamageResultCard(estimate: estimate, compact: true)
-              : StickerCard(
+              ? _DamageResultCard(
+                  estimate: estimate,
+                  identity: _session,
+                  compact: true,
+                )
+              : BattleResultCard(
                   child: Text(
                     selectedMove == null
                         ? AppLocale.pick(
@@ -322,30 +332,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
             onChanged: (value) => _edit(() => _session.teamMode = value),
           ),
           children: [
-            if (_loading)
-              TitoLoadingPanel(message: AppZh.companionLoading, compact: true)
-            else if (_error != null)
-              StickerCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _error!,
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
-                        height: 1.45,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    FilledButton.icon(
-                      onPressed: _retryLoadRelations,
-                      icon: const Icon(Icons.refresh_rounded, size: 18),
-                      label: Text(AppZh.dexRetry),
-                    ),
-                  ],
-                ),
-              )
-            else ...[
+            if (!_loading && _error == null) ...[
               BattleCombatants(
                 showAttacker: !_session.teamMode,
                 attacker: CompanionSectionCard(
@@ -675,9 +662,14 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
 /// into mint-safe / coral-damage segments. [compact] drops the extra verdict
 /// and assumptions so the result stays glanceable before the input form.
 class _DamageResultCard extends StatelessWidget {
-  const _DamageResultCard({required this.estimate, this.compact = false});
+  const _DamageResultCard({
+    required this.estimate,
+    required this.identity,
+    this.compact = false,
+  });
 
   final DamageEstimate estimate;
+  final Object identity;
   final bool compact;
 
   @override
@@ -688,39 +680,27 @@ class _DamageResultCard extends StatelessWidget {
         ? '${maxPct.round()}%'
         : '${minPct.round()}–${maxPct.round()}%';
     final damageFraction = (maxPct / 100).clamp(0.0, 1.0);
+    final typeMultiplier = formatTypeMultiplier(estimate.typeMultiplier);
+    final stabMultiplier = formatTypeMultiplier(estimate.stabMultiplier);
+    final modifierStyle = BattleResultText.meta;
 
-    return StickerCard(
-      variant: StickerVariant.deep,
+    return BattleResultCard(
+      display: true,
+      title: AppZh.companionDamageResultTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.companionDamageResultTitle,
-            style: SecondaryTypography.onGradient.small12.copyWith(
-              fontWeight: FontWeight.w800,
-              color: TitoColors.skyBlue,
-            ),
-          ),
-          const SizedBox(height: 10),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(
-                bigPercent,
-                style: SecondaryTypography.onGradient.h34.copyWith(
-                  color: TitoColors.softYellow,
-                ),
-              ),
+              Text(bigPercent, style: BattleResultText.hero),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   '${estimate.minDamage} – ${estimate.maxDamage} · '
                   '${estimate.verdictZh}',
-                  style: SecondaryTypography.onGradient.small12.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.skyBlue,
-                  ),
+                  style: BattleResultText.eyebrow,
                 ),
               ),
             ],
@@ -730,23 +710,16 @@ class _DamageResultCard extends StatelessWidget {
             builder: (context, constraints) {
               final width = constraints.maxWidth;
               // HP bar rail: a translucent white wash over the deep card so
-              // the mint/coral split reads on every theme; ink outline only
-              // where the theme draws ink.
+              // the mint/coral split reads on every theme; the outline is the
+              // theme's element edge.
               return Container(
                 height: 20,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(999),
-                  border: appVisualStyle.usesFlatUi
-                      ? null
-                      : Border.all(
-                          color: appVisualStyle.usesTrainerJournal
-                              ? TrainerJournal.smallEdge
-                              : TitoColors.ink,
-                          width: appVisualStyle.usesTrainerJournal
-                              ? TitoBorders.journalHairline
-                              : TitoBorders.element,
-                        ),
+                  border: Border.fromBorderSide(
+                    TitoSurfaceTokens.of(context).elementOutline,
+                  ),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
@@ -774,42 +747,75 @@ class _DamageResultCard extends StatelessWidget {
           if (!compact) ...[
             Text(
               '${AppZh.companionDamageDefense}：${estimate.tankVerdictZh}',
-              style: SecondaryTypography.onGradient.body14,
+              style: BattleResultText.displayBody,
             ),
             const SizedBox(height: 8),
           ],
-          Text(
-            AppZh.companionDamageModifiers(
-              formatTypeMultiplier(estimate.typeMultiplier),
-              estimate.stabMultiplier == 1.0
-                  ? '1'
-                  : estimate.stabMultiplier.toStringAsFixed(1),
+          Semantics(
+            key: const ValueKey('damage-modifiers'),
+            container: true,
+            label: AppZh.companionDamageModifiers(
+              typeMultiplier,
+              stabMultiplier,
             ),
-            style: SecondaryTypography.onGradient.small12.copyWith(
-              color: TitoColors.skyBlue,
-              fontWeight: FontWeight.w700,
+            excludeSemantics: true,
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${AppZh.companionDamageTypeLabel} ×',
+                      style: modifierStyle,
+                    ),
+                    TitoRollingValue(
+                      key: const ValueKey('damage-type-multiplier'),
+                      value: typeMultiplier,
+                      // Manual type edits clear the linked Pokémon identity.
+                      // This metric slot still belongs to the same calculation.
+                      identity: (identity, 'type'),
+                      style: modifierStyle,
+                      textKey: const ValueKey('damage-type-multiplier-value'),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${AppZh.companionDamageStabLabel} ×',
+                      style: modifierStyle,
+                    ),
+                    TitoRollingValue(
+                      key: const ValueKey('damage-stab-multiplier'),
+                      value: stabMultiplier,
+                      identity: (identity, 'stab'),
+                      style: modifierStyle,
+                      textKey: const ValueKey('damage-stab-multiplier-value'),
+                    ),
+                  ],
+                ),
+                Text(AppZh.companionDamageRandomRoll, style: modifierStyle),
+              ],
             ),
           ),
           if (estimate.extraMultiplier != 1) ...[
             const SizedBox(height: 4),
             Text(
               AppZh.companionDamageExtra(
-                estimate.extraMultiplier.toStringAsFixed(2),
+                formatTypeMultiplier(estimate.extraMultiplier),
               ),
-              style: SecondaryTypography.onGradient.small12.copyWith(
-                color: TitoColors.skyBlue,
-                fontWeight: FontWeight.w700,
-              ),
+              style: BattleResultText.meta,
             ),
           ],
           if (!compact) ...[
             const SizedBox(height: 8),
             Text(
               AppZh.companionDamageAssumptions,
-              style: SecondaryTypography.onGradient.small12.copyWith(
-                color: TitoColors.skyBlue,
-                height: 1.45,
-              ),
+              style: BattleResultText.meta.copyWith(height: 1.45),
             ),
           ],
         ],

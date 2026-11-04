@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/trainer_journal.dart';
 import 'sticker_card.dart';
 
@@ -64,11 +64,11 @@ class TrainerCard extends StatelessWidget {
     );
     final card = StickerCard(
       padding: padding,
-      child: appVisualStyle.usesTrainerJournal
+      child: _journal(context)
           ? body
           : SizedBox(height: metrics.cardHeight, child: body),
     );
-    if (!appVisualStyle.usesTrainerJournal) return card;
+    if (!_journal(context)) return card;
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -186,9 +186,7 @@ class _TrainerCardBody extends StatelessWidget {
       style: nameStyle,
     );
     final textColumn = Column(
-      mainAxisSize: appVisualStyle.usesTrainerJournal
-          ? MainAxisSize.min
-          : MainAxisSize.max,
+      mainAxisSize: _journal(context) ? MainAxisSize.min : MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -209,7 +207,7 @@ class _TrainerCardBody extends StatelessWidget {
 
     // Keep the normal card height and existing font sizes. Large accessibility
     // text may grow the Journal card; long names ellipsize within the row.
-    final Widget body = appVisualStyle.usesTrainerJournal
+    final Widget body = _journal(context)
         ? ConstrainedBox(
             constraints: BoxConstraints(minHeight: metrics.cardHeight),
             child: Center(heightFactor: 1, child: row),
@@ -253,7 +251,7 @@ class TrainerAvatar extends StatelessWidget {
         child: Icon(
           Icons.person_rounded,
           size: size * 0.45,
-          color: TitoColors.mutedInk,
+          color: TitoTypography.mutedColor,
         ),
         hasImage: false,
       );
@@ -266,7 +264,7 @@ class TrainerAvatar extends StatelessWidget {
         File(avatarPath).existsSync();
 
     final child = hasImage
-        ? (appVisualStyle.usesTrainerJournal
+        ? (_journal(context)
               ? Image.file(
                   File(avatarPath),
                   width: size,
@@ -300,20 +298,12 @@ class TrainerAvatar extends StatelessWidget {
     required Widget child,
     required bool hasImage,
   }) {
-    if (appVisualStyle.usesTrainerJournal) {
+    if (_journal(context)) {
       return JournalPhotoFrame(size: size, child: child);
     }
-    final BoxBorder? border;
-    if (appVisualStyle.usesFlatUi) {
-      border = null;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      border = Border.all(
-        color: Colors.white.withValues(alpha: 0.78),
-        width: TitoBorders.glass,
-      );
-    } else {
-      border = Border.all(color: TitoColors.ink, width: TitoBorders.element);
-    }
+    final border = Border.fromBorderSide(
+      TitoSurfaceTokens.of(context).elementOutline,
+    );
     return Container(
       width: size,
       height: size,
@@ -334,3 +324,8 @@ class TrainerAvatar extends StatelessWidget {
     );
   }
 }
+
+/// Trainer's Journal lays the card out as a photo page; other finishes keep
+/// the compact sticker card.
+bool _journal(BuildContext context) =>
+    TitoSurfaceTokens.of(context).finish == TitoSurfaceFinish.paper;

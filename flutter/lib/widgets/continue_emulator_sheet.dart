@@ -4,11 +4,10 @@ import '../features/launcher/emulator_launcher.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../l10n/app_zh.dart';
 import '../navigation/tito_page_transition.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
-import '../theme/trainer_journal.dart';
 import 'tito_skeleton.dart';
+import '../theme/tito_surface_tokens.dart';
 
 Future<EmulatorAppChoice?> showEmulatorPickerSheet(
   BuildContext context,
@@ -246,7 +245,7 @@ class _AppSectionHeader extends StatelessWidget {
     return Text(
       title,
       style: context.titoHome.captionStrong.copyWith(
-        color: TitoColors.mutedInk,
+        color: TitoTypography.mutedColor,
       ),
     );
   }
@@ -259,31 +258,13 @@ class _AppChoiceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    // Rows sit on the themed sheet surface: Flat uses its container tone,
-    // Solid Plastic a milky plate, Trainer's Journal the cream card.
-    final (fill, outline) = appVisualStyle.usesFlatUi
-        ? (scheme.surfaceContainerHigh, BorderSide.none)
-        : appVisualStyle.usesSolidPlastic
-        ? (
-            Colors.white.withValues(alpha: 0.8),
-            BorderSide(
-              color: Colors.white.withValues(alpha: 0.85),
-              width: TitoBorders.glass,
-            ),
-          )
-        : (
-            TrainerJournal.paper,
-            const BorderSide(
-              color: TrainerJournal.smallEdge,
-              width: TitoBorders.journalElement,
-            ),
-          );
+    // Rows sit on the themed sheet surface as shared choice tiles.
+    final tile = titoChoiceTile(context, selected: false);
     return Material(
-      color: fill,
+      color: tile.fill,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        side: outline,
+        side: tile.outline,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(TitoRadii.md),

@@ -16,7 +16,6 @@ import '../l10n/localized_names.dart';
 import '../features/dex/dex_search_terms.dart';
 import '../features/dex/dex_filter.dart';
 import '../features/dex/dex_encounter_labels.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_typography.dart';
@@ -29,6 +28,7 @@ import 'sticker_card.dart';
 import 'tito_animated_size_switcher.dart';
 import 'tito_loading_panel.dart';
 import 'tito_progress_bar.dart';
+import 'tito_rolling_value.dart';
 import 'type_badge.dart';
 
 /// Stroke for custom-drawn tiles and pills inside cards. Trainer's Journal
@@ -91,7 +91,7 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
     final headerPadding = titoDetailHeaderPadding(square);
     final metaStyle = SecondaryTypography.onGradient.small12.copyWith(
       color: TitoColors.card.withValues(alpha: 0.92),
-      fontWeight: FontWeight.w800,
+      fontWeight: TitoTypography.weight(FontWeight.w800),
     );
     final routeAnimation =
         ModalRoute.of(context)?.animation ??
@@ -165,7 +165,7 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onGradient.h15.copyWith(
                           fontSize: 26,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: TitoTypography.weight(FontWeight.w800),
                           letterSpacing: 26 * -0.03,
                           height: 1.05,
                         ),
@@ -177,7 +177,7 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onGradient.small12.copyWith(
                           color: TitoColors.card.withValues(alpha: 0.92),
-                          fontWeight: FontWeight.w700,
+                          fontWeight: TitoTypography.weight(FontWeight.w700),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -235,7 +235,7 @@ class PokemonDetailHeader extends StatelessWidget {
       final headerPadding = titoDetailHeaderPadding(square);
       final metaStyle = SecondaryTypography.onGradient.small12.copyWith(
         color: TitoColors.card.withValues(alpha: 0.92),
-        fontWeight: FontWeight.w800,
+        fontWeight: TitoTypography.weight(FontWeight.w800),
       );
       final routeAnimation =
           ModalRoute.of(context)?.animation ??
@@ -312,7 +312,7 @@ class PokemonDetailHeader extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onGradient.h15.copyWith(
                           fontSize: 26,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: TitoTypography.weight(FontWeight.w800),
                           letterSpacing: 26 * -0.03,
                           height: 1.05,
                         ),
@@ -331,7 +331,9 @@ class PokemonDetailHeader extends StatelessWidget {
                                     color: TitoColors.card.withValues(
                                       alpha: 0.92,
                                     ),
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: TitoTypography.weight(
+                                      FontWeight.w700,
+                                    ),
                                   ),
                             ),
                             if (detail.genusZh.isNotEmpty)
@@ -342,7 +344,9 @@ class PokemonDetailHeader extends StatelessWidget {
                                       color: TitoColors.card.withValues(
                                         alpha: 0.92 * fillProgress,
                                       ),
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: TitoTypography.weight(
+                                        FontWeight.w700,
+                                      ),
                                     ),
                               ),
                           ],
@@ -434,7 +438,7 @@ class PokemonDetailHeader extends StatelessWidget {
                 Text(
                   summary.displayName,
                   style: context.tito.onDeepHeading.copyWith(
-                    fontWeight: FontWeight.w900,
+                    fontWeight: TitoTypography.weight(FontWeight.w900),
                   ),
                 ),
                 if (detail.genusZh.isNotEmpty)
@@ -697,7 +701,9 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                           child: Text(
                             entry.displayLabel,
                             style: SecondaryTypography.onCard.meta14.copyWith(
-                              color: TitoColors.coral,
+                              fontWeight: TitoTypography.weight(
+                                FontWeight.w800,
+                              ),
                             ),
                           ),
                         ),
@@ -708,7 +714,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                       Text(
                         note,
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: TitoTypography.mutedColor,
                         ),
                       ),
                     ],
@@ -719,14 +725,14 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                       Text(
                         AppZh.dexFlavorZhReference(reference.displayLabel),
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: TitoTypography.mutedColor,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         reference.text,
                         style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: TitoTypography.weight(FontWeight.w700),
                         ),
                       ),
                     ],
@@ -745,13 +751,11 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                 onPressed: index > 0 ? () => _goTo(index - 1) : null,
                 icon: const Icon(Icons.chevron_left_rounded),
-                color: TitoColors.coral,
               ),
               Text(
                 '${index + 1}/${widget.entries.length}',
                 style: SecondaryTypography.onCard.meta14.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: TitoColors.coral,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
                 ),
               ),
               IconButton(
@@ -762,7 +766,6 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                     ? () => _goTo(index + 1)
                     : null,
                 icon: const Icon(Icons.chevron_right_rounded),
-                color: TitoColors.coral,
               ),
             ],
           ),
@@ -817,7 +820,7 @@ class BaseStatsCard extends StatelessWidget {
                       '${entry.value}',
                       textAlign: TextAlign.end,
                       style: SecondaryTypography.onCard.meta14.copyWith(
-                        fontWeight: FontWeight.w900,
+                        fontWeight: TitoTypography.weight(FontWeight.w900),
                       ),
                     ),
                   ),
@@ -958,7 +961,7 @@ class _RadarStatLabel extends StatelessWidget {
         textAlign: TextAlign.center,
         style: SecondaryTypography.onCard.small12.copyWith(
           fontSize: 9,
-          fontWeight: FontWeight.w800,
+          fontWeight: TitoTypography.weight(FontWeight.w800),
           height: 1.1,
         ),
       ),
@@ -984,12 +987,12 @@ class _BaseStatsRadarPainter extends CustomPainter {
     }
 
     final gridPaint = Paint()
-      ..color = TitoColors.mutedInk.withValues(alpha: 0.25)
+      ..color = TitoTypography.mutedColor.withValues(alpha: 0.25)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
     final axisPaint = Paint()
-      ..color = TitoColors.mutedInk.withValues(alpha: 0.35)
+      ..color = TitoTypography.mutedColor.withValues(alpha: 0.35)
       ..strokeWidth = 1;
 
     for (final level in _gridLevels) {
@@ -1123,14 +1126,11 @@ class _StatsViewChip extends StatelessWidget {
   Widget build(BuildContext context) {
     // Single-choice toggle: soft-yellow selection (Flat: secondaryContainer),
     // element stroke that follows the theme, small radius.
-    final scheme = Theme.of(context).colorScheme;
-    final flat = appVisualStyle.usesFlatUi;
-    final background = flat
-        ? (selected ? scheme.secondaryContainer : scheme.surfaceContainerLow)
-        : (selected ? TitoColors.softYellow : TitoColors.card);
-    final foreground = flat
-        ? (selected ? scheme.onSecondaryContainer : scheme.onSurface)
-        : TitoColors.ink;
+    final tone = TitoSurfaceTokens.of(context).surface(
+      selected ? TitoSurfaceRole.selectionActive : TitoSurfaceRole.selection,
+    );
+    final background = tone.fill;
+    final foreground = tone.foreground;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1147,7 +1147,7 @@ class _StatsViewChip extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: SecondaryTypography.onCard.small12.copyWith(
-              fontWeight: FontWeight.w800,
+              fontWeight: TitoTypography.weight(FontWeight.w800),
               color: foreground,
             ),
           ),
@@ -1211,17 +1211,70 @@ class TypeEffectivenessGrid extends StatelessWidget {
             builder: (context, constraints) {
               const crossAxisSpacing = 6.0;
               const mainAxisSpacing = 8.0;
-              // Narrow screens drop to 5 columns instead of squeezing tiles
-              // below their minimum, which used to overflow the cells by a
-              // few pixels ("折叠" stripes).
-              final crossAxisCount = constraints.maxWidth < 300 ? 5 : 6;
+              final nameStyle = SecondaryTypography.onCard.small12.copyWith(
+                fontSize: 9,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
+              );
+              final valueStyle = SecondaryTypography.onCard.small12.copyWith(
+                fontWeight: TitoTypography.weight(FontWeight.w900),
+                fontFeatures: const [FontFeature.tabularFigures()],
+              );
+              final inheritedStyle = DefaultTextStyle.of(context).style;
+              Size measure(String label, TextStyle style) {
+                final painter = TextPainter(
+                  text: TextSpan(
+                    text: label,
+                    style: inheritedStyle
+                        .merge(style)
+                        .merge(
+                          MediaQuery.boldTextOf(context)
+                              ? const TextStyle(fontWeight: FontWeight.bold)
+                              : null,
+                        ),
+                  ),
+                  textDirection: Directionality.of(context),
+                  textScaler: MediaQuery.textScalerOf(context),
+                  locale: Localizations.maybeLocaleOf(context),
+                  maxLines: 1,
+                )..layout();
+                final size = painter.size;
+                painter.dispose();
+                return size;
+              }
+
+              var nameHeight = 0.0;
+              var minTileWidth = 44.0;
+              // Keep room for precise fractions and common ability decimals,
+              // so a changed multiplier does not squeeze adjacent columns.
+              final decimalSize = measure('0.125', valueStyle);
+              var valueHeight = decimalSize.height;
+              minTileWidth = math.max(minTileWidth, decimalSize.width + 4);
+              for (final type in typeGridOrder) {
+                final nameSize = measure(typeNameZh(type), nameStyle);
+                final valueSize = measure(
+                  formatTypeMultiplier(multipliers[type] ?? 1),
+                  valueStyle,
+                );
+                nameHeight = math.max(nameHeight, nameSize.height);
+                valueHeight = math.max(valueHeight, valueSize.height);
+                minTileWidth = math.max(
+                  minTileWidth,
+                  math.max(nameSize.width, valueSize.width) + 4,
+                );
+              }
+              final preferredColumns = constraints.maxWidth < 300 ? 5 : 6;
+              final crossAxisCount =
+                  ((constraints.maxWidth + crossAxisSpacing) /
+                          (minTileWidth + crossAxisSpacing))
+                      .floor()
+                      .clamp(1, preferredColumns)
+                      .toInt();
               final tileWidth =
                   (constraints.maxWidth -
                       crossAxisSpacing * (crossAxisCount - 1)) /
                   crossAxisCount;
-              // Icon tile never exceeds the cell it lives in.
-              final tileSide = tileWidth.clamp(28.0, 56.0).toDouble();
-              final cellHeight = tileSide + 22.0;
+              final tileSide = math.min(tileWidth, 56.0);
+              final cellHeight = tileSide + 2 + nameHeight + valueHeight + 2;
 
               return GridView.builder(
                 shrinkWrap: true,
@@ -1238,6 +1291,7 @@ class TypeEffectivenessGrid extends StatelessWidget {
                   final multiplier = multipliers[type] ?? 1;
                   final label = formatTypeMultiplier(multiplier);
                   return Column(
+                    key: ValueKey('type-effectiveness-cell-$type'),
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
@@ -1261,16 +1315,15 @@ class TypeEffectivenessGrid extends StatelessWidget {
                         typeNameZh(type),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: nameStyle,
                       ),
-                      Text(
-                        label,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: _multiplierColor(multiplier),
+                      TitoRollingValue(
+                        key: ValueKey('type-multiplier-$type'),
+                        value: label,
+                        identity: type,
+                        textKey: ValueKey('type-multiplier-text-$type'),
+                        style: valueStyle.copyWith(
+                          color: typeMultiplierColor(multiplier),
                         ),
                       ),
                     ],
@@ -1282,19 +1335,6 @@ class TypeEffectivenessGrid extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _multiplierColor(double multiplier) {
-    if (multiplier >= 2) {
-      return TitoColors.danger;
-    }
-    if (multiplier <= 0) {
-      return TitoColors.mutedInk;
-    }
-    if (multiplier <= 0.5) {
-      return TitoColors.effectivenessResist;
-    }
-    return TitoColors.ink;
   }
 }
 
@@ -1315,7 +1355,7 @@ class AbilitiesCard extends StatelessWidget {
             Text(
               AppZh.dexAbilityEmptyPending,
               style: SecondaryTypography.onCard.body14.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoTypography.mutedColor,
               ),
             ),
           ],
@@ -1341,7 +1381,7 @@ class AbilitiesCard extends StatelessWidget {
                         child: Text(
                           ability.displayNameZh,
                           style: SecondaryTypography.onCard.body14.copyWith(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: TitoTypography.weight(FontWeight.w800),
                           ),
                         ),
                       ),
@@ -1361,7 +1401,9 @@ class AbilitiesCard extends StatelessWidget {
                           child: Text(
                             AppZh.dexAbilityHidden,
                             style: SecondaryTypography.onCard.small12.copyWith(
-                              fontWeight: FontWeight.w800,
+                              fontWeight: TitoTypography.weight(
+                                FontWeight.w800,
+                              ),
                               fontSize: 10,
                             ),
                           ),
@@ -1373,7 +1415,7 @@ class AbilitiesCard extends StatelessWidget {
                     Text(
                       ability.descriptionZh,
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoTypography.mutedColor,
                         height: 1.35,
                       ),
                     ),
@@ -1467,7 +1509,7 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
                 child: Text(
                   entry.areaLabelZh,
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: TitoTypography.weight(FontWeight.w700),
                   ),
                 ),
               ),
@@ -1477,7 +1519,7 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
                       ? 'Lv.${entry.minLevel}–${entry.maxLevel}'
                       : 'Lv.${entry.minLevel}',
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
               if (rateLabel != null) ...[
@@ -1485,8 +1527,7 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
                 Text(
                   rateLabel,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.coral,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
               ],
@@ -1496,7 +1537,7 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
             Text(
               entry.versions.map(flavorVersionLabelZh).join(' / '),
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoTypography.mutedColor,
               ),
             ),
           if (methods.isNotEmpty || widget.tags.isNotEmpty)
@@ -1505,8 +1546,8 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
               style: SecondaryTypography.onCard.small12.copyWith(
                 color: entry.formAmbiguous
                     ? TitoColors.coral
-                    : TitoColors.mutedInk,
-                fontWeight: FontWeight.w700,
+                    : TitoTypography.mutedColor,
+                fontWeight: TitoTypography.weight(FontWeight.w700),
               ),
             ),
           if (conditions.isNotEmpty) ...[
@@ -1529,7 +1570,7 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
                         : AppZh.encounterConditionsShow(conditions.length),
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.deepBlue,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                 ],
@@ -1541,7 +1582,7 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
                 child: Text(
                   conditions.join(' · '),
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                     height: 1.35,
                   ),
                 ),
@@ -1579,7 +1620,7 @@ class MoveCategoryPanel extends StatelessWidget {
               Text(
                 '${moves.length}',
                 style: SecondaryTypography.onCard.meta14.copyWith(
-                  color: TitoColors.coral,
+                  color: TitoTypography.mutedColor,
                 ),
               ),
             ],
@@ -1590,7 +1631,7 @@ class MoveCategoryPanel extends StatelessWidget {
               child: Text(
                 AppZh.dexNone,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoTypography.mutedColor,
                 ),
               ),
             )
@@ -1649,8 +1690,8 @@ class _MoveTile extends StatelessWidget {
             Text(
               'Lv.${entry.level}',
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w800,
+                color: TitoTypography.mutedColor,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
           Text(
@@ -1658,7 +1699,7 @@ class _MoveTile extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: SecondaryTypography.onCard.small12.copyWith(
-              fontWeight: FontWeight.w900,
+              fontWeight: TitoTypography.weight(FontWeight.w900),
             ),
           ),
           const SizedBox(height: 4),
@@ -1887,7 +1928,7 @@ class _MetaWidgetRow extends StatelessWidget {
           child: Text(
             label,
             style: SecondaryTypography.onCard.team12.copyWith(
-              fontWeight: FontWeight.w800,
+              fontWeight: TitoTypography.weight(FontWeight.w800),
             ),
           ),
         ),
@@ -2040,7 +2081,7 @@ class _InteractiveTypeEffectivenessCardState
                     normalized.map(typeNameZh).join('/'),
                   ),
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
               ),

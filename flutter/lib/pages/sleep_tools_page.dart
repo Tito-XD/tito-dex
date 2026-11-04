@@ -4,10 +4,10 @@ import '../features/sleep/sleep_calculator.dart';
 import '../l10n/localized_names.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../theme/tito_typography.dart';
 
 class SleepToolsPage extends StatefulWidget {
   const SleepToolsPage({super.key});
@@ -130,7 +130,7 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
               Text(
                 AppZh.sleepIngredientAdd,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
                 ),
               ),
               const SizedBox(height: 8),
@@ -154,8 +154,8 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
                 Text(
                   AppZh.sleepIngredientEmpty,
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    color: TitoColors.mutedInk,
-                    fontWeight: FontWeight.w700,
+                    color: TitoTypography.mutedColor,
+                    fontWeight: TitoTypography.weight(FontWeight.w700),
                   ),
                 )
               else
@@ -170,7 +170,7 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
               Text(
                 AppZh.sleepRecipeLevel(_recipeLevel),
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
                 ),
               ),
               Slider(
@@ -204,8 +204,8 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
                   (_recipeEnergy * 3).round(),
                 ),
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                  fontWeight: FontWeight.w700,
+                  color: TitoTypography.mutedColor,
+                  fontWeight: TitoTypography.weight(FontWeight.w700),
                 ),
               ),
             ],
@@ -224,8 +224,8 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
                 Text(
                   AppZh.sleepSourceBody,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                    fontWeight: FontWeight.w700,
+                    color: TitoTypography.mutedColor,
+                    fontWeight: TitoTypography.weight(FontWeight.w700),
                   ),
                 ),
               ],
@@ -258,7 +258,7 @@ class _TimeButton extends StatelessWidget {
         Text(
           label,
           style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
+            fontWeight: TitoTypography.weight(FontWeight.w800),
           ),
         ),
         const SizedBox(height: 6),
@@ -295,7 +295,7 @@ class _IngredientQuantityRow extends StatelessWidget {
             child: Text(
               '${localizedName(nameEn: ingredient.nameEn, nameZh: ingredient.nameZh)} · ${ingredient.baseEnergy}',
               style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
           ),
@@ -311,7 +311,7 @@ class _IngredientQuantityRow extends StatelessWidget {
               '$quantity',
               textAlign: TextAlign.center,
               style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w900,
+                fontWeight: TitoTypography.weight(FontWeight.w900),
               ),
             ),
           ),
@@ -345,15 +345,15 @@ class _ResultBand extends StatelessWidget {
           Text(
             mainText,
             style: SecondaryTypography.onCard.h15.copyWith(
-              fontWeight: FontWeight.w900,
+              fontWeight: TitoTypography.weight(FontWeight.w900),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             detailText,
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              fontWeight: FontWeight.w700,
+              color: TitoTypography.mutedColor,
+              fontWeight: TitoTypography.weight(FontWeight.w700),
             ),
           ),
         ],

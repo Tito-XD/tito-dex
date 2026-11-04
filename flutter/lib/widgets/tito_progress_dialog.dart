@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../features/dex/dex_models.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
 import 'tito_progress_bar.dart';
+import '../theme/tito_typography.dart';
 
 /// Blocking progress dialog with cancel for long-running downloads.
 Future<DexCacheProgress?> trackWhileDownloading({
@@ -63,7 +63,7 @@ Future<DexCacheProgress?> trackWhileDownloading({
                   Text(
                     '$progressText · ${(progressValue * 100).round()}%',
                     style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                      color: TitoTypography.mutedColor,
                     ),
                   ),
                   if (latest?.label != null) ...[
@@ -73,7 +73,7 @@ Future<DexCacheProgress?> trackWhileDownloading({
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoTypography.mutedColor,
                       ),
                     ),
                   ],

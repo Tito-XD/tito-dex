@@ -5,7 +5,6 @@ import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_surface_tokens.dart';
@@ -14,6 +13,7 @@ import 'handheld_input.dart';
 import 'sticker_card.dart';
 import 'sticker_pressable.dart';
 import 'tito_sprite_sticker.dart';
+import '../theme/tito_typography.dart';
 
 /// Dashed rounded-rect outline for the empty team slot (no native dashed
 /// borders in Flutter).
@@ -154,12 +154,13 @@ class _PartyGridSlot extends StatelessWidget {
         speciesId != null &&
         _canEvolveFrom(details[speciesId]?.evolutionChain, speciesId);
     final label = member.nickname ?? localizeSpecies(member.species);
-    final scheme = Theme.of(context).colorScheme;
     final radius = BorderRadius.circular(TitoRadii.md);
-    final journal = appVisualStyle.usesTrainerJournal;
-    final selectedColor = appVisualStyle.usesFlatUi
-        ? scheme.primary
-        : TitoColors.coral;
+    final journal =
+        TitoSurfaceTokens.of(context).finish == TitoSurfaceFinish.paper;
+    // Selection is soft yellow outside Flat; coral is reserved for CTAs.
+    final selectedColor = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.highlight).fill;
     final body = InkWell(
       onTap: onSelect == null ? null : () => onSelect!(index),
       borderRadius: radius,
@@ -292,7 +293,7 @@ class _EmptyGridSlot extends StatelessWidget {
                 child: Icon(
                   Icons.add_rounded,
                   size: 22,
-                  color: TitoColors.mutedInk.withValues(alpha: 0.8),
+                  color: TitoTypography.mutedColor.withValues(alpha: 0.8),
                 ),
               ),
             ),

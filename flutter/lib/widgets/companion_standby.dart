@@ -18,13 +18,11 @@ import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_surface_tokens.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import 'companion_picker_sheet.dart';
 import 'fallback_sprite_image.dart';
 
@@ -601,14 +599,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
                     decoration: BoxDecoration(
                       color: TitoColors.softYellow,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: appVisualStyle.usesTrainerJournal
-                            ? TrainerJournal.smallEdge
-                            : TitoColors.ink,
-                        width: appVisualStyle.usesTrainerJournal
-                            ? TitoBorders.journalElement
-                            : TitoBorders.element,
-                      ),
+                      border: Border.fromBorderSide(titoInkOutline(context)),
                     ),
                     child: const Icon(
                       Icons.favorite_rounded,
@@ -664,13 +655,8 @@ class _QuoteBubble extends StatelessWidget {
             decoration: BoxDecoration(
               color: TitoColors.card,
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(
-                color: appVisualStyle.usesTrainerJournal
-                    ? TrainerJournal.edge
-                    : TitoColors.ink,
-                width: appVisualStyle.usesTrainerJournal
-                    ? TitoBorders.journalElement
-                    : TitoBorders.element,
+              border: Border.fromBorderSide(
+                titoInkOutline(context, strong: true),
               ),
               boxShadow: !retroStyle.enabled
                   ? null

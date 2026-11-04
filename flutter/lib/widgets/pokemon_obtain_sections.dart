@@ -10,6 +10,7 @@ import '../theme/tito_surface_tokens.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 import 'tito_skeleton.dart';
+import '../theme/tito_typography.dart';
 
 /// Stroke for the small status boxes and pills drawn inside these cards:
 /// ink element stroke in Trainer's Journal, plastic hairline, none in Flat.
@@ -134,7 +135,7 @@ class PokemonHeldItemsCard extends StatelessWidget {
               Text(
                 AppZh.dexWildHeldItemsHint,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoTypography.mutedColor,
                 ),
               ),
               const SizedBox(height: 10),
@@ -207,7 +208,7 @@ class _HeldItemRow extends StatelessWidget {
               Text(
                 entry.reference.nameZh,
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: TitoTypography.weight(FontWeight.w800),
                 ),
               ),
               const SizedBox(height: 5),
@@ -320,7 +321,7 @@ class _PlanningPrompt extends StatelessWidget {
               Text(
                 AppZh.dexChainPlanningPickVersion,
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: TitoTypography.weight(FontWeight.w700),
                 ),
               ),
               if (onPickVersion != null) ...[
@@ -357,7 +358,7 @@ class _PlanningLoading extends StatelessWidget {
         Text(
           AppZh.dexChainPlanningLoading,
           style: SecondaryTypography.onCard.small12.copyWith(
-            color: TitoColors.mutedInk,
+            color: TitoTypography.mutedColor,
           ),
         ),
         const SizedBox(height: 10),
@@ -434,7 +435,7 @@ class _VersionPlanBody extends StatelessWidget {
                   child: Text(
                     summary,
                     style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
                     ),
                   ),
                 ),
@@ -446,8 +447,8 @@ class _VersionPlanBody extends StatelessWidget {
             Text(
               _exclusivityLabel(exclusivity!, version, pairedVersion!),
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w700,
+                color: TitoTypography.mutedColor,
+                fontWeight: TitoTypography.weight(FontWeight.w700),
               ),
             ),
           ],
@@ -508,7 +509,7 @@ class _ChainStageRow extends StatelessWidget {
             child: Text(
               stage.nameZh,
               style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: TitoTypography.weight(FontWeight.w800),
               ),
             ),
           ),
@@ -518,8 +519,8 @@ class _ChainStageRow extends StatelessWidget {
               label,
               textAlign: TextAlign.end,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w700,
+                color: TitoTypography.mutedColor,
+                fontWeight: TitoTypography.weight(FontWeight.w700),
               ),
             ),
           ),
@@ -612,7 +613,7 @@ class _InfoPill extends StatelessWidget {
       child: Text(
         label,
         style: SecondaryTypography.onCard.small12.copyWith(
-          fontWeight: FontWeight.w800,
+          fontWeight: TitoTypography.weight(FontWeight.w800),
           height: 1.1,
         ),
       ),

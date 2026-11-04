@@ -8,9 +8,12 @@ import '../navigation/tito_page_transition.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
+import '../theme/tito_colors.dart';
 import '../widgets/app_header.dart';
 import '../widgets/companion_standby.dart';
 import '../widgets/home_dashboard_body.dart';
+import '../widgets/home_entrance.dart';
+import '../theme/tito_surface_tokens.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
@@ -85,17 +88,23 @@ class _QuickActionsRow extends StatelessWidget {
           for (var index = 0; index < actions.length; index++) ...[
             if (index > 0) SizedBox(width: gap),
             Expanded(
-              child: _withDexHero(
-                actions[index],
-                TitoQuickTile(
-                  label: actions[index].label,
-                  icon: actions[index].icon,
-                  onTap: () => _openRoute(context, actions[index]),
-                  compact: true,
-                  dense: true,
-                  square: true,
-                  iconAsset: actions[index].iconAsset,
-                  backgroundColor: actions[index].tileColor,
+              child: HomeEntranceItem(
+                index: 3 + index,
+                child: _withDexHero(
+                  actions[index],
+                  TitoQuickTile(
+                    label: actions[index].label,
+                    icon: actions[index].icon,
+                    onTap: () => _openRoute(context, actions[index]),
+                    compact: true,
+                    dense: true,
+                    square: true,
+                    iconAsset: actions[index].iconAsset,
+                    backgroundColor: titoStickerTint(
+                      context,
+                      actions[index].tileColor,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -131,26 +140,23 @@ List<_QuickAction> _quickActions() {
       label: AppZh.navTeam,
       icon: Icons.groups_rounded,
       route: '/team',
-      tone: TitoPolaroidTone.blue,
       iconAsset: 'assets/icons/Team.png',
-      tileColor: const Color(0xFFFBEFC3),
+      tileColor: TitoColors.homeTeamTile,
     ),
     _QuickAction(
       label: AppZh.navDex,
       icon: Icons.grid_view_rounded,
       route: '/dex',
       heroTag: TitoHomeActionHero.dex,
-      tone: TitoPolaroidTone.coral,
       iconAsset: 'assets/icons/Dex.png',
-      tileColor: const Color(0xFFF9DEDC),
+      tileColor: TitoColors.homeDexTile,
     ),
     _QuickAction(
       label: AppZh.navSearch,
       icon: Icons.search_rounded,
       route: '/search',
-      tone: TitoPolaroidTone.mint,
       iconAsset: 'assets/icons/Search.png',
-      tileColor: const Color(0xFFDFF1F9),
+      tileColor: TitoColors.homeSearchTile,
     ),
   ];
 }
@@ -161,7 +167,6 @@ class _QuickAction {
     required this.icon,
     required this.route,
     this.heroTag,
-    required this.tone,
     required this.iconAsset,
     required this.tileColor,
   });
@@ -170,7 +175,6 @@ class _QuickAction {
   final IconData icon;
   final String route;
   final String? heroTag;
-  final TitoPolaroidTone tone;
 
   /// Hand-drawn transparent icon, shown directly on the tile (no frame).
   final String iconAsset;

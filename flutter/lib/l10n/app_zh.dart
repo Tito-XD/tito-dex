@@ -1377,6 +1377,12 @@ abstract final class AppZh {
   );
   static String get companionDamageOffense => t('companionDamageOffense', '进攻');
   static String get companionDamageDefense => t('companionDamageDefense', '防守');
+  static String get companionDamageTypeLabel =>
+      t('companionDamageTypeLabel', '属性倍率');
+  static String get companionDamageStabLabel =>
+      t('companionDamageStabLabel', '本系');
+  static String get companionDamageRandomRoll =>
+      t('companionDamageRandomRoll', '随机 85%–100%');
   static String companionDamageModifiers(String type, String stab) => t(
     'companionDamageModifiers',
     '属性倍率 ×$type · 本系 ×$stab · 随机 85%–100%',

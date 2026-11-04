@@ -26,6 +26,7 @@ import 'package:titodex/widgets/battle_team_panel.dart';
 import 'package:titodex/widgets/battle_party_picker.dart';
 import 'package:titodex/widgets/companion_tool_fields.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
+import 'package:titodex/widgets/tito_animated_number.dart';
 import 'package:titodex/widgets/type_badge.dart';
 import 'package:titodex/theme/app_visual_style.dart';
 import 'package:titodex/theme/tito_theme.dart';
@@ -326,7 +327,17 @@ void main() {
         ),
       ),
     );
-    for (final text in ['4×', '2×', '1×', '½×', '¼×', '0×', '1.5×', '0.75×']) {
+    // Same formatter as the Pokédex type grid: one multiplier vocabulary.
+    for (final text in [
+      '4×',
+      '2×',
+      '1×',
+      '1/2×',
+      '1/4×',
+      '0×',
+      '1.5×',
+      '0.75×',
+    ]) {
       expect(find.text(text), findsOneWidget);
     }
     expect(tester.takeException(), isNull);
@@ -817,9 +828,18 @@ void main() {
       find.descendant(of: level, matching: find.byType(TextField)),
       '75',
     );
-    await tester.pumpAndSettle();
-    final after = tester.widget<Text>(result).data;
-    expect(after, isNot(before));
+    await tester.pump();
+    final target = tester
+        .widget<TitoAnimatedNumber>(find.byType(TitoAnimatedNumber))
+        .value;
+    expect(target, isNot(int.parse(before!)));
+    expect(tester.widget<Text>(result).data, before);
+    await tester.pump(const Duration(milliseconds: 70));
+    final intermediate = int.parse(tester.widget<Text>(result).data!);
+    expect(intermediate, greaterThan(int.parse(before)));
+    expect(intermediate, lessThan(target));
+    // Handoff uses the real result even while its decorative number is moving.
+    final after = '$target';
     await tester.tap(
       find.descendant(
         of: find.byKey(const ValueKey('battle-result')),

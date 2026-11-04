@@ -13,15 +13,17 @@ import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/localized_names.dart';
 import '../navigation/tito_page_transition.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_pressable.dart';
 import 'tito_loading_panel.dart';
+import '../theme/tito_typography.dart';
+import 'tito_progress_bar.dart';
+import 'tito_pokeball_loading.dart';
+import '../theme/tito_surface_tokens.dart';
 
 /// Pick the standby companion from the full national dex. The selection is
 /// saved to [companionRepository]; only its animated sprite is fetched later,
@@ -208,7 +210,7 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
               Text(
                 AppZh.companionPickerHint,
                 style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                  color: TitoTypography.mutedColor,
                 ),
               ),
             ],
@@ -343,7 +345,10 @@ class _CompanionAnimationDownloadDialogState
         if (_failed)
           Text(AppZh.companionAnimationFailed)
         else ...[
-          LinearProgressIndicator(value: _received / widget.asset.sizeBytes),
+          TitoProgressBar(
+            value: _received / widget.asset.sizeBytes,
+            height: 10,
+          ),
           const SizedBox(height: 8),
           Text(
             _received == widget.asset.sizeBytes
@@ -518,7 +523,7 @@ class _CompanionMediaLoadingDialogState
             Text(
               AppZh.companionMediaFailedHint,
               style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+                color: TitoTypography.mutedColor,
               ),
             ),
           ],
@@ -545,12 +550,10 @@ class _MediaLoadRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 16px inline status dot — the one place a bare spinner is allowed (D10).
     final indicator = switch (state) {
-      _MediaLoadState.loading => const SizedBox(
-        width: 16,
-        height: 16,
-        child: CircularProgressIndicator(strokeWidth: 2.5),
+      _MediaLoadState.loading => const TitoPokeballLoading(
+        size: 16,
+        onLight: true,
       ),
       _MediaLoadState.done => const Icon(
         Icons.check_circle_rounded,
@@ -595,7 +598,7 @@ class _CompanionPickTile extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: tile.outline, width: tile.outlineWidth),
+              border: Border.fromBorderSide(tile.outline),
             ),
             padding: const EdgeInsets.all(6),
             child: Column(
@@ -615,7 +618,7 @@ class _CompanionPickTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
               ],
@@ -965,7 +968,7 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                 Text(
                   previewSummary.displayName,
                   style: SecondaryTypography.onCard.body14.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: TitoTypography.mutedColor,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -1038,10 +1041,7 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                           decoration: BoxDecoration(
                             color: tile.fill,
                             borderRadius: BorderRadius.circular(TitoRadii.md),
-                            border: Border.all(
-                              color: tile.outline,
-                              width: tile.outlineWidth,
-                            ),
+                            border: Border.fromBorderSide(tile.outline),
                           ),
                           child: FallbackSpriteImage(sources: previewSources),
                         );
@@ -1201,40 +1201,11 @@ class _LabeledMediaSource {
   String get value => animation?.id ?? url;
 }
 
-/// Per-theme fill/outline for the picker's grid tiles and preview slot. They
-/// sit on the sheet surface, so Flat uses container tones, Solid Plastic a
-/// milky plate and Trainer's Journal the cream sticker with an ink stroke.
-({Color fill, Color outline, double outlineWidth}) _pickerTileStyle(
+/// The picker's grid tiles and preview slot use the shared choice-tile recipe.
+TitoSurfaceRecipe _pickerTileStyle(
   BuildContext context, {
   required bool selected,
-}) {
-  final scheme = Theme.of(context).colorScheme;
-  if (appVisualStyle.usesFlatUi) {
-    return (
-      fill: selected ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
-      outline: selected ? scheme.primary : scheme.outlineVariant,
-      outlineWidth: TitoBorders.element,
-    );
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return (
-      fill: selected
-          ? TitoColors.softYellow.withValues(alpha: 0.85)
-          : Colors.white.withValues(alpha: 0.8),
-      outline: Colors.white.withValues(alpha: 0.85),
-      outlineWidth: TitoBorders.glass,
-    );
-  }
-  return (
-    fill: selected
-        ? TitoColors.softYellow.withValues(alpha: 0.22)
-        : TrainerJournal.paper,
-    outline: selected ? TrainerJournal.selectedEdge : TrainerJournal.smallEdge,
-    outlineWidth: selected
-        ? TitoBorders.journalCard
-        : TitoBorders.journalElement,
-  );
-}
+}) => titoChoiceTile(context, selected: selected);
 
 class _CompanionFormTile extends StatelessWidget {
   const _CompanionFormTile({
@@ -1267,7 +1238,7 @@ class _CompanionFormTile extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: tile.outline, width: tile.outlineWidth),
+              border: Border.fromBorderSide(tile.outline),
             ),
             padding: const EdgeInsets.all(6),
             child: Column(
@@ -1289,7 +1260,7 @@ class _CompanionFormTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                   ),
                 ),
               ],

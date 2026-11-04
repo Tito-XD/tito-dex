@@ -5,6 +5,7 @@ import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'liquid_glass.dart';
+import '../theme/tito_typography.dart';
 
 /// Retro form language shared across Settings, team editing, and the battle
 /// tools (v0.6.7 preview): sticker toggle switches, floating group labels,
@@ -102,7 +103,7 @@ class StickerGroupLabel extends StatelessWidget {
     final label = Text(
       text,
       style: SecondaryTypography.onCard.small12.copyWith(
-        fontWeight: FontWeight.w800,
+        fontWeight: TitoTypography.weight(FontWeight.w800),
         color: surface.foreground,
       ),
     );
@@ -365,10 +366,10 @@ class StickerPillToggle extends StatelessWidget {
                 child: Text(
                   label,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
                     color: value
                         ? TitoColors.selectionInk
-                        : TitoColors.mutedInk,
+                        : TitoTypography.mutedColor,
                   ),
                 ),
               ),

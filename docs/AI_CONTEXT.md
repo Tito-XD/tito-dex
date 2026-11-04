@@ -5,7 +5,7 @@
 | Field | Value |
 | --- | --- |
 | **Latest release** | [v0.9.24](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.24) |
-| **`main` / lite source** | `0.9.24+216` (`flutter/pubspec.yaml`) |
+| **`main` / lite source** | `0.9.25+218` (`flutter/pubspec.yaml`), v0.9.25 release candidate |
 | **Offline package** | `0.9.24-offline+217` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
@@ -38,11 +38,67 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 | `data/journey/` | Canonical progression hints and strict request/data schemas |
 | `data/extensions/` | Legacy companion APK catalog and pack-manifest schemas kept for 1.0.0 compatibility |
 | `flutter/android/journey-assistant-pack/` | Legacy no-launcher Journey Assistant 1.0.0 content APK |
+| `launcher/` (branch only) | Exists only on the historical `codex/titodex-launcher` branch, not on `main`; active development moved to [Tito-XD/tito-dex-launcher](https://github.com/Tito-XD/tito-dex-launcher) |
 | `data/l10n/zh/` | Master zh catalog (git); copied to bundle + APK assets |
 | `releases/` | RG APK binaries (`TitoDex-<ver>-{lite,offline}-rg-arm64.apk`) |
 | `fixtures/` | Test saves (e.g. `PKMSS.sav`) |
 
 ---
+
+## Independent development tracks (reviewed 2026-11-04)
+
+- Stable App remains v0.9.24 (`main` / `33dbb4b`). Its release-source CI passed;
+  physical RG/controller, browser and signed-upgrade acceptance remain open.
+- Launcher is now the independent [Tito-XD/tito-dex-launcher](https://github.com/Tito-XD/tito-dex-launcher)
+  project. Its `main` / `acdb92f` README and build source identify
+  `0.3.2-adaptive.8` / code 14, with native Compose at repository root, separate
+  square/landscape/portrait layouts, system safe insets and a replaceable or
+  hideable primary app entry. Its README states this version has not been
+  validated on RG. Current layout proposals and acceptance belong in that
+  project's [development context](https://github.com/Tito-XD/tito-dex-launcher/blob/main/docs/AI_CONTEXT.md).
+- This repository's `codex/titodex-launcher` / `b2566d0` and `launcher/` are a
+  historical snapshot, not a pending App-main integration. The old
+  `0.3.1-motion.1` / code 6 prerelease has 2026-10-18 records of 50 passing checks
+  and RG touch / simulated-key acceptance. Those records do not validate the
+  independent project's newer version; that branch's `launcher/HANDOFF.md` predates the move.
+- Theme branch `codex/theme-refresh` / `fce207e` records local
+  `0.9.6-motion.2` / code 194 on 2026-10-19: matte plastic surfaces and removal
+  of trainer dates, with analysis, 660 passing tests / 6 conditional skips and
+  RG validation. The public prerelease remains motion.1. Its independent package
+  still uses the 0.9.6 feature baseline and needs selective integration onto
+  v0.9.24 before becoming a stable-App candidate.
+- `codex/workspace-sync-20261016` / `14f9169` is a historical preservation
+  snapshot, not an integration or release branch. Main already contains Exa/Ask
+  and type-picker work; assess remaining differences individually and never
+  merge pre-cleanup history back into main.
+
+These are verified repository/release records, not new test runs or a current
+device/production inspection. [ROADMAP.md](../ROADMAP.md#development-tracks-and-follow-ups-reviewed-2026-11-04)
+owns the App follow-up checklist. [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#layout-and-motion-assessment-2026-11-04)
+records the App page-pattern assessment and separates current implementation from
+proposed layout/motion changes. Launcher follow-ups are maintained in its independent project.
+
+### Approved local App layout candidate (2026-11-04)
+
+`code/app-adaptive-layout` implements the approved adaptive prototype on the
+v0.9.24 App baseline. Team uses a bounded roster beside the existing inspector
+or editor when both fit; narrow space or larger text wraps the same widget
+subtrees vertically so drafts and focus survive rotation. Reference cards choose
+two, three or four columns and grow for localized labels. Home keeps its existing
+Bento compositions with one bounded entrance. The stat calculator transitions
+only changes to the same subject and metric, with immediate final semantics and
+no replay after reduced motion or hidden tabs. Fixed type-grid slots and damage
+result multipliers roll between exact formatted values, including decimals and
+fractions, without inventing intermediate multipliers. Ability-adjusted values
+retain their actual magnitude instead of being rounded into type-chart buckets.
+
+The same branch also routes every themed page surface through
+`TitoSurfaceTokens` roles and shared widgets (no `appVisualStyle.uses*` branch
+remains outside `lib/theme`), and keeps battle-tool loading and errors inside
+the fixed result slot. It is prepared as v0.9.25 (`0.9.25+218` /
+`0.9.25-offline+219`); signed artifacts and physical-device acceptance are
+recorded only after publication. Exact behavior and validation are
+tracked in [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#approved-app-implementation-2026-11-04).
 
 ## Current feature status (latest release line: v0.9.24)
 

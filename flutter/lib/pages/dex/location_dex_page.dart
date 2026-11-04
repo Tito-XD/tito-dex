@@ -11,15 +11,16 @@ import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import '../../l10n/localized_names.dart';
 import '../../models/journey.dart';
-import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
-import '../../theme/trainer_journal.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
 import '../../widgets/sticker_pressable.dart';
 import '../../widgets/tito_loading_panel.dart';
+import '../../theme/tito_typography.dart';
+import '../../navigation/tito_page_transition.dart';
+import '../../theme/tito_surface_tokens.dart';
 
 class LocationDexPage extends StatefulWidget {
   const LocationDexPage({super.key, required this.journey});
@@ -143,7 +144,7 @@ class _LocationDexPageState extends State<LocationDexPage> {
           child: Text(
             AppZh.locationDexHint,
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+              color: TitoTypography.mutedColor,
             ),
           ),
         ),
@@ -178,22 +179,12 @@ class _LocationAreaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final caught = area.caughtCount(caughtIds);
-    final scheme = Theme.of(context).colorScheme;
     // Two-line area tile (name + completion + chevron) — too tall for a
-    // Material chip, so it is drawn by hand with the element tokens: ink
-    // stroke in Trainer's Journal, plastic hairline, no stroke in Flat.
-    final Border? stroke = appVisualStyle.usesFlatUi
-        ? null
-        : appVisualStyle.usesSolidPlastic
-        ? Border.all(
-            color: Colors.white.withValues(alpha: 0.8),
-            width: TitoBorders.glass,
-          )
-        : TrainerJournal.allElement();
+    // Material chip, so it is drawn by hand from the element tokens.
+    final tokens = TitoSurfaceTokens.of(context);
+    final stroke = tokens.surface(TitoSurfaceRole.element).border;
     return Material(
-      color: appVisualStyle.usesFlatUi
-          ? scheme.surfaceContainerLow
-          : TitoColors.card,
+      color: tokens.surface(TitoSurfaceRole.selection).fill,
       borderRadius: BorderRadius.circular(TitoRadii.sm),
       child: InkWell(
         borderRadius: BorderRadius.circular(TitoRadii.sm),
@@ -216,14 +207,14 @@ class _LocationAreaChip extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: TitoTypography.weight(FontWeight.w800),
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       AppZh.locationDexCompletion(caught, area.speciesCount),
                       style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
+                        color: TitoTypography.mutedColor,
                       ),
                     ),
                   ],
@@ -236,7 +227,7 @@ class _LocationAreaChip extends StatelessWidget {
                 size: 20,
                 color: caught == area.speciesCount
                     ? TitoColors.deepBlue
-                    : TitoColors.mutedInk,
+                    : TitoTypography.mutedColor,
               ),
             ],
           ),
@@ -246,10 +237,9 @@ class _LocationAreaChip extends StatelessWidget {
   }
 
   Future<void> _showAreaSheet(BuildContext pageContext) {
-    return showModalBottomSheet<void>(
+    return showTitoModalBottomSheet<void>(
       context: pageContext,
       isScrollControlled: true,
-      useSafeArea: true,
       builder: (context) {
         var missingOnly = area.entries.any(
           (entry) => !caughtIds.contains(entry.speciesId),
@@ -432,7 +422,7 @@ class _EncounterSheetRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: TitoTypography.weight(FontWeight.w800),
                       ),
                     ),
                     if (details.isNotEmpty) ...[
@@ -442,7 +432,7 @@ class _EncounterSheetRow extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
+                          color: TitoTypography.mutedColor,
                         ),
                       ),
                     ],
@@ -454,7 +444,7 @@ class _EncounterSheetRow extends StatelessWidget {
                     ? Icons.check_circle_rounded
                     : Icons.chevron_right_rounded,
                 size: 20,
-                color: caught ? TitoColors.deepBlue : TitoColors.mutedInk,
+                color: caught ? TitoColors.deepBlue : TitoTypography.mutedColor,
               ),
             ],
           ),
