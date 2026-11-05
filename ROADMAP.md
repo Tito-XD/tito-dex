@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest stable release:** [v0.9.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.25) · Lite `0.9.25+218` · Offline `0.9.25-offline+219`.
+> **Latest stable release:** [v0.9.26](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.26) · Lite `0.9.26+224` · Offline `0.9.26-offline+225`.
 >
-> **Current `main`:** v0.9.25 with adaptive Team/reference layouts, one design system across three themes, dismissible animated toasts, compact Search, Exa/Ask sessions, visible handheld focus, shared battle tools and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.26 with per-digit odometer numbers, experimental retro number styles, reworked battle result cards, destructive-action confirmations, adaptive Team/reference layouts, one design system across three themes, dismissible animated toasts, compact Search, Exa/Ask sessions, visible handheld focus, shared battle tools and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,7 +14,7 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree, Journey counterpart completion grids and Team evolution details |
 | “Ask TitoDex” blocker Q&A | Built into the host; reviewed local hints and deterministic existing-resource queries, move/ability reverse filters, bounded retrieval and Qwen with final fact protection |
-| Offline data | Live bundle v20; v0.9.25 Offline embeds the verified v20 archive |
+| Offline data | Live bundle v20; v0.9.26 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
@@ -29,7 +29,7 @@ continues in the independent [TitoDex Launcher repository](https://github.com/Ti
 
 | Track | Verified repository / release record | Remaining work |
 | --- | --- | --- |
-| Stable App | v0.9.25 published from `de38caa`, with successful release-source CI | Physical RG/controller, browser-owned citation experience and signed upgrade acceptance; see the maintenance checklist below |
+| Stable App | v0.9.26 published from `33ea03e`, with successful release-source CI | Physical RG/controller, browser-owned citation experience and signed upgrade acceptance; see the maintenance checklist below |
 | Independent Launcher | [Tito-XD/tito-dex-launcher](https://github.com/Tito-XD/tito-dex-launcher), `main` at `acdb92f`; README/build source records `0.3.2-adaptive.8` / code 14, with the Compose project at repository root | Continue layout assessment and device acceptance in that project. Its README states this version has not been validated on RG |
 | Historical Launcher snapshot | This repository's `codex/titodex-launcher` / `b2566d0` (its `launcher/` directory is not on `main`) preserve [0.3.1-motion.1](https://github.com/Tito-XD/tito-dex/releases/tag/launcher-v0.3.1-motion.1), published from `db779e5`; its record includes 50 checks and RG touch/simulated-key acceptance | Historical evidence only; it neither validates the independent project's latest version nor represents work to merge into App main |
 | App themes | `codex/theme-refresh` at `fce207e`; local `0.9.6-motion.2` / code 194 records analysis, 660 passing tests / 6 conditional skips and RG checks | Transfer the desired changes onto v0.9.24 while preserving current features. Public [theme prerelease](https://github.com/Tito-XD/tito-dex/releases/tag/app-theme-v0.9.6-motion.1) remains motion.1; motion.2 has no new online release |
@@ -58,6 +58,13 @@ Implementation and validation scope are recorded in
 [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md#layout-and-motion-assessment-2026-11-04).
 Remaining theme-preview differences still need selective review; physical-device
 acceptance and useful historical snapshot changes remain separate follow-ups.
+
+## Completed in v0.9.26
+
+- Odometer numbers flip only changed digits, one step each, and continue from the last reading per slot.
+- Experimental retro number styles (segment, dot matrix, pixel, split-flap) for battle hero numbers, themed per visual style.
+- Damage, party and matchup result cards reorganized; confirmations, undo and retryable error panels replace silent actions and endless spinners.
+- Fixes for manual dex marks, encounter methods, chip counts, scope progress, default dex edition and D-pad shiny toggle.
 
 ## Completed in v0.9.25
 
