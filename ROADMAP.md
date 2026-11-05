@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest stable release:** [v0.9.24](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.24) · Lite `0.9.24+216` · Offline `0.9.24-offline+217`.
+> **Latest stable release:** [v0.9.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.25) · Lite `0.9.25+218` · Offline `0.9.25-offline+219`.
 >
-> **Current `main`:** v0.9.24 with compact Search, Exa/Ask sessions, visible handheld focus, shared battle tools and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.25 with adaptive Team/reference layouts, one design system across three themes, dismissible animated toasts, compact Search, Exa/Ask sessions, visible handheld focus, shared battle tools and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,7 +14,7 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree, Journey counterpart completion grids and Team evolution details |
 | “Ask TitoDex” blocker Q&A | Built into the host; reviewed local hints and deterministic existing-resource queries, move/ability reverse filters, bounded retrieval and Qwen with final fact protection |
-| Offline data | Live bundle v20; v0.9.24 Offline embeds the verified v20 archive |
+| Offline data | Live bundle v20; v0.9.25 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
@@ -29,7 +29,7 @@ continues in the independent [TitoDex Launcher repository](https://github.com/Ti
 
 | Track | Verified repository / release record | Remaining work |
 | --- | --- | --- |
-| Stable App | `main` at `33dbb4b`; v0.9.24 published from `75304f9`, with successful release-source CI | Physical RG/controller, browser-owned citation experience and signed upgrade acceptance; see the maintenance checklist below |
+| Stable App | v0.9.25 published from `de38caa`, with successful release-source CI | Physical RG/controller, browser-owned citation experience and signed upgrade acceptance; see the maintenance checklist below |
 | Independent Launcher | [Tito-XD/tito-dex-launcher](https://github.com/Tito-XD/tito-dex-launcher), `main` at `acdb92f`; README/build source records `0.3.2-adaptive.8` / code 14, with the Compose project at repository root | Continue layout assessment and device acceptance in that project. Its README states this version has not been validated on RG |
 | Historical Launcher snapshot | This repository's `codex/titodex-launcher` / `b2566d0` (its `launcher/` directory is not on `main`) preserve [0.3.1-motion.1](https://github.com/Tito-XD/tito-dex/releases/tag/launcher-v0.3.1-motion.1), published from `db779e5`; its record includes 50 checks and RG touch/simulated-key acceptance | Historical evidence only; it neither validates the independent project's latest version nor represents work to merge into App main |
 | App themes | `codex/theme-refresh` at `fce207e`; local `0.9.6-motion.2` / code 194 records analysis, 660 passing tests / 6 conditional skips and RG checks | Transfer the desired changes onto v0.9.24 while preserving current features. Public [theme prerelease](https://github.com/Tito-XD/tito-dex/releases/tag/app-theme-v0.9.6-motion.1) remains motion.1; motion.2 has no new online release |
@@ -59,7 +59,7 @@ Implementation and validation scope are recorded in
 Remaining theme-preview differences still need selective review; physical-device
 acceptance and useful historical snapshot changes remain separate follow-ups.
 
-## Prepared for v0.9.25
+## Completed in v0.9.25
 
 - Adaptive Team panes, 2–4 column reference cards, one bounded Home entrance and exact-value battle transitions.
 - Battle-tool loading and errors stay in the fixed result slot; Search results follow the field while hub exits collapse.

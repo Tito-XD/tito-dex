@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.24](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.24) |
-| **`main` / lite source** | `0.9.25+218` (`flutter/pubspec.yaml`), v0.9.25 release candidate |
-| **Offline package** | `0.9.24-offline+217` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.25) |
+| **`main` / lite source** | `0.9.25+218` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.25-offline+219` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -47,7 +47,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ## Independent development tracks (reviewed 2026-11-04)
 
-- Stable App remains v0.9.24 (`main` / `33dbb4b`). Its release-source CI passed;
+- Stable App is v0.9.25 (published from `de38caa`). Its release-source CI passed;
   physical RG/controller, browser and signed-upgrade acceptance remain open.
 - Launcher is now the independent [Tito-XD/tito-dex-launcher](https://github.com/Tito-XD/tito-dex-launcher)
   project. Its `main` / `acdb92f` README and build source identify
@@ -95,12 +95,14 @@ retain their actual magnitude instead of being rounded into type-chart buckets.
 The same branch also routes every themed page surface through
 `TitoSurfaceTokens` roles and shared widgets (no `appVisualStyle.uses*` branch
 remains outside `lib/theme`), and keeps battle-tool loading and errors inside
-the fixed result slot. It is prepared as v0.9.25 (`0.9.25+218` /
-`0.9.25-offline+219`); signed artifacts and physical-device acceptance are
-recorded only after publication. Exact behavior and validation are
+the fixed result slot. It shipped as stable v0.9.25 (`0.9.25+218` /
+`0.9.25-offline+219`) from `de38caa` on 2026-11-05, together with one shared
+in-app toast (`showTitoSnackBar`: close button, animated entrance/exit).
+Signed artifacts are recorded in `docs/RELEASES.md`; physical-device
+acceptance remains open. Exact behavior and validation are
 tracked in [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#approved-app-implementation-2026-11-04).
 
-## Current feature status (latest release line: v0.9.24)
+## Current feature status (latest release line: v0.9.25)
 
 **Compatible Exa/Ask rollout live (2026-10-10):** Worker `c33bf145-42ee-4a7c-a075-b79bb2ee811c` serves 100% from verified source `75304f9`. Exa is primary, Tavily and DeepSeek native search are off; Qwen uses a bounded DeepSeek text fallback. Four candidate and two ordinary production requests returned answers, including old/new context shapes. Health and the latest deployment were verified; this is API behavior evidence, not an independent audit of every retrieved Pokémon fact.
 
