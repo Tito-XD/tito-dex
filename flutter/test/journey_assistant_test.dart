@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -7,10 +9,12 @@ import 'package:titodex/features/dex/dex_progress.dart';
 import 'package:titodex/features/dex/location_index.dart';
 import 'package:titodex/features/game/game_edition.dart';
 import 'package:titodex/features/journey/journey_assistant.dart';
+import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/widgets/journey_assistant_panel.dart';
 import 'package:titodex/widgets/journey_card.dart';
 import 'package:titodex/widgets/tito_fact_grid.dart';
+import 'package:titodex/widgets/tito_state_panel.dart';
 
 void main() {
   const summaries = {
@@ -129,6 +133,57 @@ void main() {
     expect(find.text('队伍与进化'), findsNothing);
     expect(find.text('版本补全'), findsOneWidget);
     expect(find.textContaining('火岩鼠 → 火暴兽'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('assistant load failure never leaves an endless spinner', (
+    tester,
+  ) async {
+    // Fail only after the widgets listen, as a real load would.
+    final load = Completer<JourneyAssistantSnapshot>();
+    final failed = load.future;
+    var retries = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ListView(
+            children: [
+              SizedBox(
+                height: 150,
+                child: JourneyCard(
+                  journey: journey,
+                  onOpenDetail: () {},
+                  assistantFuture: failed,
+                ),
+              ),
+              SizedBox(
+                height: 150,
+                child: JourneyCard(
+                  journey: journey,
+                  onOpenDetail: () {},
+                  dense: true,
+                  assistantFuture: failed,
+                ),
+              ),
+              JourneyAssistantPanel(future: failed, onRetry: () => retries++),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(find.textContaining(AppZh.journeyAssistantLoading), findsWidgets);
+    load.completeError(StateError('location index missing'));
+    await tester.pump();
+
+    expect(find.textContaining(AppZh.journeyAssistantLoading), findsNothing);
+    expect(
+      find.textContaining(AppZh.journeyAssistantCardFallback),
+      findsNWidgets(2),
+    );
+    expect(find.byType(TitoErrorPanel), findsOneWidget);
+    expect(find.textContaining('location index missing'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('tito-error-retry')));
+    expect(retries, 1);
     expect(tester.takeException(), isNull);
   });
 

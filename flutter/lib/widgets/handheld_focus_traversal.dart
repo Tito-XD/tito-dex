@@ -35,10 +35,22 @@ class HandheldFocusTraversalPolicy extends FocusTraversalPolicy {
   bool inDirection(FocusNode currentNode, TraversalDirection direction) {
     final scope = currentNode.nearestScope ?? FocusManager.instance.rootScope;
     final targets = <(FocusNode, HandheldFocusGeometry)>[];
-    for (final node in scope.traversalDescendants) {
-      if (!node.canRequestFocus || node.skipTraversal) continue;
+    void consider(FocusNode node) {
+      if (!node.canRequestFocus || node.skipTraversal) return;
       final geometry = HandheldFocusGeometry.of(node);
       if (geometry != null) targets.add((node, geometry));
+    }
+
+    scope.traversalDescendants.forEach(consider);
+    // Toasts live above the navigator, outside the route scope.
+    final root = FocusManager.instance.rootScope;
+    if (scope != root) {
+      for (final node in root.traversalDescendants) {
+        final context = node.context;
+        if (context != null && HandheldGlobalStops.contains(context)) {
+          consider(node);
+        }
+      }
     }
     final current = HandheldFocusGeometry.of(currentNode);
     final origin = current?.bounds ?? _anchors[scope];

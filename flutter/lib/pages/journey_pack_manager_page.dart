@@ -15,7 +15,9 @@ import '../widgets/sticker_card.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_progress_bar.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/tito_confirm_dialog.dart';
 import '../widgets/tito_snack_bar.dart';
+import '../widgets/tito_state_panel.dart';
 
 class JourneyPackManagerPage extends StatefulWidget {
   const JourneyPackManagerPage({
@@ -89,31 +91,13 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
   }
 
   Future<void> _delete(String family) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        final scheme = Theme.of(context).colorScheme;
-        return AlertDialog(
-          title: Text(AppZh.journeyPackDeleteTitle),
-          content: Text(AppZh.journeyPackDeleteBody),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(AppZh.cancel),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: scheme.error,
-                foregroundColor: scheme.onError,
-              ),
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(AppZh.journeyPackDelete),
-            ),
-          ],
-        );
-      },
+    final confirmed = await showTitoConfirmDialog(
+      context,
+      title: AppZh.journeyPackDeleteTitle,
+      body: AppZh.journeyPackDeleteBody,
+      confirmLabel: AppZh.journeyPackDelete,
     );
-    if (confirmed != true) return;
+    if (!confirmed) return;
     final result = await _repository.delete(family);
     if (!mounted) return;
     if (result == 'deleted') progressionHintRepository.invalidate();
@@ -250,7 +234,7 @@ class _PackEmptyCard extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => StickerCard(child: Text(text));
+  Widget build(BuildContext context) => TitoEmptyState(message: text);
 }
 
 class _JourneyPackCard extends StatelessWidget {

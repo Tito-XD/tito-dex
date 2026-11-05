@@ -60,8 +60,7 @@ class MoveEncyclopediaPage extends StatelessWidget {
       ),
       filterEntry: filterCachedMove,
       primaryLabel: (move) => move.displayName,
-      secondaryLabel: (move) =>
-          '#${move.id} · ${typeNameZh(move.type)} · ${move.category}',
+      secondaryLabel: moveSecondaryLabel,
       detailSheet: showMoveDetailSheet,
       scopedDetailSheet: (context, move, notice) =>
           showMoveDetailSheet(context, move, scopeNotice: notice),
@@ -73,6 +72,12 @@ class MoveEncyclopediaPage extends StatelessWidget {
     );
   }
 }
+
+/// List subtitle: `#id · 类型 · 分类`, with the bundle's category slug
+/// (`physical` / `special` / `status`) mapped to its localized label.
+String moveSecondaryLabel(CachedMove move) =>
+    '#${move.id} · ${typeNameZh(move.type)} · '
+    '${AppZh.moveCategory(move.category)}';
 
 String? moveScopeNotice(
   CachedMove move,

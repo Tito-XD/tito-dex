@@ -122,9 +122,7 @@ class JourneyPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-        JourneyAssistantPanel(
-          future: assistantFuture ?? journeyAssistantRepository.load(journey),
-        ),
+        _AssistantSection(journey: journey, future: assistantFuture),
         const SizedBox(height: 14),
         JourneyTimeline(
           entries: journey.timeline,
@@ -289,4 +287,37 @@ class _SummaryMeta extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Owns the assistant load so the error panel's retry can start a new one.
+class _AssistantSection extends StatefulWidget {
+  const _AssistantSection({required this.journey, this.future});
+
+  final CurrentJourney journey;
+  final Future<JourneyAssistantSnapshot>? future;
+
+  @override
+  State<_AssistantSection> createState() => _AssistantSectionState();
+}
+
+class _AssistantSectionState extends State<_AssistantSection> {
+  late Future<JourneyAssistantSnapshot> _future = _load();
+
+  Future<JourneyAssistantSnapshot> _load() =>
+      widget.future ?? journeyAssistantRepository.load(widget.journey);
+
+  @override
+  void didUpdateWidget(covariant _AssistantSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.journey != widget.journey ||
+        oldWidget.future != widget.future) {
+      _future = _load();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => JourneyAssistantPanel(
+    future: _future,
+    onRetry: () => setState(() => _future = _load()),
+  );
 }

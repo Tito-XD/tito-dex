@@ -116,12 +116,39 @@ void main() {
     expect(labelCalls, 10);
     expect(find.text('全部 (10)'), findsOneWidget);
   });
+
+  testWidgets('category counts follow the includeEntry filter', (tester) async {
+    final categoryFilter = DexReferenceCategoryFilter<int>(
+      options: const [null, '偶数', '奇数'],
+      label: (entry) => entry.isEven ? '偶数' : '奇数',
+      filter: (entry, category) =>
+          category == null || (entry.isEven ? '偶数' : '奇数') == category,
+    );
+    final router = _referenceRouter(
+      loadEntries: () async => List<int>.generate(10, (index) => index),
+      categoryFilter: categoryFilter,
+      // Hides 0..3: leaves 4,6,8 (even) and 5,7,9 (odd).
+      includeEntry: (entry) => entry >= 4,
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(_testApp(router));
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    expect(find.text('全部 (6)'), findsOneWidget);
+    expect(find.text('偶数 (3)'), findsOneWidget);
+    expect(find.text('奇数 (3)'), findsOneWidget);
+    expect(find.text('条目 3'), findsNothing);
+    expect(find.text('条目 4'), findsOneWidget);
+  });
 }
 
 GoRouter _referenceRouter({
   required Future<List<int>> Function() loadEntries,
   bool Function(int entry, String query)? filterEntry,
   DexReferenceCategoryFilter<int>? categoryFilter,
+  bool Function(int entry)? includeEntry,
 }) {
   return GoRouter(
     initialLocation: '/reference',
@@ -139,6 +166,7 @@ GoRouter _referenceRouter({
             secondaryLabel: (entry) => '#$entry',
             detailSheet: (_, _) {},
             categoryFilter: categoryFilter,
+            includeEntry: includeEntry,
             entryId: (entry) => entry,
           ),
         ),

@@ -13,6 +13,7 @@ import '../features/companion/battle_handoff.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
+import '../l10n/game_zh.dart';
 import '../l10n/localized_names.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
@@ -27,6 +28,7 @@ import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_sprite_sticker.dart';
+import '../widgets/tito_state_panel.dart';
 import '../widgets/team_summary_card.dart';
 import 'dex/dex_reference_list.dart';
 import '../theme/tito_typography.dart';
@@ -186,47 +188,52 @@ class _TeamPageState extends State<TeamPage> {
     setState(() => _editingIndex = index);
   }
 
-  void _handleEditorSave(
-    int index, {
-    required int? level,
-    required String nickname,
-    required List<String> types,
-    required String? abilitySlug,
-    required List<int> moveIds,
-  }) {
-    final member = _party[index];
+  void _handleEditorSave(int index, PartyMember edited) {
     final updated = List<PartyMember>.from(_party);
-    updated[index] = member.copyWith(
-      level: level,
-      nickname: nickname.isEmpty ? null : nickname,
-      types: types,
-      abilitySlug: abilitySlug,
-      moveIds: moveIds,
-      userEdited: true,
-      clearNickname: nickname.isEmpty,
-      clearAbilitySlug: abilitySlug == null,
-    );
+    updated[index] = edited;
     _editingIndex = null;
     _saveParty(updated);
   }
 
   void _handleEditorDelete(int index) {
+    final removed = _party[index];
     final updated = List<PartyMember>.from(_party)..removeAt(index);
     _editingIndex = null;
     _selectedIndex = updated.isEmpty
         ? null
         : index.clamp(0, updated.length - 1);
     _saveParty(updated);
+    showTitoSnackBar(
+      context,
+      AppZh.teamMemberRemoved(
+        removed.nickname ?? localizeSpecies(removed.species),
+      ),
+      actionLabel: AppZh.undo,
+      onAction: () => _undoRemove(index, removed),
+    );
   }
 
-  void _handleEditorSwap(int index, int delta) {
+  void _undoRemove(int index, PartyMember member) {
+    if (!mounted || _party.length >= 6) {
+      return;
+    }
+    final slot = index.clamp(0, _party.length);
+    final restored = List<PartyMember>.from(_party)..insert(slot, member);
+    _editingIndex = null;
+    _selectedIndex = slot;
+    _saveParty(restored);
+  }
+
+  /// [draft] carries the editor's unsaved form values (null when untouched)
+  /// so a swap never drops them; they travel with the moved member.
+  void _handleEditorSwap(int index, int delta, PartyMember? draft) {
     final target = index + delta;
     if (target < 0 || target >= _party.length) {
       return;
     }
     final updated = List<PartyMember>.from(_party);
     final temp = updated[target];
-    updated[target] = updated[index];
+    updated[target] = draft ?? updated[index];
     updated[index] = temp;
     // Keep the editor open on the moved member so repeat swaps are easy.
     _editingIndex = target;
@@ -270,7 +277,7 @@ class _TeamPageState extends State<TeamPage> {
       if (!mounted) {
         return;
       }
-      showTitoSnackBar(context, AppZh.teamAddInvalidId);
+      showTitoSnackBar(context, AppZh.teamAddAbilityLoadFailed);
     }
   }
 
@@ -452,17 +459,11 @@ class _InlineTeamEditor extends StatefulWidget {
   final int index;
   final bool canSwapPrev;
   final bool canSwapNext;
-  final void Function(
-    int index, {
-    required int? level,
-    required String nickname,
-    required List<String> types,
-    required String? abilitySlug,
-    required List<int> moveIds,
-  })
-  onSave;
+  final void Function(int index, PartyMember edited) onSave;
   final ValueChanged<int> onDelete;
-  final void Function(int index, int delta) onSwap;
+
+  /// Receives the edited member when the form has unsaved changes.
+  final void Function(int index, int delta, PartyMember? draft) onSwap;
   final VoidCallback onClose;
 
   @override
@@ -479,6 +480,37 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
   List<CachedMove> _availableMoves = const [];
   var _speciesLinked = false;
 
+  /// Form values as last loaded; anything else counts as an unsaved edit.
+  late String _baseline;
+
+  String _formFingerprint() => [
+    _levelController.text.trim(),
+    _nicknameController.text.trim(),
+    _selectedTypes.join(','),
+    _selectedAbility ?? '',
+    (_selectedMoveIds.toList()..sort()).join(','),
+  ].join('|');
+
+  PartyMember _draftMember() {
+    final nickname = _nicknameController.text.trim();
+    return widget.member.copyWith(
+      level: int.tryParse(_levelController.text.trim()),
+      nickname: nickname.isEmpty ? null : nickname,
+      types: _selectedTypes,
+      abilitySlug: _selectedAbility,
+      moveIds: _selectedMoveIds.toList(growable: false),
+      userEdited: true,
+      clearNickname: nickname.isEmpty,
+      clearAbilitySlug: _selectedAbility == null,
+    );
+  }
+
+  void _swap(int delta) => widget.onSwap(
+    widget.index,
+    delta,
+    _formFingerprint() == _baseline ? null : _draftMember(),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -491,6 +523,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
     _selectedTypes = List<String>.from(widget.member.types);
     _selectedAbility = widget.member.abilitySlug;
     _selectedMoveIds = widget.member.moveIds.toSet();
+    _baseline = _formFingerprint();
     _loadDexData();
   }
 
@@ -519,6 +552,8 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
       if (!mounted) {
         return;
       }
+      // Dex-derived defaults are not user edits; only rebase an untouched form.
+      final untouched = _formFingerprint() == _baseline;
       setState(() {
         if (_selectedTypes.isEmpty) {
           _selectedTypes = List<String>.from(summary.types);
@@ -531,6 +566,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
         _selectedAbility ??= defaultAbilitySlugForOptions(
           defensiveAbilityOptionsFrom(abilities),
         );
+        if (untouched) _baseline = _formFingerprint();
       });
     } catch (_) {
       // Keep manual edits when dex data is unavailable.
@@ -761,7 +797,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
               if (widget.canSwapPrev) ...[
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => widget.onSwap(widget.index, -1),
+                    onPressed: () => _swap(-1),
                     child: Text(
                       AppZh.teamEditSwapPrev,
                       maxLines: 1,
@@ -774,7 +810,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
               if (widget.canSwapNext) ...[
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => widget.onSwap(widget.index, 1),
+                    onPressed: () => _swap(1),
                     child: Text(
                       AppZh.teamEditSwapNext,
                       maxLines: 1,
@@ -805,14 +841,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
             label: AppZh.confirm,
             showArrow: false,
             expanded: true,
-            onPressed: () => widget.onSave(
-              widget.index,
-              level: int.tryParse(_levelController.text.trim()),
-              nickname: _nicknameController.text.trim(),
-              types: _selectedTypes,
-              abilitySlug: _selectedAbility,
-              moveIds: _selectedMoveIds.toList(growable: false),
-            ),
+            onPressed: () => widget.onSave(widget.index, _draftMember()),
           ),
         ],
       ),
@@ -959,6 +988,13 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
           FutureBuilder<List<_TeamAssistEntry>>(
             future: _future,
             builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return TitoErrorPanel.fromError(
+                  snapshot.error!,
+                  framed: false,
+                  onRetry: () => setState(() => _future = _load()),
+                );
+              }
               final entries = snapshot.data;
               if (entries == null) {
                 return const TitoLoadingPanel(

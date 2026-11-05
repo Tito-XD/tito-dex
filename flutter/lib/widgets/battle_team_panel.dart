@@ -6,6 +6,8 @@ import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
+import '../theme/tito_surface_tokens.dart';
+import '../theme/tito_typography.dart';
 import 'battle_tool_panels.dart';
 import 'type_badge.dart';
 import 'tito_loading_panel.dart';
@@ -28,12 +30,22 @@ class BattleTeamPanel extends StatefulWidget {
 }
 
 class _BattleTeamPanelState extends State<BattleTeamPanel> {
-  Widget _group(String title, Map<String, int> counts) => Padding(
+  /// Shared weaknesses on this many members are flagged in the danger colour.
+  static const _bigWeakness = 3;
+
+  Widget _group(
+    String title,
+    Map<String, int> counts, {
+    bool flagWeak = false,
+  }) => Padding(
     padding: const EdgeInsets.only(top: 10),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: SecondaryTypography.onCard.small12),
+        Text(
+          '$title${AppZh.battleTypeCountSuffix(counts.length)}',
+          style: SecondaryTypography.onCard.small12,
+        ),
         const SizedBox(height: 5),
         if (counts.isEmpty)
           Text(AppZh.dexNone, style: SecondaryTypography.onCard.small12)
@@ -47,9 +59,11 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TitoTypeBadge(typeEn: entry.key, size: TypeBadgeSize.small),
-                    Text(
-                      ' ×${entry.value}',
-                      style: SecondaryTypography.onCard.small12,
+                    const SizedBox(width: 4),
+                    _CountBadge(
+                      key: ValueKey('team-count-${entry.key}'),
+                      count: entry.value,
+                      danger: flagWeak && entry.value >= _bigWeakness,
                     ),
                   ],
                 ),
@@ -117,7 +131,11 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
                 style: SecondaryTypography.onCard.body14,
               )
             else ...[
-              _group(AppZh.battleTeamWeaknesses, analysis.sharedWeaknesses),
+              _group(
+                AppZh.battleTeamWeaknesses,
+                analysis.sharedWeaknesses,
+                flagWeak: true,
+              ),
               _group(AppZh.battleTeamResistances, analysis.resistances),
               _group(AppZh.battleTeamImmunities, analysis.immunities),
               const SizedBox(height: 10),
@@ -143,4 +161,35 @@ class _BattleTeamPanelState extends State<BattleTeamPanel> {
       },
     ),
   );
+}
+
+/// Member count after a type badge. [danger] marks a weakness shared by
+/// enough members to need attention.
+class _CountBadge extends StatelessWidget {
+  const _CountBadge({super.key, required this.count, this.danger = false});
+
+  final int count;
+  final bool danger;
+
+  @override
+  Widget build(BuildContext context) {
+    final outline = TitoSurfaceTokens.of(context).elementOutline;
+    final color = danger ? typeMultiplierColor(2) : null;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        border: Border.fromBorderSide(
+          color == null ? outline : outline.copyWith(color: color),
+        ),
+      ),
+      child: Text(
+        '×$count',
+        style: SecondaryTypography.onCard.small12.copyWith(
+          fontWeight: TitoTypography.weight(FontWeight.w800),
+          color: color,
+        ),
+      ),
+    );
+  }
 }

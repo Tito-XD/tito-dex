@@ -157,6 +157,15 @@ class JourneyCard extends StatelessWidget {
   }
 }
 
+/// The computed summary, "整理中" while loading, or the plain "查看旅途"
+/// prompt when the assistant data could not be read.
+String _assistantSummary(AsyncSnapshot<JourneyAssistantSnapshot> snapshot) {
+  final data = snapshot.data;
+  if (data != null) return data.cardSummary;
+  if (snapshot.hasError) return AppZh.journeyAssistantCardFallback;
+  return AppZh.journeyAssistantLoading;
+}
+
 class _AssistantDenseMeta extends StatelessWidget {
   const _AssistantDenseMeta({
     required this.journey,
@@ -175,11 +184,11 @@ class _AssistantDenseMeta extends StatelessWidget {
     return FutureBuilder<JourneyAssistantSnapshot>(
       future: future,
       builder: (context, snapshot) {
-        final assistant = snapshot.data?.cardSummary;
+        final assistant = _assistantSummary(snapshot);
         if (!expanded) {
           return Text(
             '${AppZh.labelBadges} ${journey.badgeProgressLabel}'
-            ' · ${assistant ?? AppZh.journeyAssistantLoading}',
+            ' · $assistant',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: style,
@@ -197,7 +206,7 @@ class _AssistantDenseMeta extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               '${AppZh.labelPlayTime} ${journey.playTime}'
-              ' · ${assistant ?? AppZh.journeyAssistantLoading}',
+              ' · $assistant',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: style,
@@ -222,7 +231,7 @@ class _AssistantMeta extends StatelessWidget {
         builder: (context, snapshot) {
           return _MetaContent(
             label: AppZh.journeyAssistantMeta,
-            value: snapshot.data?.cardSummary ?? AppZh.journeyAssistantLoading,
+            value: _assistantSummary(snapshot),
           );
         },
       ),

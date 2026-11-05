@@ -1,3 +1,4 @@
+import 'package:titodex/theme/tito_colors.dart';
 import 'package:titodex/widgets/battle_party_results.dart';
 import 'package:titodex/widgets/battle_team_editor.dart';
 import 'dart:io';
@@ -328,18 +329,97 @@ void main() {
       ),
     );
     // Same formatter as the Pokédex type grid: one multiplier vocabulary.
-    for (final text in [
-      '4×',
-      '2×',
-      '1×',
-      '1/2×',
-      '1/4×',
-      '0×',
-      '1.5×',
-      '0.75×',
-    ]) {
+    for (final text in ['4×', '2×', '1/2×', '1/4×', '0×', '1.5×', '0.75×']) {
       expect(find.text(text), findsOneWidget);
     }
+    // Sections count their types; exact ability values stay separate rows.
+    expect(find.text('${AppZh.battleMatchupWeak} 3'), findsOneWidget);
+    expect(find.text('${AppZh.battleMatchupResist} 3'), findsOneWidget);
+    expect(find.text('${AppZh.battleMatchupImmune} 1'), findsOneWidget);
+    for (final value in [4.0, 2.0, 1.5, .75, .5, .25, 0.0]) {
+      expect(find.byKey(ValueKey('matchup-multiplier-$value')), findsOneWidget);
+    }
+    // Neutral hits stay folded until opened.
+    final neutral = find.text(AppZh.battleMatchupNeutral(1));
+    expect(neutral, findsOneWidget);
+    expect(find.text('1×'), findsNothing);
+    expect(find.byKey(const ValueKey('matchup-multiplier-1.0')), findsNothing);
+    await tester.tap(neutral);
+    await tester.pumpAndSettle();
+    expect(find.text('1×'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('matchup-multiplier-1.0')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('matchup neutral disclosure opens from the keyboard', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildTitoTheme(),
+        home: const Scaffold(
+          body: BattleMatchupSummary(
+            multipliers: {'rock': 2, 'normal': 1, 'water': 1},
+          ),
+        ),
+      ),
+    );
+    expect(find.text('${AppZh.battleMatchupResist} 0'), findsNothing);
+    expect(find.text(AppZh.battleMatchupNeutral(2)), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('matchup-multiplier-1.0')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('blind spots count types and sit side by side when wide', (
+    tester,
+  ) async {
+    Widget summary(double width) => MaterialApp(
+      theme: buildTitoTheme(),
+      home: Scaffold(
+        body: Center(
+          child: SizedBox(
+            width: width,
+            child: BattleBlindSpotSummary(
+              offensive: [typeNameZh('ghost'), typeNameZh('steel')],
+              defensive: [typeNameZh('ground')],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpWidget(summary(360));
+    final attack = find.text('${AppZh.companionOffensiveBlindSpots} · 2');
+    final defend = find.text('${AppZh.companionDefensiveBlindSpots} · 1');
+    expect(attack, findsOneWidget);
+    expect(defend, findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('blind-spots-side-by-side')),
+      findsNothing,
+    );
+    expect(
+      tester.getTopLeft(defend).dy,
+      greaterThan(tester.getTopLeft(attack).dy),
+    );
+    await tester.pumpWidget(summary(700));
+    expect(
+      find.byKey(const ValueKey('blind-spots-side-by-side')),
+      findsOneWidget,
+    );
+    expect(tester.getTopLeft(defend).dy, tester.getTopLeft(attack).dy);
+    expect(
+      tester.getTopLeft(defend).dx,
+      greaterThan(tester.getTopLeft(attack).dx),
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -740,6 +820,120 @@ void main() {
     );
   }
 
+  testWidgets('wide team damage pairs members and tags default configs', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 900);
+    addTearDown(tester.view.reset);
+    const source = [
+      ..._party,
+      PartyMember(
+        species: '皮卡丘',
+        speciesId: 25,
+        nickname: '默认队员',
+        moveIds: [85],
+        types: ['electric'],
+      ),
+    ];
+    final router = _router(party: source);
+    await tester.pumpWidget(_app(router, AppVisualStyle.classic));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byKey(const ValueKey('battle-scope')),
+        matching: find.text(AppZh.battleTeamAnalysis),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppZh.battleCalcModeDamage));
+    await tester.pump();
+    final panel = tester.widget<BattlePartyResults>(
+      find.byType(BattlePartyResults),
+    );
+    await tester.runAsync(() => panel.session.partyEntries(source));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('party-damage-two-column')),
+      findsOneWidget,
+    );
+    final first = tester.getRect(find.byKey(const ValueKey('party-damage-0')));
+    final second = tester.getRect(find.byKey(const ValueKey('party-damage-1')));
+    final third = tester.getRect(find.byKey(const ValueKey('party-damage-2')));
+    expect(second.top, closeTo(first.top, 1));
+    expect(second.left, greaterThan(first.right));
+    // The odd last member keeps the left half instead of stretching.
+    expect(third.top, greaterThan(first.bottom - 1));
+    expect(third.left, closeTo(first.left, 1));
+    expect(third.width, closeTo(first.width, 1));
+    expect(find.byKey(const ValueKey('party-defaults-2')), findsOneWidget);
+    expect(find.byKey(const ValueKey('party-defaults-0')), findsNothing);
+    expect(find.text(AppZh.battlePartyDefaultTag), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    // Narrow cards keep the single column.
+    tester.view.physicalSize = const Size(400, 850);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('party-damage-two-column')), findsNothing);
+    final narrowFirst = tester.getRect(
+      find.byKey(const ValueKey('party-damage-0')),
+    );
+    final narrowSecond = tester.getRect(
+      find.byKey(const ValueKey('party-damage-1')),
+    );
+    expect(narrowSecond.top, greaterThan(narrowFirst.bottom - 1));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    router.dispose();
+  });
+
+  testWidgets('team stats highlight the best value in each column', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 850);
+    addTearDown(tester.view.reset);
+    final router = _router(party: _party);
+    await tester.pumpWidget(_app(router, AppVisualStyle.classic));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byKey(const ValueKey('battle-scope')),
+        matching: find.text(AppZh.battleTeamAnalysis),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppZh.battleCalcModeStats));
+    await tester.pump();
+    final panel = tester.widget<BattlePartyResults>(
+      find.byType(BattlePartyResults),
+    );
+    final entries = await tester.runAsync(
+      () => panel.session.partyEntries(_party),
+    );
+    await tester.pumpAndSettle();
+    for (final stat in BattleStat.values) {
+      final values = [
+        for (final entry in entries!)
+          entry.combatant.effectiveStat(stat, generation: panel.generation),
+      ];
+      final best = values.reduce((a, b) => a > b ? a : b);
+      for (var i = 0; i < values.length; i++) {
+        final number = tester.widget<TitoAnimatedNumber>(
+          find.byKey(ValueKey('party-stat-$i-${stat.name}')),
+        );
+        expect(
+          number.style?.color,
+          values[i] == best ? TitoColors.success : isNull,
+          reason: '${stat.name} member $i',
+        );
+      }
+    }
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    router.dispose();
+  });
+
   testWidgets(
     'compact roster edits update the shared team without changing Party',
     (tester) async {
@@ -833,11 +1027,15 @@ void main() {
         .widget<TitoAnimatedNumber>(find.byType(TitoAnimatedNumber))
         .value;
     expect(target, isNot(int.parse(before!)));
-    expect(tester.widget<Text>(result).data, before);
+    String shown() => tester
+        .state<TitoAnimatedNumberState>(find.byType(TitoAnimatedNumber))
+        .displayedText
+        .trim();
+    expect(shown(), before);
     await tester.pump(const Duration(milliseconds: 70));
-    final intermediate = int.parse(tester.widget<Text>(result).data!);
-    expect(intermediate, greaterThan(int.parse(before)));
-    expect(intermediate, lessThan(target));
+    // Mid-roll: the wheels are between the old and new reading.
+    expect(tester.hasRunningAnimations, isTrue);
+    expect(find.byKey(const ValueKey('battle-stat-value')), findsNothing);
     // Handoff uses the real result even while its decorative number is moving.
     final after = '$target';
     await tester.tap(

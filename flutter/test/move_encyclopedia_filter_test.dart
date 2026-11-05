@@ -32,4 +32,17 @@ void main() {
     expect(moveTypeCategoryFilter.filter(_fireMove, '火'), isTrue);
     expect(moveTypeCategoryFilter.filter(_waterMove, '火'), isFalse);
   });
+
+  test('move list subtitle localizes the bundle category slug', () {
+    const move = CachedMove(
+      id: 53,
+      nameEn: 'flamethrower',
+      nameZh: '喷射火焰',
+      type: 'fire',
+      category: 'special',
+    );
+    final label = moveSecondaryLabel(move);
+    expect(label, '#53 · 火 · 特殊');
+    expect(label, isNot(contains('special')));
+  });
 }

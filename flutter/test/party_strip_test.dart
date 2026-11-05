@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:titodex/features/dex/shiny_odds.dart';
+import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/models/journey.dart';
+import 'package:titodex/widgets/handheld_input.dart';
 import 'package:titodex/widgets/party_strip.dart';
 
 void main() {
@@ -57,5 +61,58 @@ void main() {
     final gridSize = tester.getSize(find.byType(GridView));
     expect(gridSize.height, lessThan(200));
     expect(find.byIcon(Icons.add_circle_outline_rounded), findsNWidgets(3));
+  });
+
+  testWidgets('shiny sparkle toggle is focusable and activates by keyboard', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final original = partyShinySessionSeed;
+    addTearDown(() => partyShinySessionSeed = original);
+    partyShinySessionSeed = 1;
+    final shinyId = List<int>.generate(
+      1025,
+      (i) => i + 1,
+    ).firstWhere((id) => shinyRoll(partyShinySessionSeed, id));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 200,
+              height: 320,
+              child: PartyStrip(
+                party: [
+                  PartyMember(species: 'Alpha', speciesId: shinyId, level: 5),
+                ],
+                compact: true,
+                square: true,
+                gridMode: true,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(HandheldFocusDecorator), findsOneWidget);
+    expect(
+      find.bySemanticsLabel(
+        RegExp(RegExp.escape(AppZh.shinyPartyFound('Alpha'))),
+      ),
+      findsOneWidget,
+    );
+
+    // D-pad / Tab traversal must reach the toggle.
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(FocusManager.instance.primaryFocus, isNotNull);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(find.text(AppZh.shinyPartyFound('Alpha')), findsOneWidget);
+    semantics.dispose();
   });
 }

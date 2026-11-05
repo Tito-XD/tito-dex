@@ -17,6 +17,7 @@ implementation rather than a second UI stack. Architecture boundaries live in
 | --- | --- |
 | `showModalBottomSheet`（预算 0） | `showTitoModalBottomSheet`：主题背景、拖动条、安全区和键盘避让已包含，调用处不再加 `backgroundColor` 或键盘内边距 |
 | `ScaffoldMessenger.showSnackBar` / `SnackBar(`（预算 0） | `showTitoSnackBar(context, 文案, actionLabel:, onAction:)`：统一带关闭按钮、上滑淡入与淡出（减少动画时直接出现／消失）、下滑关闭与读屏播报；新消息替换当前消息 |
+| 自写加载失败卡片或空状态（`AppZh.retry` / `dexRetry` 只剩 4 处行内用法） | 失败用 `TitoErrorPanel`（标题、弱化说明、左侧带刷新图标的「重试」；`TitoErrorPanel.fromError(error)` 自动换成用户可读文案，不显示原始异常），空状态用 `TitoEmptyState`（弱化文字，可带图标和操作）；宿主已有卡片时传 `framed: false` |
 | `CircularProgressIndicator` / `LinearProgressIndicator`（预算 0） | 局部 `TitoInlineLoading`，区块 `TitoLoadingPanel`，图像 `TitoPokeballLoading`，确定进度 `TitoProgressBar` |
 | `Theme.of(context).textTheme`（仅首页标题例外） | `SecondaryTypography.onPage(context)` / `onCard` / `onGradient` |
 | `TitoColors.mutedInk`、在 `copyWith` 中写 `TitoColors.ink` | `TitoTypography.mutedColor` / `inkColor`，粗细用 `TitoTypography.weight` |
@@ -32,6 +33,8 @@ implementation rather than a second UI stack. Architecture boundaries live in
 页面层的常用角色：页头底色与标题 `pageChrome`，页面上的副标题 `pageSubtle`，返回箭头与页面描边按钮
 `pageAction`，圆形页头按钮 `headerButton`，页面上的淡框 `pageWell`，焦点框与选中环 `highlight`，
 奶油卡上的强调图标 `accent`，页面上的小状态标签 `pageBadge`。卡内选择用 `selection` / `selectionActive`，输入底色用 `field`。
+**手柄可达性**：凡是手指能点的控件，方向键也必须能停上去，并能用 A 键触发。自写 `GestureDetector` 的控件要包一层 `HandheldFocusDecorator(onActivate: …)`（`StickerSwitch`、`StickerPillToggle` 已内置）。画在导航层之上的控件（应用内提示）用 `HandheldGlobalStops` 标记，方向键才能从页面移进去。`flutter/test/handheld_reachability_test.dart` 会在三个主题、竖屏和横屏下逐页检查：只能点、不能聚焦的控件，以及从第一个焦点出发、只用方向键走不到的控件，都会报出路由和控件名。新增主页面时把路由加进 `_routes`。
+
 测试里直接 `pumpWidget` 时要传 `theme: buildTitoTheme(style)`；没有主题扩展时令牌按 Flat 取值。
 
 ## Design Personality
@@ -526,14 +529,17 @@ behavior; Android installer and launcher confirmation remain system surfaces.
 
 | 动效 | 已有实现 | 判断 |
 | --- | --- | --- |
-| Stagger | 正式版列表/图鉴已有有限延迟和滚回不重播；主题预览新增首页六区共用一次入场 | 保留并整合已有方案。页面切回、数据刷新和布局变化不应全页重播，点击/按键不等待入场完成 |
-| Spring | 正式 App 常规按压主要是短缓出下沉；主题预览有短曲线回弹/轻压缩 | 用在按压释放等有动作原因的位置。预览 App 的曲线回弹不等同于物理 SpringSimulation；不增加所有卡片持续弹跳 |
-| Skeleton | 正式版已有主题色静态占位，可选轻微脉冲；Ask 等待区已有扫光 | 保持真实等待反馈与尺寸稳定。普通图片不统一改成灰色扫光；慢加载沿用 160ms 延迟与共享加载器，减少动画时静态显示 |
-| Count Up / 数值滚动 | 能力值计算使用同一指标的数值过渡；属性格与伤害结果倍率使用准确旧文案→新文案的滚轮切换 | 不从零入场。整数、小数、分数均可滚动；离散倍率不生成虚构的中间值。连续修改可中断，系统/App 减少动画、隐藏页直接收束；无障碍、摘要与计算始终读取最终值。固定倍率分组的标题保持不动 |
-| Typewriter | 正式 Ask 已有提示/回答逐步呈现和减少动画处理 | 限于 Ask 的既有语义呈现，不扩展到菜单、普通资料、数值或操作说明；不人为拖慢已完成内容的访问 |
-| Marquee | 核心界面无相应需求 | 不新增持续滚动。长标签用换行、展开或完整详情；搜索快捷词保留用户主动横向滚动 |
+| Stagger | `TitoListReveal`：14px 上浮 + 淡入，`staggerDelay` 每行 40ms、最多 8 级；图鉴网格按行+列斜向波浪（每级 34ms） | 新结果集才错峰；滚回、页面切回、数据刷新不重播，点击/按键不等待入场完成 |
+| Spring | `StickerPressable` 释放使用 `SpringSimulation`（`TitoMotion.pressSpring`，欠阻尼，约 350ms 回到静止并轻微过冲）；按下 70ms 缓出下沉 | 手账与塑料主题生效；Flat UI 继续由 Material 状态层反馈。减少动画时直接回到静止 |
+| 数字样式（实验） | 设置 → 界面风格 → 数字样式（实验）：默认 / 段码 / 点阵 / 像素字 / 翻页牌，偏好键 `appearance.numberStyle`（`numberStylePreferences`）。只对显式传 `TitoAnimatedNumber(retro: true)` 的大数字生效，目前仅伤害页与能力值页的 hero 数字；表格、队伍行不传。字形由 `lib/widgets/tito_retro_digits.dart` 用 CustomPaint 绘制（无字体、无新资源），亮色取传入文字色，未点亮部分取其低透明度，翻页牌底板取 `TitoSurfaceTokens`（`deep`/`inset`/`knob`）。按主题区分：训练家手帐为圆角线段与柔和描边，固态塑料为更粗线段、点亮发光与顶部高光，扁平为直角线段、无阴影无描边。变化时只有变化的字符动：段码交叉淡入淡出，点阵/像素字按行推入（变大自下而上、变小自上而下），翻页牌只翻变化的那一块。减少动画、隐藏标签页与按住方向键时直接显示最终值；语义与 key 保持不变；遇到字形表之外的字符退回普通 Text | 实验功能；默认关闭，不影响其他数字 |
+| Skeleton | `TitoShimmer` 斜向扫光（1.3s 周期）；`TitoCardSkeleton`、详情头、图鉴网格骨架整组共用一个 ticker；`TitoSkeletonBox(shimmer: true)` 单块扫光 | 仍经 `TitoSkeletonGate` 延迟出现。减少动画、关闭界面动画或隐藏页时静态显示 |
+| Count Up / 数值滚动 | `TitoAnimatedNumber(countUp: true)`：结果首次出现或换对象时从 0 滚入（680ms easeOutQuart）；之后改参数按里程表逐位滚动：只有变化的数位滚动，且每位只滚一步（旧数字→新数字，不经过中间数字；120→136 只滚“20→36”，136→236 只滚百位，236→210 的个位直接 6→0），数值变大向上滚、变小向下滚（420ms easeOutCubic），被打断时从当前显示继续；identity 只标识指标槽位（不含对象/招式），换防守方或招式也逐位滚；同一槽位被重建（范围出现最小值、结果短暂为空）时从该槽位上次显示的值滚动，只有页面里第一次出现才从 0 滚入；支持小数位与后缀。已用于伤害百分比（含血条同步）、能力值结果、整队伤害与整队能力值表；属性/本系倍率继续用 `TitoRollingValue` 的旧值→新值滚轮 | 离散倍率不生成虚构中间值。连续按住方向键时直接显示；无障碍、摘要与计算始终读取最终值 |
+| Typewriter | `TitoTypewriterText`（每秒 28 字）：首页同行宝可梦的对话气泡；Ask 保留原有逐步呈现 | 仅用于角色台词这类短句。整行先按最终尺寸排版，不撑动气泡；读屏一次读完整句 |
+| Marquee | `TitoMarquee`：设置 → 关于的“资料与媒体来源”横条循环滚动，边缘渐隐 | 只放装饰性重复信息，完整 Credits 仍在下方展开区。放得下或减少动画时改为静态换行，不滚动 |
 
 动效证据入口：`flutter/lib/widgets/tito_list_reveal.dart`、
+`flutter/lib/widgets/tito_animated_number.dart`、`flutter/lib/widgets/tito_typewriter_text.dart`、
+`flutter/lib/widgets/tito_marquee.dart`、
 `flutter/lib/widgets/tito_skeleton.dart`、`flutter/lib/widgets/sticker_pressable.dart`、
 `flutter/lib/widgets/ask/ask_answer_card.dart`、
 `flutter/lib/features/journey/ask_titodex_reveal_controller.dart`。

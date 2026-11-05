@@ -3,11 +3,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/dex/dex_encounter_labels.dart';
 import '../../features/dex/dex_models.dart';
-import '../../features/dex/dex_progress.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/location_index.dart';
 import '../../features/dex/type_chart.dart';
 import '../../features/game/game_edition_repository.dart';
+import '../../features/game/journey_capability.dart';
 import '../../l10n/app_zh.dart';
 import '../../l10n/localized_names.dart';
 import '../../models/journey.dart';
@@ -21,11 +21,18 @@ import '../../widgets/tito_loading_panel.dart';
 import '../../theme/tito_typography.dart';
 import '../../navigation/tito_page_transition.dart';
 import '../../theme/tito_surface_tokens.dart';
+import '../../widgets/tito_state_panel.dart';
 
 class LocationDexPage extends StatefulWidget {
-  const LocationDexPage({super.key, required this.journey});
+  const LocationDexPage({super.key, required this.journey, this.loadOverride});
 
   final CurrentJourney journey;
+
+  /// Replaces the location-index and summary fetch in widget tests.
+  @visibleForTesting
+  final Future<({List<LocationArea> areas, List<PokemonSummary> summaries})>
+  Function()?
+  loadOverride;
 
   @override
   State<LocationDexPage> createState() => _LocationDexPageState();
@@ -53,6 +60,14 @@ class _LocationDexPageState extends State<LocationDexPage> {
   void _refresh() => setState(() {});
 
   Future<_LocationPageData> _load() async {
+    final override = widget.loadOverride;
+    if (override != null) {
+      final data = await override();
+      return _LocationPageData(
+        areas: data.areas,
+        summaries: {for (final summary in data.summaries) summary.id: summary},
+      );
+    }
     final results = await Future.wait([
       locationIndexRepository.load(),
       dexRepository.getAllSummaries(),
@@ -67,7 +82,12 @@ class _LocationDexPageState extends State<LocationDexPage> {
 
   @override
   Widget build(BuildContext context) {
-    final progress = DexProgress.fromJourney(widget.journey);
+    // Same rule as the dex grid: editions without a save link track progress
+    // through manual seen/caught marks instead of save data.
+    final progress = dexRepository.progressFor(
+      widget.journey,
+      manualDexMarks: !gameEditionRepository.edition.isSaveLinked,
+    );
     return SecondaryPageScaffold(
       title: AppZh.locationDexTitle,
       subtitle: gameEditionRepository.edition.label,
@@ -86,18 +106,9 @@ class _LocationDexPageState extends State<LocationDexPage> {
             }
             if (snapshot.hasError || snapshot.data == null) {
               return SliverToBoxAdapter(
-                child: StickerCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(AppZh.locationDexLoadFailed),
-                      const SizedBox(height: 8),
-                      FilledButton(
-                        onPressed: () => setState(() => _future = _load()),
-                        child: Text(AppZh.dexRetry),
-                      ),
-                    ],
-                  ),
+                child: TitoErrorPanel(
+                  title: AppZh.locationDexLoadFailed,
+                  onRetry: () => setState(() => _future = _load()),
                 ),
               );
             }
@@ -118,7 +129,7 @@ class _LocationDexPageState extends State<LocationDexPage> {
                 .toList(growable: false);
             if (areas.isEmpty) {
               return SliverToBoxAdapter(
-                child: StickerCard(child: Text(AppZh.locationDexEmpty)),
+                child: TitoEmptyState(message: AppZh.locationDexEmpty),
               );
             }
             return SliverGrid.builder(

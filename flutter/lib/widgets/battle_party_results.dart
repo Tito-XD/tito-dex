@@ -15,6 +15,12 @@ import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import 'battle_tool_panels.dart';
 import 'tito_loading_panel.dart';
+import 'tito_animated_number.dart';
+import 'tito_sprite_sticker.dart';
+import '../theme/tito_colors.dart';
+import '../theme/tito_motion.dart';
+import '../theme/tito_surface_tokens.dart';
+import '../theme/tito_typography.dart';
 
 class BattlePartyResults extends StatelessWidget {
   const BattlePartyResults({
@@ -120,7 +126,8 @@ class BattlePartyResults extends StatelessWidget {
                     else if (relations == null)
                       _stats(entries)
                     else ...[
-                      for (final entry in entries) _damage(entry),
+                      _damageList(entries),
+                      const SizedBox(height: 4),
                     ],
                     ExpansionTile(
                       tilePadding: EdgeInsets.zero,
@@ -160,34 +167,134 @@ class BattlePartyResults extends StatelessWidget {
           ),
         );
 
-  Widget _stats(List<BattlePartyEntry> entries) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: Table(
-      defaultColumnWidth: const FixedColumnWidth(44),
-      columnWidths: const {0: FixedColumnWidth(84)},
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      children: [
-        TableRow(
+  /// Members side by side once two rows of sprite, move and HP bar still fit;
+  /// narrower cards keep the single column.
+  static const twoColumnWidth = 680.0;
+
+  Widget _damageList(List<BattlePartyEntry> entries) => LayoutBuilder(
+    builder: (context, constraints) {
+      final rows = [
+        for (var i = 0; i < entries.length; i++) _damage(entries[i], i),
+      ];
+      if (constraints.maxWidth < twoColumnWidth) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _cell(''),
-            for (final stat in BattleStat.values) _cell(stat.label),
+            for (var i = 0; i < rows.length; i++) ...[
+              if (i > 0) const Divider(height: 1),
+              rows[i],
+            ],
           ],
-        ),
-        for (final entry in entries)
+        );
+      }
+      return Column(
+        key: const ValueKey('party-damage-two-column'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < rows.length; i += 2) ...[
+            if (i > 0) const Divider(height: 1),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: rows[i]),
+                const SizedBox(width: 16),
+                // An odd last member keeps half the width.
+                Expanded(
+                  child: i + 1 < rows.length
+                      ? rows[i + 1]
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ],
+        ],
+      );
+    },
+  );
+
+  /// Highest value per stat among readable members; ties all count. Empty
+  /// when fewer than two members can be compared.
+  Map<BattleStat, int> _statLeaders(List<BattlePartyEntry> entries) {
+    final readable = [
+      for (final entry in entries)
+        if (!entry.combatant.selectionFailed) entry,
+    ];
+    if (readable.length < 2) return const {};
+    return {
+      for (final stat in BattleStat.values)
+        stat: readable
+            .map((e) => e.combatant.effectiveStat(stat, generation: generation))
+            .reduce((a, b) => a > b ? a : b),
+    };
+  }
+
+  Widget _stats(List<BattlePartyEntry> entries) {
+    final leaders = _statLeaders(entries);
+    final leaderStyle = SecondaryTypography.onCard.small12.copyWith(
+      fontWeight: TitoTypography.weight(FontWeight.w800),
+      color: TitoColors.success,
+    );
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Table(
+        defaultColumnWidth: const FixedColumnWidth(44),
+        columnWidths: const {0: FixedColumnWidth(84)},
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        children: [
           TableRow(
             children: [
-              _cell(entry.name),
-              for (final stat in BattleStat.values)
-                _cell(
-                  entry.combatant.selectionFailed
-                      ? '—'
-                      : '${entry.combatant.effectiveStat(stat, generation: generation)}',
-                ),
+              _cell(''),
+              for (final stat in BattleStat.values) _cell(stat.label),
             ],
           ),
-      ],
-    ),
-  );
+          for (final entry in entries)
+            TableRow(
+              children: [
+                _cell(entry.name),
+                for (final stat in BattleStat.values)
+                  entry.combatant.selectionFailed
+                      ? _cell('—')
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 4,
+                          ),
+                          child: Center(
+                            child: _statNumber(
+                              entry,
+                              stat,
+                              key: ValueKey(
+                                'party-stat-${entries.indexOf(entry)}-'
+                                '${stat.name}',
+                              ),
+                              leaders: leaders,
+                              leaderStyle: leaderStyle,
+                            ),
+                          ),
+                        ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _statNumber(
+    BattlePartyEntry entry,
+    BattleStat stat, {
+    required Key key,
+    required Map<BattleStat, int> leaders,
+    required TextStyle leaderStyle,
+  }) {
+    final value = entry.combatant.effectiveStat(stat, generation: generation);
+    return TitoAnimatedNumber(
+      key: key,
+      value: value,
+      identity: (entry.combatant, stat),
+      countUp: true,
+      style: leaders[stat] == value ? leaderStyle : null,
+    );
+  }
 
   Widget _cell(String text) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
@@ -199,26 +306,59 @@ class BattlePartyResults extends StatelessWidget {
     ),
   );
 
-  Widget _damage(BattlePartyEntry entry) {
+  /// One member: sprite, best move, a percentage that counts up and the
+  /// defender's HP after that hit. Expanding lists every assigned move on the
+  /// same grid so nothing shifts between the summary and the details.
+  Widget _damage(BattlePartyEntry entry, int index) {
     final name = entry.name;
-    if (entry.combatant.selectionFailed || _legalMoves(entry).isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Text(
-          '$name · ${entry.combatant.selectionFailed ? AppZh.battleTeamMemberFailed : AppZh.battleTeamNoMoves}',
+    final legal = _legalMoves(entry);
+    final sprite = TitoSpriteSticker(
+      source: entry.combatant.detail?.summary.displaySpritePath,
+      size: 36,
+    );
+    final nameStyle = SecondaryTypography.onCard.body14.copyWith(
+      fontWeight: TitoTypography.weight(FontWeight.w800),
+    );
+    final small = SecondaryTypography.onCard.small12;
+    final muted = small.copyWith(color: TitoTypography.mutedColor);
+    final title = Row(
+      children: [
+        Flexible(
+          child: Text(
+            name,
+            style: nameStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (entry.combatant.partyDefaults) ...[
+          const SizedBox(width: 6),
+          _DefaultsTag(key: ValueKey('party-defaults-$index')),
+        ],
+      ],
+    );
+    if (entry.combatant.selectionFailed || legal.isEmpty) {
+      return _MemberRow(
+        key: ValueKey('party-damage-$index'),
+        leading: sprite,
+        title: title,
+        subtitle: Text(
+          entry.combatant.selectionFailed
+              ? AppZh.battleTeamMemberFailed
+              : AppZh.battleTeamNoMoves,
+          style: muted,
         ),
       );
     }
     final results =
         [
-          for (final move in _legalMoves(entry).map((m) => MapEntry(m.id, m)))
+          for (final move in legal)
             (
-              move: move.value,
-              id: move.key,
+              move: move,
               estimate: estimatePartyMove(
                 attacker: entry.combatant,
                 defender: session.defender,
-                move: move.value,
+                move: move,
                 relations: relations!,
                 generation: generation,
                 weatherSlug: weatherSlug,
@@ -233,44 +373,186 @@ class BattlePartyResults extends StatelessWidget {
             a.estimate?.maxDamage ?? -1,
           ),
         );
-    final best = results.first;
-    return ExpansionTile(
-      tilePadding: EdgeInsets.zero,
-      childrenPadding: const EdgeInsets.only(bottom: 8),
-      shape: const Border(),
-      collapsedShape: const Border(),
-      textColor: SecondaryTypography.onCard.h15.color,
-      collapsedTextColor: SecondaryTypography.onCard.h15.color,
-      iconColor: SecondaryTypography.onCard.h15.color,
-      collapsedIconColor: SecondaryTypography.onCard.h15.color,
-      title: Text(name, style: SecondaryTypography.onCard.body14),
-      subtitle: Text(
-        best.estimate == null
-            ? battleMoveIssue(
-                    entry.combatant,
-                    session.defender,
-                    best.move,
-                    generation,
-                  ) ??
-                  AppZh.battleTeamMoveUnsupported
-            : '${best.move.displayName} · ${_range(best.estimate!)}',
-        style: SecondaryTypography.onCard.small12,
-      ),
-      children: [
-        for (final row in results)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '${row.move.displayName} · ${row.estimate == null ? battleMoveIssue(entry.combatant, session.defender, row.move, generation) ?? AppZh.battleTeamMoveUnsupported : _range(row.estimate!)}',
+    String issue(CachedMove move) =>
+        battleMoveIssue(entry.combatant, session.defender, move, generation) ??
+        AppZh.battleTeamMoveUnsupported;
+    final identity = entry.combatant;
+
+    Widget moveLine(
+      ({CachedMove move, DamageEstimate? estimate}) row, {
+      required bool lead,
+    }) {
+      final estimate = row.estimate;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
+                child: Text(
+                  estimate == null
+                      ? '${row.move.displayName} · ${issue(row.move)}'
+                      : '${row.move.displayName} · ${estimate.minDamage}–${estimate.maxDamage} HP',
+                  style: estimate == null ? muted : small,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
+              if (estimate != null) ...[
+                const SizedBox(width: 8),
+                TitoAnimatedNumber(
+                  value: estimate.maxPercent,
+                  fractionDigits: 1,
+                  suffix: '%',
+                  countUp: true,
+                  // The lead line tracks "best hit", whichever move it is, so
+                  // a reshuffle rolls the number instead of restarting it.
+                  identity: (identity, lead ? 'best' : row.move.id),
+                  style: (lead ? nameStyle : small).copyWith(
+                    fontWeight: TitoTypography.weight(FontWeight.w800),
+                  ),
+                ),
+              ],
+            ],
           ),
-      ],
+          if (estimate != null) ...[
+            const SizedBox(height: 4),
+            BattleHpBar(
+              damageFraction: estimate.maxPercent / 100,
+              height: lead ? 8 : 6,
+              onDisplay: false,
+            ),
+          ],
+        ],
+      );
+    }
+
+    return _MemberRow(
+      key: ValueKey('party-damage-$index'),
+      leading: sprite,
+      title: title,
+      subtitle: moveLine(results.first, lead: true),
+      details: results.length < 2
+          ? null
+          : [
+              for (final row in results.skip(1))
+                Padding(
+                  key: ValueKey('party-move-${row.move.id}'),
+                  padding: const EdgeInsets.only(top: 8),
+                  child: moveLine(row, lead: false),
+                ),
+            ],
     );
   }
+}
 
-  String _range(DamageEstimate value) =>
-      '${value.minDamage}–${value.maxDamage} / ${value.minPercent.toStringAsFixed(1)}–${value.maxPercent.toStringAsFixed(1)}%';
+/// Muted label after a member name whose missing values use defaults.
+class _DefaultsTag extends StatelessWidget {
+  const _DefaultsTag({super.key});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(TitoRadii.sm),
+      border: Border.fromBorderSide(
+        TitoSurfaceTokens.of(context).elementOutline,
+      ),
+    ),
+    child: Text(
+      AppZh.battlePartyDefaultTag,
+      maxLines: 1,
+      style: SecondaryTypography.onCard.small12.copyWith(
+        color: TitoTypography.mutedColor,
+      ),
+    ),
+  );
+}
+
+/// A member line with an optional "other moves" disclosure. Avoids
+/// ExpansionTile so the title, numbers and bar keep the card's typography and
+/// the whole row is one D-pad stop.
+class _MemberRow extends StatefulWidget {
+  const _MemberRow({
+    super.key,
+    required this.leading,
+    required this.title,
+    required this.subtitle,
+    this.details,
+  });
+
+  final Widget leading;
+  final Widget title;
+  final Widget subtitle;
+  final List<Widget>? details;
+
+  @override
+  State<_MemberRow> createState() => _MemberRowState();
+}
+
+class _MemberRowState extends State<_MemberRow> {
+  var _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final details = widget.details;
+    final body = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          widget.leading,
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: widget.title),
+                    if (details != null)
+                      AnimatedRotation(
+                        turns: _open ? 0.5 : 0,
+                        duration: TitoMotion.duration(context, TitoMotion.fast),
+                        child: Icon(
+                          Icons.expand_more_rounded,
+                          size: 20,
+                          color: TitoTypography.mutedColor,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                widget.subtitle,
+                if (details != null)
+                  AnimatedSize(
+                    duration: TitoMotion.duration(context, TitoMotion.standard),
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.topCenter,
+                    child: _open
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: details,
+                          )
+                        : const SizedBox(width: double.infinity),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+    if (details == null) return body;
+    return Semantics(
+      button: true,
+      expanded: _open,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        onTap: () => setState(() => _open = !_open),
+        child: body,
+      ),
+    );
+  }
 }

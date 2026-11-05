@@ -19,9 +19,7 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_download_notification.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/game/game_edition.dart';
 import '../features/game/game_catalog.dart';
-import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
 import '../features/parser/hgss_format.dart';
@@ -32,6 +30,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/motion_preferences.dart';
+import '../theme/number_style_preferences.dart';
 import '../widgets/retro_forms.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
@@ -44,11 +43,13 @@ import '../widgets/settings_expandable_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/app_update_card.dart';
 import '../widgets/trainer_shortcut_button.dart';
+import '../widgets/tito_confirm_dialog.dart';
 import '../widgets/tito_progress_dialog.dart';
 import '../widgets/tito_progress_bar.dart';
 import '../theme/tito_typography.dart';
 import '../navigation/tito_page_transition.dart';
 import '../widgets/tito_snack_bar.dart';
+import '../widgets/tito_marquee.dart';
 
 bool shouldPrioritizeOfflineData(DexCacheStatus? status) {
   final manifest = status?.manifest;
@@ -150,7 +151,6 @@ class _SettingsPageState extends State<SettingsPage> {
   DexOfflineService get _dexOfflineService =>
       widget.offlineService ?? dexOfflineService;
   final _dexDownloadNotification = DexDownloadNotification();
-  GameEdition _defaultGameEdition = defaultGameEdition;
 
   @override
   void initState() {
@@ -159,7 +159,6 @@ class _SettingsPageState extends State<SettingsPage> {
       text: widget.journey.trainerName,
     );
     _refreshDexCacheStatus();
-    _loadDexSettings();
     _syncDexDownloadStatus();
   }
 
@@ -219,25 +218,6 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  Future<void> _loadDexSettings() async {
-    final edition = await dexSettingsRepository.loadDefaultGameEdition();
-    if (!mounted) {
-      return;
-    }
-    setState(() => _defaultGameEdition = edition);
-  }
-
-  Future<void> _setDefaultGameEdition(GameEdition? edition) async {
-    if (edition == null) {
-      return;
-    }
-    await dexSettingsRepository.saveDefaultGameEdition(edition);
-    if (!mounted) {
-      return;
-    }
-    setState(() => _defaultGameEdition = edition);
-  }
-
   Future<void> _toggleAskTitoDex(bool enabled) async {
     await askTitoDexSettings.setEnabled(enabled);
   }
@@ -275,16 +255,6 @@ class _SettingsPageState extends State<SettingsPage> {
       await askTitoDexSettings.setExtensionEnabled(true);
     } else {
       await askTitoDexSettings.enableWithConsent();
-    }
-  }
-
-  Future<void> _pickDefaultGameEdition() async {
-    final edition = await showGameEditionGridPicker(
-      context,
-      selected: _defaultGameEdition,
-    );
-    if (edition != null && mounted) {
-      await _setDefaultGameEdition(edition);
     }
   }
 
@@ -542,6 +512,13 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _clearDexOffline() async {
+    final confirmed = await showTitoConfirmDialog(
+      context,
+      title: AppZh.confirmDexOfflineClearTitle,
+      body: AppZh.confirmDexOfflineClearBody,
+      confirmLabel: AppZh.confirmClearAction,
+    );
+    if (!confirmed || !mounted) return;
     await _dexOfflineService.clearAll();
     dexRepository.clearMemoryCache();
     await _refreshDexCacheStatus();
@@ -549,6 +526,22 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
     showTitoSnackBar(context, AppZh.snackDexOfflineCleared);
+  }
+
+  /// Runs an irreversible journey [action] only after the user confirms.
+  Future<void> _confirmThen({
+    required String title,
+    required String body,
+    required String confirmLabel,
+    required VoidCallback action,
+  }) async {
+    final confirmed = await showTitoConfirmDialog(
+      context,
+      title: title,
+      body: body,
+      confirmLabel: confirmLabel,
+    );
+    if (confirmed && mounted) action();
   }
 
   Future<void> _setDexPreferOffline(bool enabled) async {
@@ -1125,7 +1118,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _defaultGameEdition.label,
+                  gameEditionRepository.edition.label,
                   style: SecondaryTypography.onCard.small12.copyWith(
                     color: TitoTypography.mutedColor,
                   ),
@@ -1146,7 +1139,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton(
-                  onPressed: _dexDownloading ? null : _pickDefaultGameEdition,
+                  onPressed:
+                      _dexDownloading || widget.onChangeGameEdition == null
+                      ? null
+                      : () => widget.onChangeGameEdition!(context).then((_) {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        }),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(58),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1156,7 +1156,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          _defaultGameEdition.label,
+                          gameEditionRepository.edition.label,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: SecondaryTypography.onCard.body14.copyWith(
@@ -1305,6 +1305,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           const SizedBox(height: 10),
+          const _SourcesRibbon(),
+          const SizedBox(height: 10),
           SettingsExpandableSection(
             title: AppZh.settingsAttributionTitle,
             subtitle: AppZh.settingsAttributionHint,
@@ -1342,7 +1344,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: widget.onImportFixture,
+                        onPressed: () => _confirmThen(
+                          title: AppZh.confirmImportSaveTitle,
+                          body: AppZh.confirmImportSaveBody,
+                          confirmLabel: AppZh.confirmImportSaveAction,
+                          action: widget.onImportFixture,
+                        ),
                         child: Text(AppZh.settingsImportSave),
                       ),
                     ),
@@ -1367,7 +1374,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: widget.onResetMock,
+                        onPressed: () => _confirmThen(
+                          title: AppZh.confirmResetMockTitle,
+                          body: AppZh.confirmResetMockBody,
+                          confirmLabel: AppZh.confirmResetMockAction,
+                          action: widget.onResetMock,
+                        ),
                         child: Text(AppZh.settingsResetMock),
                       ),
                     ),
@@ -1378,6 +1390,67 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// Names from the attribution text, looping as a ribbon; the full credits
+/// stay in the expandable section below.
+class _SourcesRibbon extends StatelessWidget {
+  const _SourcesRibbon();
+
+  static const _sources = [
+    'PokéAPI',
+    '52Poké Wiki',
+    'Bulbapedia',
+    'PKHeX',
+    'Project Pokémon',
+    'Pokémon Showdown',
+    'PokéSprite',
+    "Neroli's Lab",
+    'Exa',
+    'Nunito',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final pill = TitoSurfaceTokens.of(context).surface(TitoSurfaceRole.fact);
+    final style = SecondaryTypography.onCard.small12.copyWith(
+      fontWeight: TitoTypography.weight(FontWeight.w700),
+    );
+    return StickerCard(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppZh.settingsSourcesStrip,
+            style: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoTypography.mutedColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TitoMarquee(
+            semanticsLabel:
+                '${AppZh.settingsSourcesStrip}: ${_sources.join(', ')}',
+            children: [
+              for (final name in _sources)
+                DecoratedBox(
+                  decoration: pill.decoration().copyWith(
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    child: Text(name, style: style),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1675,11 +1748,117 @@ class _InterfaceSection extends StatelessWidget {
                   value: motionPreferences.listAnimationsEnabled,
                   onChanged: motionPreferences.setListAnimationsEnabled,
                 ),
+                const StickerRowDivider(),
+                const _NumberStyleRow(),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// Settings → 数字样式（实验）: glyph style of the hero damage / stat numbers.
+class _NumberStyleRow extends StatelessWidget {
+  const _NumberStyleRow();
+
+  static String _label(TitoNumberStyle style) => switch (style) {
+    TitoNumberStyle.standard => AppZh.settingsNumberStyleStandard,
+    TitoNumberStyle.segment => AppZh.settingsNumberStyleSegment,
+    TitoNumberStyle.dotMatrix => AppZh.settingsNumberStyleDotMatrix,
+    TitoNumberStyle.pixel => AppZh.settingsNumberStylePixel,
+    TitoNumberStyle.splitFlap => AppZh.settingsNumberStyleSplitFlap,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: numberStylePreferences,
+      builder: (context, _) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.settingsNumberStyle,
+                style: SecondaryTypography.onCard.body14,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                AppZh.settingsNumberStyleHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoTypography.mutedColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                key: const ValueKey('settings-number-style'),
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final style in TitoNumberStyle.values)
+                    _NumberStyleChoice(
+                      key: ValueKey('settings-number-style-${style.name}'),
+                      label: _label(style),
+                      selected: numberStylePreferences.style == style,
+                      onTap: () => numberStylePreferences.setStyle(style),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _NumberStyleChoice extends StatelessWidget {
+  const _NumberStyleChoice({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tile = titoChoiceTile(context, selected: selected);
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: Material(
+        color: tile.fill,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(TitoRadii.md),
+          side: tile.outline,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 44, minWidth: 64),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              child: Center(
+                widthFactor: 1,
+                child: Text(
+                  label,
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    color: tile.foreground,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -12,6 +12,7 @@ import 'features/companion/companion_repository.dart';
 import 'features/extensions/journey_assistant_extension.dart';
 import 'theme/app_visual_style.dart';
 import 'theme/motion_preferences.dart';
+import 'theme/number_style_preferences.dart';
 import 'theme/retro_style.dart';
 import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
@@ -534,6 +535,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     await companionRepository.load();
     await appVisualStyle.load();
     await motionPreferences.load();
+    await numberStylePreferences.load();
     await retroStyle.load();
     await appShortcutPreferences.load();
     var journey = await _repository.load();

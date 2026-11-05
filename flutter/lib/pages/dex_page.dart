@@ -16,7 +16,6 @@ import '../features/dex/dex_repository.dart';
 import '../features/dex/dex_scope.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/parser/hgss_format.dart';
-import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../navigation/tito_route_work.dart';
@@ -28,7 +27,6 @@ import '../widgets/dex_search_filter_sheet.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
-import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_scroll_to_top_button.dart';
 import '../widgets/tito_list_reveal.dart';
@@ -36,6 +34,7 @@ import '../widgets/tito_skeleton.dart';
 import '../theme/tito_typography.dart';
 import '../theme/tito_surface_tokens.dart';
 import '../widgets/tito_snack_bar.dart';
+import '../widgets/tito_state_panel.dart';
 
 class DexPage extends StatefulWidget {
   const DexPage({
@@ -91,7 +90,11 @@ class _DexPageState extends State<DexPage> {
   bool _loadingEvolutionOrTrade = false;
   int _availabilityRequest = 0;
   Set<int> _journeyIds = const {};
-  String? _error;
+  Object? _error;
+
+  /// Re-runs whichever loader produced [_error] (chunk, region, generation,
+  /// journey or reference filter).
+  VoidCallback? _retry;
   bool _showScrollToTop = false;
 
   /// Whether this page instance was opened by a reference drill-down. Such
@@ -323,13 +326,15 @@ class _DexPageState extends State<DexPage> {
         _filterVisibleCount = _chunkSize.clamp(0, entries.length);
         _loadingReferenceFilter = false;
         _error = null;
+        _retry = null;
       });
     } catch (error) {
       if (!mounted || request != _filterRequest) {
         return;
       }
       setState(() {
-        _error = _formatDexError(error);
+        _error = error;
+        _retry = _loadReferenceFilter;
         _loadingReferenceFilter = false;
         _referenceFilteredSummaries = const [];
       });
@@ -403,11 +408,27 @@ class _DexPageState extends State<DexPage> {
       if (!mounted) {
         return;
       }
-      setState(() => _error = _formatDexError(error));
+      setState(() {
+        _error = error;
+        _retry = _bootstrap;
+      });
     }
   }
 
-  String _formatDexError(Object error) => formatUserFacingError(error);
+  void _retryFailedLoad() {
+    final retry = _retry;
+    setState(() {
+      _error = null;
+      _retry = null;
+    });
+    if (retry != null) {
+      retry();
+    } else if (_mode == _DexMode.national) {
+      _loadMore();
+    } else {
+      _setMode(_DexMode.journey);
+    }
+  }
 
   Set<int> _resolveJourneyIds() {
     final ids = <int>{};
@@ -497,6 +518,9 @@ class _DexPageState extends State<DexPage> {
   }
 
   void _loadMoreVisible() {
+    // A failed load waits for the explicit retry instead of re-firing on
+    // every scroll notification near the end of the list.
+    if (_error != null) return;
     if (dexFilterController.hasActiveFilter) {
       if (_filterVisibleCount >= _scopedReferenceEntries.length) {
         return;
@@ -541,7 +565,8 @@ class _DexPageState extends State<DexPage> {
         return;
       }
       setState(() {
-        _error = _formatDexError(error);
+        _error = error;
+        _retry = _loadMore;
         _loadingChunk = false;
       });
     }
@@ -557,9 +582,9 @@ class _DexPageState extends State<DexPage> {
   /// TitoListReveal waits for route completion itself. Only row stagger belongs
   /// here, avoiding a second route-length delay after the shell has landed.
   Duration _cardRevealDelay(int index, int columns) {
-    final row = index ~/ columns;
-    final staggerMs = row.clamp(0, 7).toInt() * 42;
-    return Duration(milliseconds: staggerMs);
+    // Diagonal wave: each card follows its left and upper neighbours.
+    final step = (index ~/ columns + index % columns).clamp(0, 10).toInt();
+    return Duration(milliseconds: step * 34);
   }
 
   Duration _headerRevealDelay() => Duration.zero;
@@ -572,6 +597,7 @@ class _DexPageState extends State<DexPage> {
     setState(() {
       _mode = mode;
       _error = null;
+      _retry = null;
       if (mode == _DexMode.national) {
         _loadingJourney = false;
       } else {
@@ -597,7 +623,8 @@ class _DexPageState extends State<DexPage> {
         return;
       }
       setState(() {
-        _error = _formatDexError(error);
+        _error = error;
+        _retry = () => _setMode(_DexMode.journey);
         _loadingJourney = false;
         _journeySummaries = const [];
       });
@@ -615,6 +642,7 @@ class _DexPageState extends State<DexPage> {
       );
       _mode = _DexMode.national;
       _error = null;
+      _retry = null;
     });
     unawaited(dexSettingsRepository.saveBrowseScope(scope));
     if (_scrollController.hasClients) {
@@ -648,7 +676,8 @@ class _DexPageState extends State<DexPage> {
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _error = _formatDexError(error);
+        _error = error;
+        _retry = () => _loadGeneration(generation);
         _loadingRegion = false;
       });
     }
@@ -683,7 +712,8 @@ class _DexPageState extends State<DexPage> {
         return;
       }
       setState(() {
-        _error = _formatDexError(error);
+        _error = error;
+        _retry = () => _loadRegion(region);
         _loadingRegion = false;
       });
     }
@@ -733,6 +763,9 @@ class _DexPageState extends State<DexPage> {
           .toList(growable: false);
 
   Iterable<PokemonSummary> get _primaryScopeEntries {
+    if (_mode == _DexMode.journey) {
+      return _journeySummaries.where(_browseScope.matches);
+    }
     final generation = _browseScope.generation;
     if (generation != null) return _generationCache[generation] ?? const [];
     if (_region != DexRegionalPokedex.national) {
@@ -743,7 +776,8 @@ class _DexPageState extends State<DexPage> {
 
   DexScopeStats get _scopeStats {
     final legacyScope = regionalScopeFromPokedex(_region);
-    if (_browseScope.generation == null &&
+    if (_mode != _DexMode.journey &&
+        _browseScope.generation == null &&
         (_region == DexRegionalPokedex.national ||
             _region == DexRegionalPokedex.johto ||
             _region == DexRegionalPokedex.kanto)) {
@@ -807,12 +841,12 @@ class _DexPageState extends State<DexPage> {
         .length;
   }
 
-  /// Region progress line, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
-  String? get _scopeProgressLine {
-    if (_mode != _DexMode.national) {
-      return null;
-    }
+  /// Progress line for every scope, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
+  String get _scopeProgressLine {
     final stats = _scopeStats;
+    if (_mode == _DexMode.journey) {
+      return AppZh.dexJourneyProgress(stats.seen, stats.caught, stats.total);
+    }
     final generation = _browseScope.generation;
     if (generation != null) {
       return AppZh.dexGenerationProgress(
@@ -822,7 +856,6 @@ class _DexPageState extends State<DexPage> {
         stats.total,
       );
     }
-    if (_region == DexRegionalPokedex.national) return null;
     final (start, end) = DexScope.idRangeForScope(
       _region,
       gameEdition: gameEditionRepository.edition,
@@ -901,29 +934,15 @@ class _DexPageState extends State<DexPage> {
                                 children: [
                                   // Square handheld: keep the top area short — at most one
                                   // info line (region progress when 城都/关东 is active).
-                                  if (_scopeProgressLine != null) ...[
-                                    Text(
-                                      _scopeProgressLine!,
-                                      style: SecondaryTypography.onPage(
-                                        context,
-                                      ).body14,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(height: squareGap(context)),
-                                  ] else if (!DeviceLayout.useSquareDashboard(
-                                    context,
-                                  )) ...[
-                                    Text(
-                                      AppZh.dexScopeNote,
-                                      style: SecondaryTypography.onPage(
-                                        context,
-                                      ).body14,
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(height: squareGap(context)),
-                                  ],
+                                  Text(
+                                    _scopeProgressLine,
+                                    style: SecondaryTypography.onPage(
+                                      context,
+                                    ).body14,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: squareGap(context)),
                                   if (dexFilterController.hasActiveFilter) ...[
                                     DexFilterBanner(
                                       filter: dexFilterController.currentFilter,
@@ -957,50 +976,10 @@ class _DexPageState extends State<DexPage> {
                                     ).small12,
                                   ),
                                   SizedBox(height: squareGap(context)),
-                                  if (_error != null)
-                                    StickerCard(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Text(
-                                            AppZh.dexLoadFailed,
-                                            style: SecondaryTypography
-                                                .onCard
-                                                .body14
-                                                .copyWith(
-                                                  fontWeight:
-                                                      TitoTypography.weight(
-                                                        FontWeight.w800,
-                                                      ),
-                                                ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            _error!,
-                                            style: SecondaryTypography
-                                                .onCard
-                                                .small12
-                                                .copyWith(
-                                                  color:
-                                                      TitoTypography.mutedColor,
-                                                  height: 1.45,
-                                                ),
-                                          ),
-                                          const SizedBox(height: 12),
-                                          FilledButton(
-                                            onPressed: () {
-                                              setState(() => _error = null);
-                                              if (_mode == _DexMode.national) {
-                                                _loadMore();
-                                              } else {
-                                                _setMode(_DexMode.journey);
-                                              }
-                                            },
-                                            child: Text(AppZh.dexRetry),
-                                          ),
-                                        ],
-                                      ),
+                                  if (_error != null && visible.isEmpty)
+                                    TitoErrorPanel.fromError(
+                                      _error!,
+                                      onRetry: _retryFailedLoad,
                                     )
                                   else if (visible.isEmpty && loading)
                                     LayoutBuilder(
@@ -1018,16 +997,8 @@ class _DexPageState extends State<DexPage> {
                                           ),
                                     )
                                   else if (visible.isEmpty)
-                                    StickerCard(
-                                      child: Text(
-                                        _emptyMessageForMode(),
-                                        style: SecondaryTypography.onCard.body14
-                                            .copyWith(
-                                              fontWeight: TitoTypography.weight(
-                                                FontWeight.w700,
-                                              ),
-                                            ),
-                                      ),
+                                    TitoEmptyState(
+                                      message: _emptyMessageForMode(),
                                     ),
                                 ],
                               ),
@@ -1036,7 +1007,7 @@ class _DexPageState extends State<DexPage> {
                         ),
                       ),
                     ),
-                    if (visible.isNotEmpty && _error == null)
+                    if (visible.isNotEmpty)
                       SliverPadding(
                         padding: EdgeInsets.fromLTRB(
                           padding.left,
@@ -1109,6 +1080,18 @@ class _DexPageState extends State<DexPage> {
                             crossAxisCount: columns,
                             itemCount: columns,
                             childAspectRatio: aspectRatio,
+                          ),
+                        ),
+                      ),
+                    // Already-loaded cards stay put; the failure sits after
+                    // them where the next chunk would have appeared.
+                    if (_error != null && visible.isNotEmpty)
+                      SliverPadding(
+                        padding: padding.copyWith(top: 8),
+                        sliver: SliverToBoxAdapter(
+                          child: TitoErrorPanel.fromError(
+                            _error!,
+                            onRetry: _retryFailedLoad,
                           ),
                         ),
                       ),

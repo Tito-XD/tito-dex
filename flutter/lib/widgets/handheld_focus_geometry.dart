@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+/// Marks controls drawn above the navigator (the toast host) so D-pad
+/// traversal can step from the page into them and back. Without it they sit
+/// outside the current route's focus scope and only touch can reach them.
+class HandheldGlobalStops extends InheritedWidget {
+  const HandheldGlobalStops({super.key, required super.child});
+
+  static bool contains(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<HandheldGlobalStops>() != null;
+
+  @override
+  bool updateShouldNotify(HandheldGlobalStops oldWidget) => false;
+}
+
 /// The visible control represented by one handheld focus stop.
 class HandheldFocusTarget extends SingleChildRenderObjectWidget {
   const HandheldFocusTarget({

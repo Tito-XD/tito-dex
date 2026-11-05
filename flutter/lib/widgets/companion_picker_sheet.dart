@@ -24,6 +24,7 @@ import '../theme/tito_typography.dart';
 import 'tito_progress_bar.dart';
 import 'tito_pokeball_loading.dart';
 import '../theme/tito_surface_tokens.dart';
+import 'tito_state_panel.dart';
 
 /// Pick the standby companion from the full national dex. The selection is
 /// saved to [companionRepository]; only its animated sprite is fetched later,
@@ -239,11 +240,10 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
                   }
                   final entries = _filtered(all);
                   if (entries.isEmpty) {
-                    return Center(
-                      child: Text(
-                        AppZh.searchNoResults,
-                        style: SecondaryTypography.onCard.body14,
-                      ),
+                    return TitoEmptyState(
+                      message: AppZh.searchNoResults,
+                      framed: false,
+                      centered: true,
                     );
                   }
                   return GridView.builder(

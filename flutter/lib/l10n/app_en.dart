@@ -40,6 +40,12 @@ const kAppEn = <String, String>{
   'battleRestoreStats': 'Manual stats · Recalculate',
   'battleMoreOptions': 'More options',
   'battleMatchupSummary': 'Damage taken by type',
+  'battleMatchupWeak': 'Weak',
+  'battleMatchupResist': 'Resists',
+  'battleMatchupImmune': 'Immune',
+  'battleMatchupNeutral': 'Neutral 1× · {count} types',
+  'battlePartyDefaultTag': 'Defaults',
+  'battleTypeCountSuffix': ' · {count} types',
   'battleAttacker': 'Attacker',
   'battleTypes': 'Types',
   'battleAbility': 'Ability',
@@ -134,6 +140,7 @@ const kAppEn = <String, String>{
   'journeyAssistantTitle': 'Save assistant',
   'journeyAssistantMeta': 'Assistant',
   'journeyAssistantLoading': 'Sorting…',
+  'journeyAssistantCardFallback': 'View journey',
   'journeyAssistantLoadFailed':
       'The save assistant cannot read location or Pokédex data right now.',
   'journeyAssistantNearbyTitle': 'Uncaught nearby',
@@ -289,12 +296,13 @@ const kAppEn = <String, String>{
   'settingsDexProgress': 'Pokédex progress',
   'teamSummaryTitle': 'Team overview',
   'teamCollapseDetails': 'Collapse details',
-  'teamCommonWeaknesses': 'Common weaknesses',
-  'teamSharedWeaknesses': 'Shared weaknesses (2+)',
+  'teamCommonWeaknesses': 'Most hit by',
+  'teamSharedWeaknesses': 'Shared by ≥2',
   'teamAverageLevel': 'Average level',
   'teamBaseStatTotal': 'BST total',
-  'teamTypeCoverage': 'Type coverage',
-  'journeyRemainingDex': 'Other missing Pokémon in Dex · {count}',
+  'teamTypeCoverage': 'Own types',
+  'teamOwnTypeCount': '{count}',
+  'journeyRemainingDex': 'Complete {count} in the Dex',
   'sleepToolsTitle': 'Pokémon Sleep tools',
   'sleepToolsTierAHint':
       'Built-in offline calculator, plus a Neroli’s Lab reference link',
@@ -341,8 +349,8 @@ const kAppEn = <String, String>{
   'journeySince2026': 'Journey since 2026',
   'widgetContinue': 'Continue',
   'companionMessage': '{location} is lively today!',
-  'dexScopeNote':
-      'National Dex 1–1025. Chinese names and types come from the online dex; caught/seen status comes from the save and traveling party.',
+  'dexJourneyProgress':
+      'Journey party · Seen {seen} / Caught {caught} / {total} total',
   'dexCaught': 'Caught',
   'dexSeen': 'Seen',
   'dexUnknown': 'Unseen',
@@ -407,6 +415,7 @@ const kAppEn = <String, String>{
   'dexFormStatusEventOnly': 'Event-only',
   'dexFormStatusDeprecated': 'Historical form',
   'dexFormIntroducedIn': 'First appeared in {game}',
+  'settingsSourcesStrip': 'Data and media sources',
   'settingsAttributionTitle': 'About TitoDex · Data sources & licenses',
   'settingsAttributionHint':
       'Unofficial learning tool · full Credits and rights notes',
@@ -583,6 +592,21 @@ const kAppEn = <String, String>{
   'settingsDexOfflineDownload': 'Download offline pack',
   'settingsDexOfflineResume': 'Resume offline pack download',
   'settingsDexOfflineClear': 'Clear offline cache',
+  'confirmDexOfflineClearTitle': 'Clear offline cache?',
+  'confirmDexOfflineClearBody':
+      'The full downloaded offline pack will be deleted. To use the Dex offline again you will need to download it again.',
+  'confirmClearAction': 'Clear',
+  'confirmResetMockTitle': 'Restore demo data?',
+  'confirmResetMockBody':
+      'Your current journey, party and manual marks will be replaced by demo data. This cannot be undone.',
+  'confirmResetMockAction': 'Restore',
+  'confirmImportSaveTitle': 'Import the bundled sample save?',
+  'confirmImportSaveBody':
+      'Your current journey will be overwritten by the bundled sample save PKMSS.sav. This cannot be undone.',
+  'confirmImportSaveAction': 'Import',
+  'confirmMediaClearAllTitle': 'Clear all media resources?',
+  'confirmMediaClearAllBody':
+      'All downloaded media resources will be deleted. You will need to download them again.',
   'settingsDexOfflinePrefer': 'Prefer offline cache',
   'offlineSeedProgressTitle': 'Preparing the offline pack',
   'settingsDexCdnDownload': 'Download the full offline pack',
@@ -727,6 +751,14 @@ const kAppEn = <String, String>{
   'settingsListAnimations': 'List fade-in',
   'settingsListAnimationsHint':
       'Small fade-ins on Dex, Search, and reference lists. Off, content appears at once.',
+  'settingsNumberStyle': 'Number style (experimental)',
+  'settingsNumberStyleHint':
+      'Only the large damage and stat numbers; all other numbers keep the default font.',
+  'settingsNumberStyleStandard': 'Default',
+  'settingsNumberStyleSegment': 'Segment',
+  'settingsNumberStyleDotMatrix': 'Dot matrix',
+  'settingsNumberStylePixel': 'Pixel',
+  'settingsNumberStyleSplitFlap': 'Split-flap',
   'settingsAppShortcuts': 'Home-screen shortcuts',
   'settingsAppShortcutsHint':
       'Dex and Search are shown by default. You can replace or add any reference or tool below — up to three.',
@@ -837,8 +869,8 @@ const kAppEn = <String, String>{
   'teamSummaryAvgLevel': 'Avg. Lv {avg}',
   'teamSummaryBstSum': 'BST total {sum}',
   'teamSummaryTypeCoverage': 'Type coverage {count}/18',
-  'teamSummaryWeaknesses': 'Common weaknesses: {types}',
-  'teamSummarySharedWeaknesses': 'Shared weaknesses (≥2): {types}',
+  'teamSummaryWeaknesses': 'Most hit by: {types}',
+  'teamSummarySharedWeaknesses': 'Shared by ≥2: {types}',
   'teamEditTitle': 'Edit traveler',
   'teamEditLevel': 'Level',
   'teamEditNickname': 'Nickname',
@@ -849,6 +881,9 @@ const kAppEn = <String, String>{
   'teamEditSwapNext': 'Swap with next',
   'teamAddTitle': 'Add a Pokémon',
   'teamAddInvalidId': 'Invalid number',
+  'teamAddAbilityLoadFailed': 'Couldn’t load abilities. Try again.',
+  'teamMemberRemoved': 'Removed {name}',
+  'undo': 'Undo',
   'confirm': 'OK',
   'cancel': 'Cancel',
   'retry': 'Retry',
@@ -940,7 +975,7 @@ const kAppEn = <String, String>{
   'journeyPackAvailable': 'Available packs',
   'journeyPackRefresh': 'Refresh',
   'journeyPackWorkerUnconfigured':
-      'Journey Assistant Worker is not configured. Older installed packs still work.',
+      'Online catalog unavailable. Older installed packs still work.',
   'journeyPackCatalogEmpty': 'No packs to download right now.',
   'journeyPackCatalogUnavailable':
       'The catalog cannot be read right now. Installed packs are unaffected.',
@@ -958,7 +993,7 @@ const kAppEn = <String, String>{
   'journeyPackDeleteBody':
       'Only the downloaded Q&A pack is removed. Saves and chat history stay.',
   'journeyPackErrorWorkerNotConfigured':
-      'Journey Assistant Worker is not configured.',
+      'Online catalog unavailable.',
   'journeyPackErrorTimeout': 'Connection timed out. Please try again later.',
   'journeyPackErrorInvalid':
       'Pack verification failed. The previous pack was not replaced.',
@@ -1104,6 +1139,7 @@ const kAppEn = <String, String>{
   'artworkAnniversaryLogo': '30th anniversary logo',
   'artworkFlipFront': 'Show the front',
   'artworkFlipBack': 'Show the back',
+  'artworkOpenSemantics': 'View Pokémon artwork',
   'artworkCloseSemantics': 'Close Pokémon artwork',
   'loadingSemantics': 'Loading',
   'pickGameEdition': 'Choose a game version',

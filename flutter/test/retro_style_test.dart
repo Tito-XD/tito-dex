@@ -184,34 +184,51 @@ void main() {
         ),
       );
 
-      final pressable = tester.widget<AnimatedContainer>(
-        find.descendant(
-          of: find.byType(StickerPressable),
-          matching: find.byType(AnimatedContainer),
-        ),
+      DecoratedBox depth() => tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byType(StickerPressable),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
       );
+      double sinkOffset() => tester
+          .widget<Transform>(
+            find
+                .descendant(
+                  of: find.byType(StickerPressable),
+                  matching: find.byType(Transform),
+                )
+                .first,
+          )
+          .transform
+          .storage[13];
       expect(
-        (pressable.decoration! as BoxDecoration).boxShadow,
+        (depth().decoration as BoxDecoration).boxShadow,
         TrainerJournalShadows.control,
       );
 
       final gesture = await tester.startGesture(
         tester.getCenter(find.byKey(childKey)),
       );
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 80));
-      final sunk = tester.widget<AnimatedContainer>(
-        find.descendant(
-          of: find.byType(StickerPressable),
-          matching: find.byType(AnimatedContainer),
-        ),
-      );
-      expect(sunk.transform!.storage[13], 1);
+      expect(sinkOffset(), 1);
       expect(
-        (sunk.decoration! as BoxDecoration).boxShadow,
+        (depth().decoration as BoxDecoration).boxShadow,
         TrainerJournalShadows.stickerPressed,
       );
-      await gesture.up();
       await tester.pump(const Duration(milliseconds: 120));
+      await gesture.up();
+      // Release is a spring: it overshoots above rest, then settles at 0.
+      var overshoot = 0.0;
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+        overshoot = overshoot < sinkOffset() ? overshoot : sinkOffset();
+      }
+      expect(overshoot, lessThan(0));
+      await tester.pumpAndSettle();
+      expect(sinkOffset(), 0);
     },
   );
 }

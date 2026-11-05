@@ -18,7 +18,13 @@ import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_card.dart';
+import 'handheld_input.dart';
 import 'tito_snack_bar.dart';
+
+/// One roll table per app launch — opening the app is the slot machine.
+/// Tests override this to force a shiny party member.
+@visibleForTesting
+int partyShinySessionSeed = DateTime.now().millisecondsSinceEpoch;
 
 /// Inset party cell / empty cell surface, branched per visual style the same
 /// way `sticker_card.dart` does: Trainer's Journal uses a quiet pale fill,
@@ -455,8 +461,7 @@ class _PartyMemberAvatar extends StatelessWidget {
     this.framed = true,
   });
 
-  /// One roll table per app launch — opening the app is the slot machine.
-  static final int _sessionSeed = DateTime.now().millisecondsSinceEpoch;
+  static int get _sessionSeed => partyShinySessionSeed;
 
   final PartyMember member;
   final double size;
@@ -494,17 +499,29 @@ class _PartyMemberAvatar extends StatelessWidget {
         : _letterFallback(label, size);
 
     if (isShiny) {
-      sprite = GestureDetector(
-        onTap: () {
-          HapticFeedback.mediumImpact();
-          showTitoSnackBar(context, AppZh.shinyPartyFound(label));
-        },
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            sprite,
-            const Positioned(top: -2, right: -2, child: _SparklePulse()),
-          ],
+      void showShinyNote() {
+        HapticFeedback.mediumImpact();
+        showTitoSnackBar(context, AppZh.shinyPartyFound(label));
+      }
+
+      sprite = Semantics(
+        button: true,
+        label: AppZh.shinyPartyFound(label),
+        excludeSemantics: true,
+        child: HandheldFocusDecorator(
+          onActivate: showShinyNote,
+          borderRadius: BorderRadius.circular(size / 2),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: showShinyNote,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                sprite,
+                const Positioned(top: -2, right: -2, child: _SparklePulse()),
+              ],
+            ),
+          ),
         ),
       );
     }

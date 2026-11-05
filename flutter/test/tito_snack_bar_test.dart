@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/theme/app_visual_style.dart';
 import 'package:titodex/theme/tito_theme.dart';
+import 'package:titodex/widgets/handheld_input.dart';
 import 'package:titodex/widgets/tito_snack_bar.dart';
 
 Future<BuildContext> _pumpHost(
@@ -114,5 +116,73 @@ void main() {
     await tester.pump();
     await tester.pump();
     expect(find.text('无动画'), findsNothing);
+  });
+
+  testWidgets('D-pad reaches the toast action and close, and holds it open', (
+    tester,
+  ) async {
+    FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTraditional;
+    addTearDown(
+      () => FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.automatic,
+    );
+    late BuildContext pageContext;
+    var opened = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildTitoTheme(AppVisualStyle.classic),
+        builder: (context, child) =>
+            HandheldInputShell(child: TitoSnackHost(child: child!)),
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              pageContext = context;
+              return Center(
+                child: TextButton(onPressed: () {}, child: const Text('页面')),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+    showTitoSnackBar(
+      pageContext,
+      '有新版本',
+      duration: const Duration(seconds: 2),
+      actionLabel: '查看',
+      onAction: () => opened++,
+    );
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.context?.widget, isA<Focus>());
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    final close = find.byKey(const ValueKey('tito-snack-close'));
+    final action = find.widgetWithText(TextButton, '查看');
+    bool focusedIn(Finder finder) {
+      final primary = FocusManager.instance.primaryFocus?.context;
+      return primary != null &&
+          find
+              .descendant(of: finder, matching: find.byWidget(primary.widget))
+              .evaluate()
+              .isNotEmpty;
+    }
+
+    expect(focusedIn(action) || focusedIn(close), isTrue);
+    // Focus on the toast suspends its timer.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(find.text('有新版本'), findsOneWidget);
+    if (!focusedIn(action)) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+    }
+    expect(focusedIn(action), isTrue);
+    await tester.sendKeyEvent(LogicalKeyboardKey.gameButtonA);
+    await tester.pumpAndSettle();
+    expect(opened, 1);
+    expect(find.text('有新版本'), findsNothing);
   });
 }

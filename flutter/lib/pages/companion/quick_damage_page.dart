@@ -22,13 +22,12 @@ import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
-import '../../theme/tito_colors.dart';
 import '../../widgets/companion_tool_fields.dart';
-import '../../theme/tito_surface_tokens.dart';
 import '../../widgets/battle_tool_panels.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
 import '../../widgets/tito_rolling_value.dart';
+import '../../widgets/tito_animated_number.dart';
 
 class QuickDamagePage extends StatefulWidget {
   const QuickDamagePage({
@@ -670,137 +669,128 @@ class _DamageResultCard extends StatelessWidget {
 
   final DamageEstimate estimate;
   final Object identity;
+
+  /// Attacker, defender and move: a new matchup counts up from zero again.
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final minPct = estimate.minPercent;
     final maxPct = estimate.maxPercent;
-    final bigPercent = (maxPct - minPct) < 0.5
-        ? '${maxPct.round()}%'
-        : '${minPct.round()}–${maxPct.round()}%';
+    final singlePercent = (maxPct - minPct) < 0.5;
     final damageFraction = (maxPct / 100).clamp(0.0, 1.0);
+    final hero = BattleResultText.hero;
+    Widget count(num value, String slot, {String suffix = ''}) =>
+        TitoAnimatedNumber(
+          // Keyed so the max keeps its state when the min appears or goes.
+          key: ValueKey('damage-hero-$slot'),
+          value: value,
+          identity: (identity, slot),
+          countUp: true,
+          suffix: suffix,
+          retro: true,
+          style: hero,
+        );
     final typeMultiplier = formatTypeMultiplier(estimate.typeMultiplier);
     final stabMultiplier = formatTypeMultiplier(estimate.stabMultiplier);
     final modifierStyle = BattleResultText.meta;
 
-    return BattleResultCard(
-      display: true,
-      title: AppZh.companionDamageResultTitle,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    final modifiers = Semantics(
+      key: const ValueKey('damage-modifiers'),
+      container: true,
+      label: AppZh.companionDamageModifiers(typeMultiplier, stabMultiplier),
+      excludeSemantics: true,
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(bigPercent, style: BattleResultText.hero),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  '${estimate.minDamage} – ${estimate.maxDamage} · '
-                  '${estimate.verdictZh}',
-                  style: BattleResultText.eyebrow,
-                ),
+              Text('${AppZh.companionDamageTypeLabel} ×', style: modifierStyle),
+              TitoRollingValue(
+                key: const ValueKey('damage-type-multiplier'),
+                value: typeMultiplier,
+                // Manual type edits clear the linked Pokémon identity.
+                // This metric slot still belongs to the same calculation.
+                identity: (identity, 'type'),
+                style: modifierStyle,
+                textKey: const ValueKey('damage-type-multiplier-value'),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              // HP bar rail: a translucent white wash over the deep card so
-              // the mint/coral split reads on every theme; the outline is the
-              // theme's element edge.
-              return Container(
-                height: 20,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.fromBorderSide(
-                    TitoSurfaceTokens.of(context).elementOutline,
-                  ),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: width * (1 - damageFraction),
-                      child: const ColoredBox(color: TitoColors.mint),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: width * damageFraction,
-                      child: const ColoredBox(color: TitoColors.coral),
-                    ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${AppZh.companionDamageStabLabel} ×', style: modifierStyle),
+              TitoRollingValue(
+                key: const ValueKey('damage-stab-multiplier'),
+                value: stabMultiplier,
+                identity: (identity, 'stab'),
+                style: modifierStyle,
+                textKey: const ValueKey('damage-stab-multiplier-value'),
+              ),
+            ],
+          ),
+          Text(AppZh.companionDamageRandomRoll, style: modifierStyle),
+        ],
+      ),
+    );
+
+    return BattleResultCard(
+      display: true,
+      title: AppZh.companionDamageResultTitle,
+      trailing: BattleDisplayPill(
+        key: const ValueKey('damage-verdict'),
+        label: estimate.verdictZh,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Counts up from zero when the result first appears, then rolls
+          // between values as inputs change.
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Semantics(
+              container: true,
+              label: singlePercent
+                  ? '${maxPct.round()}%'
+                  : '${minPct.round()}–${maxPct.round()}%',
+              excludeSemantics: true,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  if (!singlePercent) ...[
+                    count(minPct.round(), 'min'),
+                    Text('–', style: hero),
                   ],
-                ),
-              );
-            },
+                  count(maxPct.round(), 'max', suffix: '%'),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 10),
-          if (!compact) ...[
-            Text(
-              '${AppZh.companionDamageDefense}：${estimate.tankVerdictZh}',
-              style: BattleResultText.displayBody,
-            ),
-            const SizedBox(height: 8),
-          ],
-          Semantics(
-            key: const ValueKey('damage-modifiers'),
-            container: true,
-            label: AppZh.companionDamageModifiers(
-              typeMultiplier,
-              stabMultiplier,
-            ),
-            excludeSemantics: true,
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 4,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${AppZh.companionDamageTypeLabel} ×',
-                      style: modifierStyle,
-                    ),
-                    TitoRollingValue(
-                      key: const ValueKey('damage-type-multiplier'),
-                      value: typeMultiplier,
-                      // Manual type edits clear the linked Pokémon identity.
-                      // This metric slot still belongs to the same calculation.
-                      identity: (identity, 'type'),
-                      style: modifierStyle,
-                      textKey: const ValueKey('damage-type-multiplier-value'),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${AppZh.companionDamageStabLabel} ×',
-                      style: modifierStyle,
-                    ),
-                    TitoRollingValue(
-                      key: const ValueKey('damage-stab-multiplier'),
-                      value: stabMultiplier,
-                      identity: (identity, 'stab'),
-                      style: modifierStyle,
-                      textKey: const ValueKey('damage-stab-multiplier-value'),
-                    ),
-                  ],
-                ),
-                Text(AppZh.companionDamageRandomRoll, style: modifierStyle),
-              ],
-            ),
+          BattleHpBar(damageFraction: damageFraction),
+          const SizedBox(height: 10),
+          // HP range on the left, modifiers on the right; the modifiers drop
+          // to their own line when the card is too narrow for both.
+          Wrap(
+            key: const ValueKey('damage-meta'),
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 4,
+            children: [
+              Text(
+                '${estimate.minDamage}–${estimate.maxDamage} HP',
+                key: const ValueKey('damage-hp-range'),
+                style: modifierStyle,
+              ),
+              modifiers,
+            ],
           ),
           if (estimate.extraMultiplier != 1) ...[
             const SizedBox(height: 4),
@@ -812,6 +802,11 @@ class _DamageResultCard extends StatelessWidget {
             ),
           ],
           if (!compact) ...[
+            const SizedBox(height: 8),
+            Text(
+              '${AppZh.companionDamageDefense}：${estimate.tankVerdictZh}',
+              style: BattleResultText.displayBody,
+            ),
             const SizedBox(height: 8),
             Text(
               AppZh.companionDamageAssumptions,

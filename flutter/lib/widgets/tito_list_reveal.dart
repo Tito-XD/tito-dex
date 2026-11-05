@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import '../theme/motion_preferences.dart';
 import '../theme/tito_motion.dart';
 
-/// Small fade + eight-pixel lift for list/grid items and page sections.
+/// Fade + short lift for list/grid items and page sections, staggered so a
+/// fresh result set arrives one row after another.
 ///
 /// A bounded per-route memory prevents lazily disposed rows from replaying just
 /// because the player scrolled them back into view. A new widget/replay key is
@@ -24,8 +25,8 @@ class TitoListReveal extends StatefulWidget {
   /// lists don't keep animating forever.
   static Duration staggerDelay(
     int index, {
-    int stepMs = 22,
-    int maxSteps = 7,
+    int stepMs = 40,
+    int maxSteps = 8,
     int baseMs = 0,
   }) {
     final step = index < maxSteps ? index : maxSteps;

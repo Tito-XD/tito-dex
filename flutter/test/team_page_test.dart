@@ -276,7 +276,9 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('${AppZh.navTeam} · 心金'), findsOneWidget);
+    // The page title already says 队伍; the summary card shows only the game.
+    expect(find.text('心金'), findsOneWidget);
+    expect(find.text('${AppZh.navTeam} · 心金'), findsNothing);
     expect(find.textContaining('魂银'), findsNothing);
   });
 
@@ -387,6 +389,106 @@ void main() {
     await tester.tap(delete);
     await tester.pump(const Duration(milliseconds: 300));
     expect(journey.party, isEmpty);
+  });
+
+  testWidgets('swapping keeps unsaved editor changes on the moved member', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final harness = _TeamHarness(
+      CurrentJourney.mock().copyWith(
+        party: const [
+          PartyMember(species: 'Alpha', nickname: 'First', level: 10),
+          PartyMember(species: 'Beta', nickname: 'Second', level: 20),
+        ],
+        saveSyncedParty: const [],
+      ),
+    );
+    await harness.pump(tester);
+
+    await tester.tap(find.text('First').first);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text(AppZh.teamEditAction));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.enterText(
+      find.widgetWithText(TextField, AppZh.teamEditNickname),
+      'Draft',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, AppZh.teamEditLevel),
+      '33',
+    );
+    await tester.pump();
+    final swap = find.text(AppZh.teamEditSwapNext);
+    await tester.ensureVisible(swap);
+    await tester.pump();
+    await tester.tap(swap);
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(harness.journey.party.map((m) => m.nickname), ['Second', 'Draft']);
+    expect(harness.journey.party[1].level, 33);
+    expect(harness.journey.party[1].userEdited, isTrue);
+    expect(harness.journey.party[0].userEdited, isFalse);
+    expect(harness.saves, 1);
+    // The editor stays open on the moved member with the edits intact.
+    final nickname = find.widgetWithText(TextField, AppZh.teamEditNickname);
+    expect(nickname, findsOneWidget);
+    expect(tester.widget<TextField>(nickname).controller!.text, 'Draft');
+    expect(find.text(AppZh.teamSlotTitle(2)), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('removing a member offers undo that restores its slot', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final harness = _TeamHarness(
+      CurrentJourney.mock().copyWith(
+        party: const [
+          PartyMember(species: 'Alpha', nickname: 'First', level: 10),
+          PartyMember(species: 'Beta', nickname: 'Second', level: 20),
+          PartyMember(species: 'Gamma', nickname: 'Third', level: 30),
+        ],
+        saveSyncedParty: const [],
+      ),
+    );
+    await harness.pump(tester);
+
+    await tester.tap(find.text('Second').first);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text(AppZh.teamEditAction));
+    await tester.pump(const Duration(milliseconds: 300));
+    final delete = find.text(AppZh.teamEditDelete);
+    await tester.ensureVisible(delete);
+    await tester.pump();
+    await tester.tap(delete);
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(harness.journey.party.map((m) => m.nickname), ['First', 'Third']);
+    // Let the snack bar finish its entrance before tapping its action.
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text(AppZh.teamMemberRemoved('Second')), findsOneWidget);
+    await tester.tap(find.text(AppZh.undo));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(harness.journey.party.map((m) => m.nickname), [
+      'First',
+      'Second',
+      'Third',
+    ]);
+    expect(harness.saves, 2);
+    expect(
+      tester.widget<PartyTeamBoard>(find.byType(PartyTeamBoard)).selectedIndex,
+      1,
+    );
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets(
@@ -807,4 +909,36 @@ Future<void> _captureTeam(WidgetTester tester, String name) async {
       image.dispose();
     }
   });
+}
+
+/// Hosts [TeamPage] under a Scaffold and records every saved journey.
+class _TeamHarness {
+  _TeamHarness(this.journey);
+
+  CurrentJourney journey;
+  var saves = 0;
+
+  Future<void> pump(WidgetTester tester) async {
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => Scaffold(
+            body: StatefulBuilder(
+              builder: (context, rebuild) => TeamPage(
+                journey: journey,
+                onSaveJourney: (updated) => rebuild(() {
+                  journey = updated;
+                  saves++;
+                }),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pump(const Duration(milliseconds: 300));
+  }
 }

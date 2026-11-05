@@ -22,6 +22,7 @@ import '../../widgets/tito_loading_panel.dart';
 import '../../widgets/type_badge.dart';
 import '../../theme/tito_typography.dart';
 import '../../navigation/tito_page_transition.dart';
+import '../../widgets/tito_state_panel.dart';
 
 typedef DexReferenceFilter<T> = bool Function(T entry, String query);
 
@@ -104,7 +105,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
   bool _loading = true;
   bool _initialLoadScheduled = false;
   bool _batchScheduled = false;
-  String? _error;
+  Object? _error;
   bool _initialEntryOpened = false;
   int _loadGeneration = 0;
   int _materializedCount = 0;
@@ -172,7 +173,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
         return;
       }
       setState(() {
-        _error = error.toString();
+        _error = error;
         _loading = false;
       });
     }
@@ -211,8 +212,13 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
       _categoryCounts = const {};
       return;
     }
-    final counts = <String?, int>{null: _entries.length};
+    final counts = <String?, int>{null: 0};
     for (final entry in _entries) {
+      if (!_isInitialEntry(entry) &&
+          !(widget.includeEntry?.call(entry) ?? true)) {
+        continue;
+      }
+      counts[null] = counts[null]! + 1;
       final label = filter.label(entry);
       counts[label] = (counts[label] ?? 0) + 1;
     }
@@ -367,31 +373,12 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
           if (_loading)
             TitoLoadingPanel(message: AppZh.referenceLoading, compact: true)
           else if (_error != null)
-            StickerCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppZh.dexLoadFailed,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: TitoTypography.weight(FontWeight.w800),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(_error!, style: SecondaryTypography.onCard.small12),
-                  const SizedBox(height: 12),
-                  FilledButton(onPressed: _load, child: Text(AppZh.dexRetry)),
-                ],
-              ),
-            )
+            TitoErrorPanel.fromError(_error!, onRetry: _load)
           else if (visible.isEmpty)
-            StickerCard(
-              child: Text(
-                widget.initialEntryId != null
-                    ? AppZh.dexReferenceDataMissing
-                    : AppZh.dexReferenceEmpty,
-                style: SecondaryTypography.onCard.body14,
-              ),
+            TitoEmptyState(
+              message: widget.initialEntryId != null
+                  ? AppZh.dexReferenceDataMissing
+                  : AppZh.dexReferenceEmpty,
             )
           else if (widget.gridMode)
             _buildItemGrid(visible)

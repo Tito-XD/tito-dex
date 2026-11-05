@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/pages/dex/dex_reference_list.dart';
+import 'package:titodex/widgets/tito_state_panel.dart';
 
 void main() {
   testWidgets(
@@ -77,5 +78,50 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(AppZh.dexReferenceDataMissing), findsOneWidget);
+  });
+
+  testWidgets('load failure shows a user-facing panel and retries', (
+    tester,
+  ) async {
+    var attempts = 0;
+    final router = GoRouter(
+      initialLocation: '/reference',
+      routes: [
+        GoRoute(
+          path: '/reference',
+          builder: (context, state) => Scaffold(
+            body: DexReferenceListPage<int>(
+              title: '道具',
+              loadEntries: () async {
+                attempts += 1;
+                if (attempts == 1) {
+                  throw StateError('raw-internal-boom');
+                }
+                return const [7];
+              },
+              filterEntry: (_, _) => true,
+              primaryLabel: (entry) => '道具 $entry',
+              secondaryLabel: (_) => '',
+              detailSheet: (_, _) {},
+            ),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TitoErrorPanel), findsOneWidget);
+    expect(find.textContaining('raw-internal-boom'), findsNothing);
+    expect(find.textContaining('StateError'), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('tito-error-retry')));
+    await tester.pumpAndSettle();
+
+    expect(attempts, 2);
+    expect(find.byType(TitoErrorPanel), findsNothing);
+    expect(find.text('道具 7'), findsOneWidget);
   });
 }

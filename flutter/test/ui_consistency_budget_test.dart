@@ -47,6 +47,16 @@ final _rules = <_Rule>[
     allowFiles: {'lib/widgets/tito_snack_bar.dart'},
   ),
   _Rule(
+    'hand-built retry',
+    RegExp(r'\bAppZh\.(?:dexRetry|retry)\b'),
+    // Inline retries that are not a failure panel: Ask answer card, team
+    // panel's partial-load line, emulator empty-list refresh, artwork image.
+    4,
+    'TitoErrorPanel (title, muted detail, retry) or TitoEmptyState '
+        '(muted line with an optional action)',
+    allowFiles: {'lib/widgets/tito_state_panel.dart'},
+  ),
+  _Rule(
     'bare progress indicator',
     RegExp(r'\b(Circular|Linear)ProgressIndicator\s*[.(]'),
     0,

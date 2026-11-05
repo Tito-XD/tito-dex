@@ -8,6 +8,7 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'tito_skeleton.dart';
 import '../theme/tito_surface_tokens.dart';
+import 'tito_state_panel.dart';
 
 Future<EmulatorAppChoice?> showEmulatorPickerSheet(
   BuildContext context,
@@ -96,17 +97,23 @@ class _EmulatorPickerSheetState extends State<_EmulatorPickerSheet>
             }
 
             if (_error != null) {
-              return _EmulatorPickerMessage(
-                message: AppZh.continueSheetEmulatorLoadFailed,
+              return TitoErrorPanel(
+                title: AppZh.continueSheetEmulatorLoadFailed,
                 onRetry: _reload,
+                framed: false,
               );
             }
 
             final apps = snapshot.data ?? const [];
             if (apps.isEmpty) {
-              return _EmulatorPickerMessage(
+              return TitoEmptyState(
                 message: AppZh.continueSheetNoEmulators,
-                onRetry: _reload,
+                framed: false,
+                action: TextButton.icon(
+                  onPressed: _reload,
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(AppZh.retry),
+                ),
               );
             }
 
@@ -118,26 +125,6 @@ class _EmulatorPickerSheetState extends State<_EmulatorPickerSheet>
           },
         ),
       ),
-    );
-  }
-}
-
-class _EmulatorPickerMessage extends StatelessWidget {
-  const _EmulatorPickerMessage({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(message, style: context.titoHome.cardBody),
-        const SizedBox(height: 12),
-        FilledButton(onPressed: onRetry, child: Text(AppZh.dexRetry)),
-      ],
     );
   }
 }

@@ -64,7 +64,14 @@ android {
             versionNameSuffix = "-flat-ui-debug"
         }
         release {
-            if (keystorePropertiesFile.exists()) {
+            // Local preview builds (no release key on this machine) install
+            // beside the signed app instead of colliding with its signature:
+            // TITODEX_APPLICATION_ID_SUFFIX=.preview flutter build apk ...
+            val previewSuffix = System.getenv("TITODEX_APPLICATION_ID_SUFFIX")
+            if (!previewSuffix.isNullOrBlank()) {
+                applicationIdSuffix = previewSuffix
+                signingConfig = signingConfigs.getByName("debug")
+            } else if (keystorePropertiesFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
             ndk {

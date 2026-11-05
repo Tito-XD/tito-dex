@@ -4,6 +4,7 @@ import '../theme/tito_surface_tokens.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import 'handheld_input.dart';
 import 'liquid_glass.dart';
 import '../theme/tito_typography.dart';
 
@@ -38,46 +39,50 @@ class StickerSwitch extends StatelessWidget {
     return Semantics(
       toggled: value,
       button: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: enabled ? () => onChanged!(!value) : null,
-        child: Opacity(
-          opacity: enabled ? 1.0 : 0.45,
-          child: ListenableBuilder(
-            listenable: retroStyle,
-            builder: (context, knob) => AnimatedContainer(
-              duration: const Duration(milliseconds: 120),
-              curve: Curves.easeOut,
-              width: 46,
-              height: 27,
-              padding: const EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                color: tokens
-                    .surface(
-                      value
-                          ? TitoSurfaceRole.toggleSelected
-                          : TitoSurfaceRole.toggle,
-                    )
-                    .fill,
-                borderRadius: BorderRadius.circular(999),
-                border: Border.fromBorderSide(tokens.elementOutline),
-                boxShadow: !retroStyle.enabled ? null : tokens.elementShadow,
-              ),
-              child: knob,
-            ),
-            child: AnimatedAlign(
-              duration: const Duration(milliseconds: 120),
-              curve: Curves.easeOut,
-              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                width: 19,
-                height: 19,
+      child: HandheldFocusDecorator(
+        onActivate: enabled ? () => onChanged!(!value) : null,
+        borderRadius: BorderRadius.circular(999),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: enabled ? () => onChanged!(!value) : null,
+          child: Opacity(
+            opacity: enabled ? 1.0 : 0.45,
+            child: ListenableBuilder(
+              listenable: retroStyle,
+              builder: (context, knob) => AnimatedContainer(
+                duration: const Duration(milliseconds: 120),
+                curve: Curves.easeOut,
+                width: 46,
+                height: 27,
+                padding: const EdgeInsets.all(1),
                 decoration: BoxDecoration(
-                  color: value
-                      ? TitoColors.deepBlue
-                      : tokens.surface(TitoSurfaceRole.knob).fill,
-                  shape: BoxShape.circle,
+                  color: tokens
+                      .surface(
+                        value
+                            ? TitoSurfaceRole.toggleSelected
+                            : TitoSurfaceRole.toggle,
+                      )
+                      .fill,
+                  borderRadius: BorderRadius.circular(999),
                   border: Border.fromBorderSide(tokens.elementOutline),
+                  boxShadow: !retroStyle.enabled ? null : tokens.elementShadow,
+                ),
+                child: knob,
+              ),
+              child: AnimatedAlign(
+                duration: const Duration(milliseconds: 120),
+                curve: Curves.easeOut,
+                alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  width: 19,
+                  height: 19,
+                  decoration: BoxDecoration(
+                    color: value
+                        ? TitoColors.deepBlue
+                        : tokens.surface(TitoSurfaceRole.knob).fill,
+                    shape: BoxShape.circle,
+                    border: Border.fromBorderSide(tokens.elementOutline),
+                  ),
                 ),
               ),
             ),
@@ -334,46 +339,50 @@ class StickerPillToggle extends StatelessWidget {
       toggled: value,
       onTap: () => onChanged(!value),
       excludeSemantics: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => onChanged(!value),
-        child: ListenableBuilder(
-          listenable: retroStyle,
-          builder: (context, content) => AnimatedContainer(
-            duration: const Duration(milliseconds: 120),
-            curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            decoration: BoxDecoration(
-              color: tokens
-                  .surface(
-                    value
-                        ? TitoSurfaceRole.toggleSelected
-                        : TitoSurfaceRole.toggle,
-                  )
-                  .fill,
-              borderRadius: BorderRadius.circular(999),
-              border: Border.fromBorderSide(tokens.elementOutline),
-              boxShadow: !retroStyle.enabled ? null : tokens.elementShadow,
+      child: HandheldFocusDecorator(
+        onActivate: () => onChanged(!value),
+        borderRadius: BorderRadius.circular(999),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => onChanged(!value),
+          child: ListenableBuilder(
+            listenable: retroStyle,
+            builder: (context, content) => AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              curve: Curves.easeOut,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: tokens
+                    .surface(
+                      value
+                          ? TitoSurfaceRole.toggleSelected
+                          : TitoSurfaceRole.toggle,
+                    )
+                    .fill,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.fromBorderSide(tokens.elementOutline),
+                boxShadow: !retroStyle.enabled ? null : tokens.elementShadow,
+              ),
+              child: content,
             ),
-            child: content,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              dot,
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  label,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: TitoTypography.weight(FontWeight.w800),
-                    color: value
-                        ? TitoColors.selectionInk
-                        : TitoTypography.mutedColor,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                dot,
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    label,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontWeight: TitoTypography.weight(FontWeight.w800),
+                      color: value
+                          ? TitoColors.selectionInk
+                          : TitoTypography.mutedColor,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

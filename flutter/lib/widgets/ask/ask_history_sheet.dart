@@ -7,6 +7,7 @@ import '../../theme/tito_colors.dart';
 import 'ask_paper_style.dart';
 import 'ask_game_label.dart';
 import '../../theme/tito_typography.dart';
+import '../tito_state_panel.dart';
 
 enum AskHistoryManagerAction { compact, clear }
 
@@ -59,13 +60,10 @@ class AskHistoryManagerSheet extends StatelessWidget {
             const SizedBox(height: 10),
             Expanded(
               child: newestFirst.isEmpty
-                  ? Center(
-                      child: Text(
-                        AppZh.askTitoDexHistoryEmpty,
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          color: TitoTypography.mutedColor,
-                        ),
-                      ),
+                  ? TitoEmptyState(
+                      message: AppZh.askTitoDexHistoryEmpty,
+                      framed: false,
+                      centered: true,
                     )
                   : ListView.separated(
                       key: const Key('ask-titodex-history-list'),

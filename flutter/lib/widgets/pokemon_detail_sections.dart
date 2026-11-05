@@ -22,6 +22,7 @@ import '../theme/tito_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_surface_tokens.dart';
 import 'dex_sprite_image.dart';
+import 'handheld_input.dart';
 import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
 import 'sticker_card.dart';
@@ -30,6 +31,7 @@ import 'tito_loading_panel.dart';
 import 'tito_progress_bar.dart';
 import 'tito_rolling_value.dart';
 import 'type_badge.dart';
+import 'tito_state_panel.dart';
 
 /// Stroke for custom-drawn tiles and pills inside cards. Trainer's Journal
 /// keeps the ink element stroke, Solid Plastic uses its milky hairline, and
@@ -396,11 +398,9 @@ class PokemonDetailHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: titoDetailHeaderLabelGap),
-                    GestureDetector(
+                    _ArtworkButton(
                       key: const ValueKey('pokemon-detail-artwork'),
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () =>
-                          showPokemonArtworkViewer(context, summary: summary),
+                      summary: summary,
                       child: SizedBox.square(
                         dimension: plateSize,
                         child: Center(
@@ -462,9 +462,8 @@ class PokemonDetailHeader extends StatelessWidget {
                   ),
                   tooltip: AppZh.navSettings,
                 ),
-              GestureDetector(
-                onTap: () =>
-                    showPokemonArtworkViewer(context, summary: summary),
+              _ArtworkButton(
+                summary: summary,
                 child: Hero(
                   tag: pokemonArtworkHeroTag(summary),
                   transitionOnUserGestures: true,
@@ -622,12 +621,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
           ),
         );
       }
-      return StickerCard(
-        child: Text(
-          AppZh.dexFlavorEmpty,
-          style: SecondaryTypography.onCard.body14,
-        ),
-      );
+      return TitoEmptyState(message: AppZh.dexFlavorEmpty);
     }
 
     // Older games were never localized in Chinese, so their entries stay
@@ -1542,7 +1536,7 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
             ),
           if (methods.isNotEmpty || widget.tags.isNotEmpty)
             Text(
-              [...methods.take(2), ...widget.tags].join(' · '),
+              [...methods, ...widget.tags].join(' · '),
               style: SecondaryTypography.onCard.small12.copyWith(
                 color: entry.formAmbiguous
                     ? TitoColors.coral
@@ -2093,6 +2087,31 @@ class _InteractiveTypeEffectivenessCardState
             immunities: profile.immunities,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Opens the full artwork viewer from the header sprite, by touch or D-pad A.
+class _ArtworkButton extends StatelessWidget {
+  const _ArtworkButton({super.key, required this.summary, required this.child});
+
+  final PokemonSummary summary;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    void open() => showPokemonArtworkViewer(context, summary: summary);
+    return Semantics(
+      button: true,
+      label: AppZh.artworkOpenSemantics,
+      child: HandheldFocusDecorator(
+        onActivate: open,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: open,
+          child: child,
+        ),
       ),
     );
   }

@@ -30,6 +30,7 @@ import '../theme/tito_buttons.dart';
 import '../theme/tito_motion.dart';
 import '../widgets/search_query_section.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/tito_state_panel.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({
@@ -422,46 +423,13 @@ class _SearchPageState extends State<SearchPage> {
       );
     }
     if (_error != null) {
-      return StickerCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppZh.dexLoadFailed,
-              style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: TitoTypography.weight(FontWeight.w800),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _error!,
-              style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoTypography.mutedColor,
-                height: 1.45,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton.icon(
-                onPressed: () => _runSearch(_controller.text),
-                icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: Text(AppZh.dexRetry),
-              ),
-            ),
-          ],
-        ),
+      return TitoErrorPanel(
+        message: _error,
+        onRetry: () => _runSearch(_controller.text),
       );
     }
     if (_results.isEmpty) {
-      return StickerCard(
-        child: Text(
-          AppZh.searchNoResults,
-          style: SecondaryTypography.onCard.body14.copyWith(
-            fontWeight: TitoTypography.weight(FontWeight.w700),
-          ),
-        ),
-      );
+      return TitoEmptyState(message: AppZh.searchNoResults);
     }
     // Outgoing result widgets survive the transition; capture their list
     // so clearing the field cannot change a still-mounted builder count.

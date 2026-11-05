@@ -102,13 +102,31 @@ class JourneyAssistantRepository {
   Future<JourneyAssistantSnapshot> loadPreview(CurrentJourney journey) async {
     final edition = await _editions.loadEdition();
     final key = 'preview:${_cacheKey(journey, edition)}';
-    return _cache.putIfAbsent(key, () => _loadPreview(journey, edition));
+    return _remember(key, () => _loadPreview(journey, edition));
+  }
+
+  /// Caches a load, but drops it again if it fails so a retry reads afresh.
+  Future<JourneyAssistantSnapshot> _remember(
+    String key,
+    Future<JourneyAssistantSnapshot> Function() load,
+  ) {
+    final cached = _cache[key];
+    if (cached != null) return cached;
+    final future = load();
+    _cache[key] = future;
+    future.then<void>(
+      (_) {},
+      onError: (Object _) {
+        if (identical(_cache[key], future)) _cache.remove(key);
+      },
+    );
+    return future;
   }
 
   Future<JourneyAssistantSnapshot> load(CurrentJourney journey) async {
     final edition = await _editions.loadEdition();
     final key = _cacheKey(journey, edition);
-    return _cache.putIfAbsent(key, () => _load(journey, edition));
+    return _remember(key, () => _load(journey, edition));
   }
 
   Future<JourneyAssistantSnapshot> _loadPreview(

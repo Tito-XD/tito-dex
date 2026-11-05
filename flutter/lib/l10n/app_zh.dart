@@ -66,6 +66,15 @@ abstract final class AppZh {
   static String get battleMoreOptions => t('battleMoreOptions', '更多选项');
   static String get battleMatchupSummary =>
       t('battleMatchupSummary', '防守方受击倍率');
+  static String get battleMatchupWeak => t('battleMatchupWeak', '弱点');
+  static String get battleMatchupResist => t('battleMatchupResist', '抵抗');
+  static String get battleMatchupImmune => t('battleMatchupImmune', '无效');
+  static String battleMatchupNeutral(int count) =>
+      t('battleMatchupNeutral', '普通 1× · $count 个属性', {'count': count});
+  static String get battlePartyDefaultTag =>
+      t('battlePartyDefaultTag', '默认配置');
+  static String battleTypeCountSuffix(int count) =>
+      t('battleTypeCountSuffix', ' · $count 种', {'count': count});
   static String get battleAttacker => t('battleAttacker', '进攻方');
   static String get battleTypes => t('battleTypes', '属性');
   static String get battleAbility => t('battleAbility', '特性');
@@ -221,6 +230,8 @@ abstract final class AppZh {
   static String get journeyAssistantMeta => t('journeyAssistantMeta', '助手');
   static String get journeyAssistantLoading =>
       t('journeyAssistantLoading', '整理中');
+  static String get journeyAssistantCardFallback =>
+      t('journeyAssistantCardFallback', '查看旅途');
   static String get journeyAssistantLoadFailed =>
       t('journeyAssistantLoadFailed', '存档助手暂时无法读取地点或图鉴资料。');
   static String get journeyAssistantNearbyTitle =>
@@ -470,14 +481,16 @@ abstract final class AppZh {
   static String get settingsDexProgress => t('settingsDexProgress', '图鉴进度');
   static String get teamSummaryTitle => t('teamSummaryTitle', '队伍概览');
   static String get teamCollapseDetails => t('teamCollapseDetails', '收回详情');
-  static String get teamCommonWeaknesses => t('teamCommonWeaknesses', '常见弱点');
+  static String get teamCommonWeaknesses => t('teamCommonWeaknesses', '最多被克');
   static String get teamSharedWeaknesses =>
-      t('teamSharedWeaknesses', '共同弱点（≥2 只）');
+      t('teamSharedWeaknesses', '≥2 只同被克');
   static String get teamAverageLevel => t('teamAverageLevel', '平均等级');
   static String get teamBaseStatTotal => t('teamBaseStatTotal', '种族值合计');
-  static String get teamTypeCoverage => t('teamTypeCoverage', '属性覆盖');
+  static String get teamTypeCoverage => t('teamTypeCoverage', '自身属性');
+  static String teamOwnTypeCount(int count) =>
+      t('teamOwnTypeCount', '$count 种', {'count': count});
   static String journeyRemainingDex(int count) =>
-      t('journeyRemainingDex', '图鉴查看其他待补全 · $count 种', {'count': count});
+      t('journeyRemainingDex', '去图鉴补全 $count 种', {'count': count});
   static String get sleepToolsTitle => t('sleepToolsTitle', 'Pokémon Sleep 工具');
   static String get sleepToolsTierAHint =>
       t('sleepToolsTierAHint', '内置离线试算，并保留 Neroli’s Lab 资料入口');
@@ -554,8 +567,11 @@ abstract final class AppZh {
   static String companionMessage(String location) =>
       t('companionMessage', '$location 今天也很热闹！', {'location': location});
 
-  static String get dexScopeNote =>
-      t('dexScopeNote', '全国图鉴 1–1025，中文名与属性来自在线图鉴；已捕获/已见过状态来自存档与同行队伍。');
+  static String dexJourneyProgress(int seen, int caught, int total) => t(
+    'dexJourneyProgress',
+    '旅程同行 · 已见 $seen / 已捕 $caught / 共 $total',
+    {'seen': seen, 'caught': caught, 'total': total},
+  );
   static String get dexCaught => t('dexCaught', '已捕获');
   static String get dexSeen => t('dexSeen', '已见过');
   static String get dexUnknown => t('dexUnknown', '未见过');
@@ -674,6 +690,8 @@ abstract final class AppZh {
 
   static String get settingsAttributionTitle =>
       t('settingsAttributionTitle', '关于 TitoDex · 数据来源与许可');
+  static String get settingsSourcesStrip =>
+      t('settingsSourcesStrip', '资料与媒体来源');
   static String get settingsAttributionHint =>
       t('settingsAttributionHint', '非官方学习工具 · 查看完整 Credits 与权利说明');
   static String get settingsOpenSourceLicenses =>
@@ -956,6 +974,35 @@ abstract final class AppZh {
       t('settingsDexOfflineResume', '继续下载离线资料包');
   static String get settingsDexOfflineClear =>
       t('settingsDexOfflineClear', '清除离线缓存');
+  static String get confirmDexOfflineClearTitle =>
+      t('confirmDexOfflineClearTitle', '清除离线缓存？');
+  static String get confirmDexOfflineClearBody => t(
+    'confirmDexOfflineClearBody',
+    '将删除已下载的完整离线资料包。之后要离线使用图鉴，需要重新下载。',
+  );
+  static String get confirmClearAction => t('confirmClearAction', '清除');
+  static String get confirmResetMockTitle =>
+      t('confirmResetMockTitle', '恢复演示数据？');
+  static String get confirmResetMockBody => t(
+    'confirmResetMockBody',
+    '当前旅程、队伍和手动标记将被演示数据替换，无法撤销。',
+  );
+  static String get confirmResetMockAction =>
+      t('confirmResetMockAction', '恢复');
+  static String get confirmImportSaveTitle =>
+      t('confirmImportSaveTitle', '导入内置示例存档？');
+  static String get confirmImportSaveBody => t(
+    'confirmImportSaveBody',
+    '当前旅程将被内置示例存档 PKMSS.sav 覆盖，无法撤销。',
+  );
+  static String get confirmImportSaveAction =>
+      t('confirmImportSaveAction', '导入');
+  static String get confirmMediaClearAllTitle =>
+      t('confirmMediaClearAllTitle', '清理全部媒体资源？');
+  static String get confirmMediaClearAllBody => t(
+    'confirmMediaClearAllBody',
+    '将删除所有已下载的媒体资源，之后需要重新下载。',
+  );
   static String get settingsDexOfflinePrefer =>
       t('settingsDexOfflinePrefer', '优先使用离线缓存');
   static String settingsDexOfflineProgress(
@@ -1222,6 +1269,19 @@ abstract final class AppZh {
       t('settingsListAnimations', '列表渐入动画');
   static String get settingsListAnimationsHint =>
       t('settingsListAnimationsHint', '图鉴、搜索、常用资料等列表的渐入小动画；关闭后内容会立即显示。');
+  static String get settingsNumberStyle => t('settingsNumberStyle', '数字样式（实验）');
+  static String get settingsNumberStyleHint =>
+      t('settingsNumberStyleHint', '只用于伤害与能力值的大数字；其余数字保持默认字体。');
+  static String get settingsNumberStyleStandard =>
+      t('settingsNumberStyleStandard', '默认');
+  static String get settingsNumberStyleSegment =>
+      t('settingsNumberStyleSegment', '段码');
+  static String get settingsNumberStyleDotMatrix =>
+      t('settingsNumberStyleDotMatrix', '点阵');
+  static String get settingsNumberStylePixel =>
+      t('settingsNumberStylePixel', '像素字');
+  static String get settingsNumberStyleSplitFlap =>
+      t('settingsNumberStyleSplitFlap', '翻页牌');
   static String get settingsAppShortcuts => t('settingsAppShortcuts', '桌面快捷入口');
   static String get settingsAppShortcutsHint =>
       t('settingsAppShortcutsHint', '默认显示图鉴和搜索；可替换或补充下方任意资料与工具，最多三个。');
@@ -1408,9 +1468,9 @@ abstract final class AppZh {
   static String teamSummaryTypeCoverage(int count) =>
       t('teamSummaryTypeCoverage', '属性覆盖 $count/18', {'count': count});
   static String teamSummaryWeaknesses(String types) =>
-      t('teamSummaryWeaknesses', '常见弱点：$types', {'types': types});
+      t('teamSummaryWeaknesses', '最多被克：$types', {'types': types});
   static String teamSummarySharedWeaknesses(String types) =>
-      t('teamSummarySharedWeaknesses', '共同弱点（≥2 只）：$types', {'types': types});
+      t('teamSummarySharedWeaknesses', '≥2 只同被克：$types', {'types': types});
   static String get teamEditTitle => t('teamEditTitle', '编辑同行');
   static String get teamEditLevel => t('teamEditLevel', '等级');
   static String get teamEditNickname => t('teamEditNickname', '昵称');
@@ -1421,6 +1481,11 @@ abstract final class AppZh {
   static String get teamEditSwapNext => t('teamEditSwapNext', '与后一位交换');
   static String get teamAddTitle => t('teamAddTitle', '添加宝可梦');
   static String get teamAddInvalidId => t('teamAddInvalidId', '无效编号');
+  static String get teamAddAbilityLoadFailed =>
+      t('teamAddAbilityLoadFailed', '无法读取特性，请重试');
+  static String teamMemberRemoved(String name) =>
+      t('teamMemberRemoved', '已移出 $name', {'name': name});
+  static String get undo => t('undo', '撤销');
   static String get confirm => t('confirm', '确定');
   static String get cancel => t('cancel', '取消');
   static String get retry => t('retry', '重试');
@@ -1573,7 +1638,7 @@ abstract final class AppZh {
   static String get journeyPackRefresh => t('journeyPackRefresh', '刷新');
   static String get journeyPackWorkerUnconfigured => t(
     'journeyPackWorkerUnconfigured',
-    'Journey Assistant Worker 尚未配置，已安装的旧资料仍可继续使用。',
+    '在线目录暂不可用，已安装的旧资料仍可继续使用。',
   );
   static String get journeyPackCatalogEmpty =>
       t('journeyPackCatalogEmpty', '暂时没有可下载的资料包。');
@@ -1602,7 +1667,7 @@ abstract final class AppZh {
       t('journeyPackDeleteBody', '只会删除下载的问答资料，不会删除存档或问答记录。');
   static String get journeyPackErrorWorkerNotConfigured => t(
     'journeyPackErrorWorkerNotConfigured',
-    'Journey Assistant Worker 尚未配置。',
+    '在线目录暂不可用。',
   );
   static String get journeyPackErrorTimeout =>
       t('journeyPackErrorTimeout', '连接超时，请稍后再试。');
@@ -1806,6 +1871,8 @@ abstract final class AppZh {
       t('artworkAnniversaryLogo', '30周年 Logo');
   static String get artworkFlipFront => t('artworkFlipFront', '切回正面');
   static String get artworkFlipBack => t('artworkFlipBack', '翻到背面');
+  static String get artworkOpenSemantics =>
+      t('artworkOpenSemantics', '查看宝可梦大图');
   static String get artworkCloseSemantics =>
       t('artworkCloseSemantics', '关闭宝可梦大图');
   static String get loadingSemantics => t('loadingSemantics', '正在加载');

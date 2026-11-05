@@ -7,6 +7,7 @@ import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_confirm_dialog.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_snack_bar.dart';
 
@@ -195,6 +196,13 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () async {
+                      final confirmed = await showTitoConfirmDialog(
+                        context,
+                        title: AppZh.confirmMediaClearAllTitle,
+                        body: AppZh.confirmMediaClearAllBody,
+                        confirmLabel: AppZh.mediaResourceClearAll,
+                      );
+                      if (!confirmed || !mounted) return;
                       for (final file in _cached) {
                         await companionMediaCache.deleteCached(file.name);
                       }

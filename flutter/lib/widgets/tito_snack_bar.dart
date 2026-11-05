@@ -6,6 +6,7 @@ import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
+import 'handheld_focus_geometry.dart';
 
 /// Shows a short transient message at the bottom of the app.
 ///
@@ -80,6 +81,7 @@ class TitoSnackHostState extends State<TitoSnackHost>
   TitoSnackMessage? _pending;
   Timer? _timer;
   int _serial = 0;
+  bool _holdForReader = false;
 
   @override
   void initState() {
@@ -108,11 +110,26 @@ class TitoSnackHostState extends State<TitoSnackHost>
     _controller.duration = TitoMotion.duration(context, TitoMotion.emphasized);
     _controller.forward(from: 0);
     // Screen-reader users get unlimited time when there is an action.
-    final holdForReader =
+    _holdForReader =
         message.actionLabel != null &&
         MediaQuery.accessibleNavigationOf(context);
-    if (!holdForReader) {
-      _timer = Timer(message.duration, () => unawaited(dismiss()));
+    if (!_holdForReader) _startTimer(message);
+  }
+
+  void _startTimer(TitoSnackMessage message) {
+    _timer?.cancel();
+    _timer = Timer(message.duration, () => unawaited(dismiss()));
+  }
+
+  /// A D-pad user who moved onto the toast keeps it until they leave it.
+  void _focusChanged(bool focused) {
+    final message = _current;
+    if (message == null) return;
+    if (focused) {
+      _timer?.cancel();
+    } else if (!_holdForReader &&
+        _controller.status != AnimationStatus.reverse) {
+      _startTimer(message);
     }
   }
 
@@ -165,13 +182,21 @@ class TitoSnackHostState extends State<TitoSnackHost>
                 constraints: const BoxConstraints(maxWidth: 560),
                 child: _TitoSnackMotion(
                   animation: _controller,
+                  // D-pad Down from the page reaches the action and close.
                   child: Dismissible(
                     key: ValueKey(_serial),
                     direction: DismissDirection.down,
                     onDismissed: (_) => unawaited(dismiss(animate: false)),
-                    child: _TitoSnackCard(
-                      message: message,
-                      onClose: () => unawaited(dismiss()),
+                    child: HandheldGlobalStops(
+                      child: Focus(
+                        canRequestFocus: false,
+                        skipTraversal: true,
+                        onFocusChange: _focusChanged,
+                        child: _TitoSnackCard(
+                          message: message,
+                          onClose: () => unawaited(dismiss()),
+                        ),
+                      ),
                     ),
                   ),
                 ),

@@ -34,6 +34,7 @@ import '../widgets/tito_skeleton_gate.dart';
 import '../widgets/tito_animated_size_switcher.dart';
 import '../widgets/tito_segmented_control.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/tito_state_panel.dart';
 
 enum _MoveMethodFilter { level, machine, egg, tutor }
 
@@ -280,7 +281,16 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                                 children: [transitionHeader],
                               ),
                         child: errorCopy != null
-                            ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
+                            ? Center(
+                                child: Padding(
+                                  padding: DeviceLayout.pagePadding(context),
+                                  child: TitoErrorPanel(
+                                    title: errorCopy.$1,
+                                    message: errorCopy.$2,
+                                    onRetry: _loadDetail,
+                                  ),
+                                ),
+                              )
                             : displayDetail == null
                             ? const SizedBox.shrink()
                             : ListView(
@@ -428,8 +438,17 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     }
 
     collect(chain);
-    final details = await Future.wait(ids.map(dexRepository.getDetail));
-    return {for (final detail in details) detail.summary.id: detail};
+    // One missing member (Lite offline, partial cache) must not hide the
+    // rest of the chain or surface as an unhandled error.
+    final details = await Future.wait(
+      ids.map(
+        (id) => dexRepository
+            .getDetail(id)
+            .then<PokemonDetail?>((detail) => detail)
+            .catchError((Object _) => null),
+      ),
+    );
+    return {for (final detail in details.nonNulls) detail.summary.id: detail};
   }
 
   PokemonFormDetail? get _selectedForm {
@@ -1062,46 +1081,6 @@ class _DetailArrival extends StatelessWidget {
         );
       },
       child: child,
-    );
-  }
-}
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({required this.copy, required this.onRetry});
-
-  final (String, String) copy;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: DeviceLayout.pagePadding(context),
-        child: StickerCard(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                copy.$1,
-                style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: TitoTypography.weight(FontWeight.w800),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                copy.$2,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoTypography.mutedColor,
-                  height: 1.45,
-                ),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(onPressed: onRetry, child: Text(AppZh.dexRetry)),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

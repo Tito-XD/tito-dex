@@ -10,13 +10,17 @@ import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 import 'tito_loading_panel.dart';
+import 'tito_state_panel.dart';
 import 'tito_fact_grid.dart';
 import '../theme/tito_typography.dart';
 
 class JourneyAssistantPanel extends StatelessWidget {
-  const JourneyAssistantPanel({super.key, required this.future});
+  const JourneyAssistantPanel({super.key, required this.future, this.onRetry});
 
   final Future<JourneyAssistantSnapshot> future;
+
+  /// Shown as the retry action when [future] fails; the host owns reloading.
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +36,10 @@ class JourneyAssistantPanel extends StatelessWidget {
         }
         final data = snapshot.data;
         if (data == null) {
-          return StickerCard(child: Text(AppZh.journeyAssistantLoadFailed));
+          return TitoErrorPanel.fromError(
+            snapshot.error ?? StateError('journey assistant returned no data'),
+            onRetry: onRetry,
+          );
         }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

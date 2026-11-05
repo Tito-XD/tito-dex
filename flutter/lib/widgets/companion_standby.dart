@@ -24,8 +24,10 @@ import '../theme/tito_surface_tokens.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'companion_picker_sheet.dart';
+import 'handheld_input.dart';
 import 'fallback_sprite_image.dart';
 import 'tito_snack_bar.dart';
+import 'tito_typewriter_text.dart';
 
 /// Home standby companion — animated sprite fetched on demand (never
 /// bundled), sized by the species' dex height. Tap to pat (bounce + hearts +
@@ -554,13 +556,19 @@ class _CompanionStandbyState extends State<CompanionStandby>
                   onDone: () => _removeHeart(heart.id),
                 ),
               ),
-            GestureDetector(
-              onTap: _onPat,
-              onLongPress: _openPicker,
-              child: ScaleTransition(
-                scale: _bounceScale,
-                alignment: Alignment.bottomCenter,
-                child: sticker,
+            // D-pad A pats too; the picker stays on long-press and in
+            // Settings → 同行宝可梦 → 更换同伴.
+            HandheldFocusDecorator(
+              onActivate: _onPat,
+              borderRadius: BorderRadius.circular(TitoRadii.md),
+              child: GestureDetector(
+                onTap: _onPat,
+                onLongPress: _openPicker,
+                child: ScaleTransition(
+                  scale: _bounceScale,
+                  alignment: Alignment.bottomCenter,
+                  child: sticker,
+                ),
               ),
             ),
             if (widget.isShiny)
@@ -661,7 +669,7 @@ class _QuoteBubble extends StatelessWidget {
                   ? null
                   : TitoSurfaceTokens.of(context).elementShadow,
             ),
-            child: Text(
+            child: TitoTypewriterText(
               quote ?? '',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

@@ -23,6 +23,7 @@ import '../../widgets/tito_loading_panel.dart';
 import '../../theme/tito_typography.dart';
 import '../../theme/tito_surface_tokens.dart';
 import '../../widgets/tito_snack_bar.dart';
+import '../../widgets/tito_state_panel.dart';
 
 /// "Who's that Pokémon" — silhouette quiz over the current dex scope,
 /// using the same sprites the dex already caches (offline friendly).
@@ -176,22 +177,12 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
   Widget _body(BuildContext context) {
     final error = _error;
     if (error != null) {
-      return StickerCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(error, style: SecondaryTypography.onCard.body14),
-            const SizedBox(height: 12),
-            FilledButton.icon(
-              onPressed: () {
-                setState(() => _error = null);
-                _loadPool();
-              },
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: Text(AppZh.dexRetry),
-            ),
-          ],
-        ),
+      return TitoErrorPanel(
+        message: error,
+        onRetry: () {
+          setState(() => _error = null);
+          _loadPool();
+        },
       );
     }
     final question = _question;

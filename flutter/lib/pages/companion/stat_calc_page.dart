@@ -145,11 +145,9 @@ class _StatCalcPageState extends State<StatCalcPage> {
                               children: [
                                 TitoAnimatedNumber(
                                   value: result,
-                                  identity: (
-                                    _editingDefender,
-                                    _combatant.pokemonId,
-                                    _stat,
-                                  ),
+                                  identity: (this, _editingDefender, _stat),
+                                  countUp: true,
+                                  retro: true,
                                   textKey: const ValueKey('battle-stat-value'),
                                   style: BattleResultText.hero,
                                 ),

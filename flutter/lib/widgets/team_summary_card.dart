@@ -102,7 +102,7 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
             children: [
               Expanded(
                 child: Text(
-                  '${AppZh.navTeam} · ${gameEditionRepository.edition.selectedLabel}',
+                  gameEditionRepository.edition.selectedLabel,
                   style: SecondaryTypography.onCard.h15,
                 ),
               ),
@@ -151,7 +151,7 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
                 TitoFactTile(
                   icon: Icons.category_rounded,
                   title: AppZh.teamTypeCoverage,
-                  child: Text('${data.typeCoverage}/18'),
+                  child: Text(AppZh.teamOwnTypeCount(data.typeCoverage)),
                 ),
               ],
             ),

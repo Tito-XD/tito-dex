@@ -20,6 +20,7 @@ import 'package:titodex/theme/motion_preferences.dart';
 import 'package:titodex/theme/tito_theme.dart';
 import 'package:titodex/widgets/battle_move_picker.dart';
 import 'package:titodex/widgets/companion_tool_fields.dart';
+import 'package:titodex/widgets/tito_animated_number.dart';
 import 'package:titodex/widgets/tito_rolling_value.dart';
 
 const _font = String.fromEnvironment('UI_AUDIT_CJK_FONT');
@@ -95,6 +96,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     AppLocale.instance.debugOverride(AppUiLanguage.zh);
+    TitoAnimatedNumberState.debugResetMemory();
     battlePartyHandoff.clear();
     await gameEditionRepository.saveSlug('sv');
     await motionPreferences.setListAnimationsEnabled(true);
@@ -104,6 +106,32 @@ void main() {
     battlePartyHandoff.clear();
     await appVisualStyle.setStyle(AppVisualStyle.classic);
     await motionPreferences.setListAnimationsEnabled(true);
+  });
+
+  testWidgets('switching defender rolls the damage digits in place', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(800, 900);
+    addTearDown(tester.view.reset);
+    final session = _session();
+    addTearDown(session.dispose);
+    await _openEstimate(tester, session, AppVisualStyle.classic);
+    final hero = find.byKey(const ValueKey('damage-hero-max'));
+    final state = tester.state<TitoAnimatedNumberState>(hero);
+    final before = state.displayedText;
+    session.defender.pokemonId = 130;
+    session.defender.types = ['water', 'flying'];
+    session.changed();
+    await tester.pump();
+    // Same slot, continuing from the old reading rather than from 0%.
+    expect(tester.state(hero), same(state));
+    expect(state.displayedText, before);
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(state.displayedText, isNot('0%'));
+    await tester.pumpAndSettle();
+    expect(state.displayedText, isNot(before));
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets('real damage edits roll exact modifiers with final semantics', (
@@ -199,6 +227,54 @@ void main() {
   });
 
   for (final style in AppVisualStyle.values) {
+    testWidgets('${style.name}: damage card keeps its rows at 360px', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await appVisualStyle.setStyle(style);
+      final session = _session();
+      addTearDown(session.dispose);
+      for (final (scale, language) in [
+        (1.0, AppUiLanguage.zh),
+        (1.4, AppUiLanguage.en),
+      ]) {
+        tester.view.physicalSize = const Size(360, 740);
+        AppLocale.instance.debugOverride(language);
+        await _openEstimate(tester, session, style, scale: scale);
+        final verdict = find.byKey(const ValueKey('damage-verdict'));
+        final title = find.text(AppZh.companionDamageResultTitle);
+        final hero = find.byKey(const ValueKey('damage-hero-max'));
+        final range = find.byKey(const ValueKey('damage-hp-range'));
+        expect(verdict, findsOneWidget);
+        // Verdict pill shares the title row; the hero number owns its row.
+        expect(
+          tester.getCenter(verdict).dy,
+          closeTo(tester.getCenter(title).dy, 6),
+        );
+        expect(tester.getRect(verdict).right, lessThanOrEqualTo(360));
+        expect(
+          tester.getRect(hero).top,
+          greaterThanOrEqualTo(tester.getRect(verdict).bottom),
+        );
+        expect(
+          tester.getRect(range).top,
+          greaterThan(tester.getRect(hero).bottom),
+        );
+        expect(
+          tester.getRect(range).left,
+          lessThan(tester.getRect(hero).right),
+        );
+        _expectModifierBounds(tester);
+        expect(
+          tester.getRect(find.byKey(_modifiers)).right,
+          lessThanOrEqualTo(360),
+        );
+        expect(tester.takeException(), isNull, reason: '$scale $language');
+      }
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
     testWidgets(
       '${style.name}: wrapped modifiers survive large text and reduced motion',
       (tester) async {
