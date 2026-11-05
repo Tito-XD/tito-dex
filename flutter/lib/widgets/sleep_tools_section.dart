@@ -7,6 +7,7 @@ import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import 'settings_expandable_section.dart';
 import '../theme/tito_typography.dart';
+import 'tito_snack_bar.dart';
 
 /// Tier A integration: local deterministic helpers plus reference links, with
 /// no Pokémon Sleep account access.
@@ -29,9 +30,7 @@ class _SleepToolsSectionState extends State<SleepToolsSection> {
   Future<void> _copyLink(String url) async {
     await Clipboard.setData(ClipboardData(text: url));
     if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppZh.sleepLinkCopied)));
+    showTitoSnackBar(context, AppZh.sleepLinkCopied);
   }
 
   @override

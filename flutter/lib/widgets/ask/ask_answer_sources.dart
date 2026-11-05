@@ -9,6 +9,7 @@ import '../../theme/tito_surface_tokens.dart';
 import 'ask_paper_style.dart';
 import '../../theme/tito_typography.dart';
 import '../../navigation/tito_page_transition.dart';
+import '../tito_snack_bar.dart';
 
 typedef AskTitoDexSourceOpener = Future<bool> Function(Uri uri);
 
@@ -356,10 +357,9 @@ class _SourceReferenceTile extends StatelessWidget {
                   opened = false;
                 }
                 if (!opened && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(AppZh.askTitoDexSourceLinkUnavailable),
-                    ),
+                  showTitoSnackBar(
+                    context,
+                    AppZh.askTitoDexSourceLinkUnavailable,
                   );
                 }
               },

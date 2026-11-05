@@ -7,6 +7,7 @@ import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import 'trainer_card.dart';
+import 'tito_snack_bar.dart';
 
 Future<bool> showTrainerOnboarding(
   BuildContext context, {
@@ -103,15 +104,11 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
       if (pin) {
         final result = await shortcuts.pinTrainerShortcut(profile.trainerName);
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(switch (result) {
-              'requested' => AppZh.trainerShortcutRequested,
-              'updated' => AppZh.trainerShortcutUpdated,
-              _ => AppZh.trainerShortcutUnsupported,
-            }),
-          ),
-        );
+        showTitoSnackBar(context, switch (result) {
+          'requested' => AppZh.trainerShortcutRequested,
+          'updated' => AppZh.trainerShortcutUpdated,
+          _ => AppZh.trainerShortcutUnsupported,
+        });
       }
       if (mounted) Navigator.of(context).pop(openData);
     } catch (_) {

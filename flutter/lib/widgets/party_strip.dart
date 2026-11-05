@@ -18,6 +18,7 @@ import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_card.dart';
+import 'tito_snack_bar.dart';
 
 /// Inset party cell / empty cell surface, branched per visual style the same
 /// way `sticker_card.dart` does: Trainer's Journal uses a quiet pale fill,
@@ -496,9 +497,7 @@ class _PartyMemberAvatar extends StatelessWidget {
       sprite = GestureDetector(
         onTap: () {
           HapticFeedback.mediumImpact();
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(AppZh.shinyPartyFound(label))));
+          showTitoSnackBar(context, AppZh.shinyPartyFound(label));
         },
         child: Stack(
           clipBehavior: Clip.none,

@@ -63,6 +63,7 @@ acceptance and useful historical snapshot changes remain separate follow-ups.
 
 - Adaptive Team panes, 2–4 column reference cards, one bounded Home entrance and exact-value battle transitions.
 - Battle-tool loading and errors stay in the fixed result slot; Search results follow the field while hub exits collapse.
+- In-app toasts share one component with a close button, swipe-down dismissal and animated entrance/exit (instant under reduced motion).
 - One design system across the three themes: page roles and shared header/scroll-to-top buttons replace per-theme branches (ratchet at 0).
 
 ## Completed in v0.9.24

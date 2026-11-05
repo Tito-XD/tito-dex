@@ -35,6 +35,7 @@ import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_skeleton.dart';
 import '../theme/tito_typography.dart';
 import '../theme/tito_surface_tokens.dart';
+import '../widgets/tito_snack_bar.dart';
 
 class DexPage extends StatefulWidget {
   const DexPage({
@@ -441,22 +442,16 @@ class _DexPageState extends State<DexPage> {
         if (!seenIds.contains(id)) {
           seenIds = [...seenIds, id];
         }
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppZh.dexManualMarkSeen)));
+        showTitoSnackBar(context, AppZh.dexManualMarkSeen);
       case DexEncounterStatus.seen:
         if (!caughtIds.contains(id)) {
           caughtIds = [...caughtIds, id];
         }
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppZh.dexManualMarkCaught)));
+        showTitoSnackBar(context, AppZh.dexManualMarkCaught);
       case DexEncounterStatus.caught:
         seenIds = seenIds.where((value) => value != id).toList();
         caughtIds = caughtIds.where((value) => value != id).toList();
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppZh.dexManualMarkClear)));
+        showTitoSnackBar(context, AppZh.dexManualMarkClear);
     }
 
     final updated = widget.journey.copyWith(

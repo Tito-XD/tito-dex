@@ -16,6 +16,7 @@ implementation rather than a second UI stack. Architecture boundaries live in
 | 不要写 | 改用 |
 | --- | --- |
 | `showModalBottomSheet`（预算 0） | `showTitoModalBottomSheet`：主题背景、拖动条、安全区和键盘避让已包含，调用处不再加 `backgroundColor` 或键盘内边距 |
+| `ScaffoldMessenger.showSnackBar` / `SnackBar(`（预算 0） | `showTitoSnackBar(context, 文案, actionLabel:, onAction:)`：统一带关闭按钮、上滑淡入与淡出（减少动画时直接出现／消失）、下滑关闭与读屏播报；新消息替换当前消息 |
 | `CircularProgressIndicator` / `LinearProgressIndicator`（预算 0） | 局部 `TitoInlineLoading`，区块 `TitoLoadingPanel`，图像 `TitoPokeballLoading`，确定进度 `TitoProgressBar` |
 | `Theme.of(context).textTheme`（仅首页标题例外） | `SecondaryTypography.onPage(context)` / `onCard` / `onGradient` |
 | `TitoColors.mutedInk`、在 `copyWith` 中写 `TitoColors.ink` | `TitoTypography.mutedColor` / `inkColor`，粗细用 `TitoTypography.weight` |

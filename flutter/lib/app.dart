@@ -66,6 +66,7 @@ import 'widgets/pokemon_card.dart';
 import 'widgets/system_ui_coordinator.dart';
 import 'widgets/tito_page_container.dart';
 import 'widgets/tito_progress_dialog.dart';
+import 'widgets/tito_snack_bar.dart';
 
 class TitoDexApp extends StatefulWidget {
   const TitoDexApp({super.key});
@@ -622,17 +623,12 @@ class _TitoDexAppState extends State<TitoDexApp> {
         appUpdateService.release == null) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '${AppZh.appUpdateAvailable} · ${appUpdateService.release!.version}',
-        ),
-        duration: const Duration(seconds: 12),
-        action: SnackBarAction(
-          label: AppZh.appUpdateView,
-          onPressed: () => _router.push('/settings/about'),
-        ),
-      ),
+    showTitoSnackBar(
+      context,
+      '${AppZh.appUpdateAvailable} · ${appUpdateService.release!.version}',
+      duration: const Duration(seconds: 12),
+      actionLabel: AppZh.appUpdateView,
+      onAction: () => _router.push('/settings/about'),
     );
   }
 
@@ -757,14 +753,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
       if (!feedbackContext.mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        feedbackContext,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackSaveFileSet)));
+      showTitoSnackBar(feedbackContext, AppZh.snackSaveFileSet);
       return;
     }
-    ScaffoldMessenger.of(
-      feedbackContext,
-    ).showSnackBar(SnackBar(content: Text(_syncMessage(result) ?? '')));
+    showTitoSnackBar(feedbackContext, _syncMessage(result) ?? '');
   }
 
   Future<void> _clearSaveFile(BuildContext feedbackContext) async {
@@ -774,9 +766,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     }
     setState(() => _saveConfig = config);
     _settingsRefresh.value += 1;
-    ScaffoldMessenger.of(
-      feedbackContext,
-    ).showSnackBar(SnackBar(content: Text(AppZh.snackSaveFileCleared)));
+    showTitoSnackBar(feedbackContext, AppZh.snackSaveFileCleared);
   }
 
   Future<void> _setAutoLoadOnStartup(bool enabled) async {
@@ -810,9 +800,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
     final message = _syncMessage(result);
     if (message != null && mounted && feedbackContext.mounted) {
-      ScaffoldMessenger.of(
-        feedbackContext,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      showTitoSnackBar(feedbackContext, message);
     }
   }
 
@@ -841,14 +829,11 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return;
     }
     final warnings = summary.warnings;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          warnings.isEmpty
-              ? AppZh.snackSaveLoaded(summary.trainerName, summary.party.length)
-              : AppZh.snackSaveLoadedWarnings(warnings.length),
-        ),
-      ),
+    showTitoSnackBar(
+      context,
+      warnings.isEmpty
+          ? AppZh.snackSaveLoaded(summary.trainerName, summary.party.length)
+          : AppZh.snackSaveLoadedWarnings(warnings.length),
     );
   }
 
@@ -857,9 +842,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppZh.snackMockRestored)));
+    showTitoSnackBar(context, AppZh.snackMockRestored);
   }
 
   Future<void> _exportJourney() async {
@@ -867,9 +850,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppZh.snackJourneyExported)));
+    showTitoSnackBar(context, AppZh.snackJourneyExported);
   }
 
   Future<void> _importJourneyJson() async {
@@ -881,9 +862,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppZh.snackJourneyImported)));
+    showTitoSnackBar(context, AppZh.snackJourneyImported);
   }
 
   Future<void> _rememberEmulator(
@@ -897,9 +876,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     setState(() => _emulatorChoice = choice);
     _emulatorChoiceRefresh.value = choice;
     if (feedbackContext.mounted) {
-      ScaffoldMessenger.of(
-        feedbackContext,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackEmulatorSaved)));
+      showTitoSnackBar(feedbackContext, AppZh.snackEmulatorSaved);
     }
   }
 
@@ -911,9 +888,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     setState(() => _emulatorChoice = null);
     _emulatorChoiceRefresh.value = null;
     if (feedbackContext.mounted) {
-      ScaffoldMessenger.of(
-        feedbackContext,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackEmulatorCleared)));
+      showTitoSnackBar(feedbackContext, AppZh.snackEmulatorCleared);
     }
   }
 
@@ -944,9 +919,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!mounted || !context.mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppZh.snackGameSwitched(picked.label))),
-    );
+    showTitoSnackBar(context, AppZh.snackGameSwitched(picked.label));
   }
 
   Future<void> _onContinue(BuildContext pickerContext) async {
@@ -960,8 +933,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
         if (!mounted || !pickerContext.mounted) {
           return;
         }
-        ScaffoldMessenger.of(pickerContext).showSnackBar(
-          SnackBar(content: Text(AppZh.continueSheetLaunching(saved.appName))),
+        showTitoSnackBar(
+          pickerContext,
+          AppZh.continueSheetLaunching(saved.appName),
         );
         return;
       } catch (_) {
@@ -971,9 +945,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
         }
         setState(() => _emulatorChoice = null);
         _emulatorChoiceRefresh.value = null;
-        ScaffoldMessenger.of(pickerContext).showSnackBar(
-          SnackBar(content: Text(AppZh.snackEmulatorLaunchFailed)),
-        );
+        showTitoSnackBar(pickerContext, AppZh.snackEmulatorLaunchFailed);
       }
     }
 
@@ -1003,9 +975,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
           }
           setState(() => _emulatorChoice = null);
           _emulatorChoiceRefresh.value = null;
-          ScaffoldMessenger.of(pickerContext).showSnackBar(
-            SnackBar(content: Text(AppZh.snackEmulatorLaunchFailed)),
-          );
+          showTitoSnackBar(pickerContext, AppZh.snackEmulatorLaunchFailed);
         }
       }
     }
@@ -1055,7 +1025,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     }
                   }
                 },
-                child: child ?? const SizedBox.shrink(),
+                child: TitoSnackHost(child: child ?? const SizedBox.shrink()),
               ),
             ),
           );

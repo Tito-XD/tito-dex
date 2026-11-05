@@ -40,6 +40,13 @@ final _rules = <_Rule>[
     allowFiles: {'lib/navigation/tito_page_transition.dart'},
   ),
   _Rule(
+    'raw snack bar',
+    RegExp(r'\b(?:showSnackBar|SnackBar)\s*\('),
+    0,
+    'showTitoSnackBar (close button, animated entrance and exit)',
+    allowFiles: {'lib/widgets/tito_snack_bar.dart'},
+  ),
+  _Rule(
     'bare progress indicator',
     RegExp(r'\b(Circular|Linear)ProgressIndicator\s*[.(]'),
     0,

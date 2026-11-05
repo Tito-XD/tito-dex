@@ -8,6 +8,7 @@ import '../theme/tito_typography.dart';
 import 'retro_forms.dart';
 import 'sticker_card.dart';
 import 'tito_progress_bar.dart';
+import 'tito_snack_bar.dart';
 
 class AppUpdateCard extends StatefulWidget {
   const AppUpdateCard({super.key, this.service});
@@ -211,10 +212,9 @@ class _AppUpdateCardState extends State<AppUpdateCard> {
                           /* Report unsupported browser below. */
                         }
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(AppZh.appUpdateBrowserFailed),
-                            ),
+                          showTitoSnackBar(
+                            context,
+                            AppZh.appUpdateBrowserFailed,
                           );
                         }
                       },

@@ -22,6 +22,7 @@ import '../../widgets/sticker_pressable.dart';
 import '../../widgets/tito_loading_panel.dart';
 import '../../theme/tito_typography.dart';
 import '../../theme/tito_surface_tokens.dart';
+import '../../widgets/tito_snack_bar.dart';
 
 /// "Who's that Pokémon" — silhouette quiz over the current dex scope,
 /// using the same sprites the dex already caches (offline friendly).
@@ -156,9 +157,7 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
     }
     final choice = await adoptCompanion(context, question.answer);
     if (choice != null && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.quizAdopted(choice.nameZh))));
+      showTitoSnackBar(context, AppZh.quizAdopted(choice.nameZh));
     }
   }
 

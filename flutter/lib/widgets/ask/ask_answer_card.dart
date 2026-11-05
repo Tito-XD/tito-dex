@@ -23,6 +23,7 @@ import 'ask_answer_text.dart';
 import 'ask_entity_links.dart';
 import 'ask_paper_style.dart';
 import '../../theme/tito_typography.dart';
+import '../tito_snack_bar.dart';
 
 class AskLiveAnswerCard extends StatefulWidget {
   const AskLiveAnswerCard({
@@ -618,15 +619,11 @@ class _AnswerCardContent extends StatelessWidget {
                     ),
                   );
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppZh.askTitoDexAnswerCopied)),
-                    );
+                    showTitoSnackBar(context, AppZh.askTitoDexAnswerCopied);
                   }
                 } on Object {
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppZh.askTitoDexCopyFailed)),
-                    );
+                    showTitoSnackBar(context, AppZh.askTitoDexCopyFailed);
                   }
                 }
               },

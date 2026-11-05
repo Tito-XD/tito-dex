@@ -31,6 +31,7 @@ import '../widgets/team_summary_card.dart';
 import 'dex/dex_reference_list.dart';
 import '../theme/tito_typography.dart';
 import '../navigation/tito_page_transition.dart';
+import '../widgets/tito_snack_bar.dart';
 
 class TeamPage extends StatefulWidget {
   const TeamPage({
@@ -269,9 +270,7 @@ class _TeamPageState extends State<TeamPage> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.teamAddInvalidId)));
+      showTitoSnackBar(context, AppZh.teamAddInvalidId);
     }
   }
 

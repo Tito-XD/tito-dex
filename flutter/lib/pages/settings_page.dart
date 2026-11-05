@@ -48,6 +48,7 @@ import '../widgets/tito_progress_dialog.dart';
 import '../widgets/tito_progress_bar.dart';
 import '../theme/tito_typography.dart';
 import '../navigation/tito_page_transition.dart';
+import '../widgets/tito_snack_bar.dart';
 
 bool shouldPrioritizeOfflineData(DexCacheStatus? status) {
   final manifest = status?.manifest;
@@ -332,9 +333,7 @@ class _SettingsPageState extends State<SettingsPage> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexCdnFailed)));
+      showTitoSnackBar(context, AppZh.snackDexCdnFailed);
     } finally {
       if (mounted) {
         setState(() => _dexDownloading = false);
@@ -371,9 +370,7 @@ class _SettingsPageState extends State<SettingsPage> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexOfflineFailed)));
+      showTitoSnackBar(context, AppZh.snackDexOfflineFailed);
     } finally {
       if (mounted) {
         setState(() => _dexDownloading = false);
@@ -432,23 +429,18 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!_dexDownloadNotification.active) {
       _dexDownloadBackgrounded = false;
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppZh.snackDexBackgroundDownloadFailed)),
-        );
+        showTitoSnackBar(context, AppZh.snackDexBackgroundDownloadFailed);
       }
       throw StateError('Android foreground download service did not start');
     }
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          notificationsGranted
-              ? AppZh.snackDexBackgroundDownload
-              : AppZh.snackDexBackgroundDownloadNoNotification,
-        ),
-      ),
+    showTitoSnackBar(
+      context,
+      notificationsGranted
+          ? AppZh.snackDexBackgroundDownload
+          : AppZh.snackDexBackgroundDownloadNoNotification,
     );
   }
 
@@ -501,42 +493,28 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _showDexDownloadResult(DexCacheProgress? lastProgress) {
     if (lastProgress?.phase == 'cancelled') {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackDownloadCancelled)));
+      showTitoSnackBar(context, AppZh.snackDownloadCancelled);
       return;
     }
     if (lastProgress?.phase == 'done') {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexCdnDone)));
+      showTitoSnackBar(context, AppZh.snackDexCdnDone);
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexCdnFailed)));
+      showTitoSnackBar(context, AppZh.snackDexCdnFailed);
     }
   }
 
   void _showDexOfflineDownloadResult(DexCacheProgress? lastProgress) {
     if (lastProgress?.phase == 'cancelled') {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackDownloadCancelled)));
+      showTitoSnackBar(context, AppZh.snackDownloadCancelled);
       return;
     }
     final cachedCount = _dexCacheStatus?.manifest.pokemonCount ?? 0;
     if (lastProgress?.phase == 'done') {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexOfflineDone)));
+      showTitoSnackBar(context, AppZh.snackDexOfflineDone);
     } else if (lastProgress?.phase == 'partial' && cachedCount > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppZh.snackDexOfflinePartial(cachedCount))),
-      );
+      showTitoSnackBar(context, AppZh.snackDexOfflinePartial(cachedCount));
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexOfflineFailed)));
+      showTitoSnackBar(context, AppZh.snackDexOfflineFailed);
     }
   }
 
@@ -560,9 +538,7 @@ class _SettingsPageState extends State<SettingsPage> {
     } else {
       message = AppZh.settingsDexVerifyIncomplete;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    showTitoSnackBar(context, message);
   }
 
   Future<void> _clearDexOffline() async {
@@ -572,9 +548,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppZh.snackDexOfflineCleared)));
+    showTitoSnackBar(context, AppZh.snackDexOfflineCleared);
   }
 
   Future<void> _setDexPreferOffline(bool enabled) async {
@@ -618,16 +592,12 @@ class _SettingsPageState extends State<SettingsPage> {
           trainerAvatarCustomized: true,
         ),
       );
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackAvatarUpdated)));
+      showTitoSnackBar(context, AppZh.snackAvatarUpdated);
     } catch (_) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppZh.snackAvatarFailed)));
+      showTitoSnackBar(context, AppZh.snackAvatarFailed);
     } finally {
       if (mounted) {
         setState(() => _avatarChanging = false);
@@ -649,9 +619,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
     setState(() => _trainerDirty = false);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppZh.snackTrainerSaved)));
+    showTitoSnackBar(context, AppZh.snackTrainerSaved);
   }
 
   Widget _buildOverview(BuildContext context) {
@@ -1795,12 +1763,9 @@ class _AppShortcutsSection extends StatelessWidget {
                                 final changed = await appShortcutPreferences
                                     .toggle(option);
                                 if (!changed && context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        AppZh.settingsAppShortcutsLimit,
-                                      ),
-                                    ),
+                                  showTitoSnackBar(
+                                    context,
+                                    AppZh.settingsAppShortcutsLimit,
                                   );
                                 }
                               },
@@ -2006,12 +1971,9 @@ class _CompanionSection extends StatelessWidget {
                             context,
                           );
                           if (picked != null && context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  AppZh.companionPicked(picked.nameZh),
-                                ),
-                              ),
+                            showTitoSnackBar(
+                              context,
+                              AppZh.companionPicked(picked.nameZh),
                             );
                           }
                         },

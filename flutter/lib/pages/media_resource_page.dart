@@ -8,6 +8,7 @@ import '../theme/secondary_typography.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_loading_panel.dart';
+import '../widgets/tito_snack_bar.dart';
 
 /// Settings resource manager: inspect/delete cached companion media and
 /// selectively download cries / animated GIFs for any species in the
@@ -119,9 +120,7 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
   }
 
   void _snack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
-    );
+    showTitoSnackBar(context, message, duration: const Duration(seconds: 2));
   }
 
   @override

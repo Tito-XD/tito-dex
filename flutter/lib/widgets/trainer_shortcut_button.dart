@@ -3,6 +3,7 @@ import '../features/app_shortcuts/app_shortcuts.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_typography.dart';
+import 'tito_snack_bar.dart';
 
 class TrainerShortcutButton extends StatefulWidget {
   const TrainerShortcutButton({super.key, required this.trainerName});
@@ -42,15 +43,11 @@ class _TrainerShortcutButtonState extends State<TrainerShortcutButton> {
                           );
                           if (!context.mounted) return;
                           setState(() => busy = false);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(switch (result) {
-                                'requested' => AppZh.trainerShortcutRequested,
-                                'updated' => AppZh.trainerShortcutUpdated,
-                                _ => AppZh.trainerShortcutUnsupported,
-                              }),
-                            ),
-                          );
+                          showTitoSnackBar(context, switch (result) {
+                            'requested' => AppZh.trainerShortcutRequested,
+                            'updated' => AppZh.trainerShortcutUpdated,
+                            _ => AppZh.trainerShortcutUnsupported,
+                          });
                         },
                   icon: const Icon(Icons.add_to_home_screen_rounded),
                   label: Text(

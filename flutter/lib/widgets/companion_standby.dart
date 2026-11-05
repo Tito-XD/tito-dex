@@ -25,6 +25,7 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'companion_picker_sheet.dart';
 import 'fallback_sprite_image.dart';
+import 'tito_snack_bar.dart';
 
 /// Home standby companion — animated sprite fetched on demand (never
 /// bundled), sized by the species' dex height. Tap to pat (bounce + hearts +
@@ -461,9 +462,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
     HapticFeedback.mediumImpact();
     final choice = await showCompanionPickerSheet(context);
     if (choice != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppZh.companionPicked(choice.nameZh))),
-      );
+      showTitoSnackBar(context, AppZh.companionPicked(choice.nameZh));
     }
   }
 

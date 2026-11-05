@@ -28,6 +28,7 @@ import '../widgets/ask/ask_paper_style.dart';
 import '../widgets/ask_titodex_loading.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../theme/secondary_typography.dart';
+import '../widgets/tito_snack_bar.dart';
 
 export '../widgets/ask/ask_answer_sources.dart' show AskTitoDexSourceOpener;
 
@@ -393,9 +394,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       _applySessions(updated);
     } on Object {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppZh.askTitoDexSessionSaveFailed)),
-        );
+        showTitoSnackBar(context, AppZh.askTitoDexSessionSaveFailed);
       }
     } finally {
       if (mounted) setState(() => _sessionBusy = false);
@@ -430,9 +429,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       }
     } on Object {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppZh.askTitoDexSessionSaveFailed)),
-        );
+        showTitoSnackBar(context, AppZh.askTitoDexSessionSaveFailed);
       }
     } finally {
       if (mounted) setState(() => _sessionBusy = false);
@@ -526,9 +523,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     } on Object {
       saved = [..._history, entry];
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppZh.askTitoDexSessionSaveFailed)),
-        );
+        showTitoSnackBar(context, AppZh.askTitoDexSessionSaveFailed);
       }
     }
     if (!_isActiveRequest(requestId, editionToken)) return;

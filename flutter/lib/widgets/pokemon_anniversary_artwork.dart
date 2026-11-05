@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../features/dex/pokemon_anniversary_art.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
+import 'tito_snack_bar.dart';
 import 'tito_skeleton.dart';
 
 /// Loaded only after selecting the anniversary display in the artwork viewer.
@@ -50,11 +51,7 @@ class _PokemonAnniversaryArtworkState extends State<PokemonAnniversaryArtwork> {
       if (!mounted) return;
     }
     if (mounted) {
-      ScaffoldMessenger.maybeOf(
-        context,
-      )?.showSnackBar(
-        SnackBar(content: Text(AppZh.anniversarySourceOpenFailed)),
-      );
+      showTitoSnackBar(context, AppZh.anniversarySourceOpenFailed);
     }
   }
 

@@ -15,6 +15,7 @@ import '../widgets/sticker_card.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_progress_bar.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/tito_snack_bar.dart';
 
 class JourneyPackManagerPage extends StatefulWidget {
   const JourneyPackManagerPage({
@@ -122,7 +123,7 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
   }
 
   void _showMessage(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
+    showTitoSnackBar(context, value);
   }
 
   @override
