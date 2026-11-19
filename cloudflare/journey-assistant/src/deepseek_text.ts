@@ -10,6 +10,8 @@ export function isDeepSeekTextConfigured(config: DeepSeekNativeSearchConfig): bo
     isDeepSeekNativeSearchConfigured(config);
 }
 
+const DEFAULT_TIMEOUT_MS = 6_000;
+
 export async function runDeepSeekText(
   config: DeepSeekNativeSearchConfig,
   phase: string,
@@ -18,6 +20,7 @@ export async function runDeepSeekText(
   maxTokens: number,
   temperature: number,
   fetcher: typeof fetch = fetch,
+  timeoutMs: number = DEFAULT_TIMEOUT_MS,
 ): Promise<unknown> {
   if (!isDeepSeekTextConfigured(config)) throw new Error('deepseek_text_unconfigured');
   const endpoint = new URL('https://gateway.ai.cloudflare.com');
@@ -31,7 +34,7 @@ export async function runDeepSeekText(
       'cf-aig-authorization': `Bearer ${config.authToken!.trim()}`,
       'cf-aig-byok-alias': config.keyAlias!.trim(),
       'cf-aig-skip-cache': 'true', 'cf-aig-collect-log': 'false',
-      'cf-aig-request-timeout': '6000', 'cf-aig-max-attempts': '1',
+      'cf-aig-request-timeout': String(timeoutMs), 'cf-aig-max-attempts': '1',
       'cf-aig-metadata': JSON.stringify({ feature: 'journey-assistant', phase: `deepseek-text:${phase}` }),
     },
     body: JSON.stringify({
@@ -39,11 +42,11 @@ export async function runDeepSeekText(
       max_tokens: maxTokens, temperature, stream: false,
       thinking: { type: 'disabled' },
       system: messages.filter((message) => message.role === 'system').map((message) => message.content).join('\n') +
-        '\n你是文本模型备用，只能使用本次提供的 sources，不得联网、调用工具或凭记忆新增事实。只输出符合此 schema 的 JSON：' + JSON.stringify(schema),
+        '\n你是文本模型，只能使用本次提供的 sources，不得联网、调用工具或凭记忆新增事实。只输出符合此 schema 的 JSON：' + JSON.stringify(schema),
       messages: messages.filter((message) => message.role === 'user'),
       // Intentionally no tools, tool_choice or native-search continuation.
     }),
-    signal: AbortSignal.timeout(6_000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) {
     await response.body?.cancel();

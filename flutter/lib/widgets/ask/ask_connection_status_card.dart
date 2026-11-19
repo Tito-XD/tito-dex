@@ -424,10 +424,6 @@ Future<void> _showConnectionDetails(
 }
 
 List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) {
-  final models = [
-    if (status.qwenConfigured) 'Qwen',
-    if (status.textFallbackConfigured) AppZh.askTitoDexTextFallbackShort,
-  ].join(' · ');
   final providers = status.webSearchProviders
       .toSet()
       .map(_webSearchProviderLabel)
@@ -438,10 +434,10 @@ List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) {
       status.availability == AskTitoDexAvailability.online,
     ),
     (
-      models.isEmpty
-          ? AppZh.askTitoDexCapAnswerGeneric
-          : AppZh.askTitoDexCapAnswerComposition(models),
-      status.qwenConfigured || status.textFallbackConfigured,
+      status.textModelConfigured
+          ? AppZh.askTitoDexCapAnswerComposition(AppZh.askTitoDexTextModelShort)
+          : AppZh.askTitoDexCapAnswerGeneric,
+      status.textModelConfigured,
     ),
     (
       providers.isEmpty

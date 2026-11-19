@@ -5,7 +5,6 @@
   "compatibility_date": "2026-08-11",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
-    "AI_MODEL": "@cf/qwen/qwen3-30b-a3b-fp8",
     "AI_GATEWAY_ID": "test",
     "AI_SEARCH_ENABLED": "false",
     "CURATED_WEB_ENABLED": "false",
@@ -13,13 +12,9 @@
     "EXA_WEB_ENABLED": "false",
     "WEB_SEARCH_PRIMARY": "exa",
     "DEEPSEEK_NATIVE_SEARCH_ENABLED": "false",
-    "DEEPSEEK_TEXT_FALLBACK_ENABLED": "false",
+    "DEEPSEEK_TEXT_ENABLED": "false",
     "DEEPSEEK_NATIVE_PROVIDER": "custom-deepseek-anthropic",
-    "DEEPSEEK_NATIVE_KEY_ALIAS": "TitoDex",
-    "AI_EXTERNAL_PROVIDER_ENABLED": "false",
-    "AI_PROVIDER": "workers-ai",
-    "AI_PROVIDER_MODEL": "deepseek-v4-flash",
-    "AI_PROVIDER_ENDPOINT": "chat/completions"
+    "DEEPSEEK_NATIVE_KEY_ALIAS": "TitoDex"
   },
   "r2_buckets": [
     {

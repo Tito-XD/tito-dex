@@ -112,6 +112,8 @@ actions, retryable error panels and several dex/team fixes.
 
 **Compatible Exa/Ask rollout live (2026-10-10):** Worker `c33bf145-42ee-4a7c-a075-b79bb2ee811c` serves 100% from verified source `75304f9`. Exa is primary, Tavily and DeepSeek native search are off; Qwen uses a bounded DeepSeek text fallback. Four candidate and two ordinary production requests returned answers, including old/new context shapes. Health and the latest deployment were verified; this is API behavior evidence, not an independent audit of every retrieved Pokémon fact.
 
+**Qwen removed in source (2026-11-18, not deployed):** the Journey Worker no longer binds Workers AI or uses `@cf/qwen/qwen3-30b-a3b-fp8`. DeepSeek V4 Flash text through the existing AI Gateway BYOK alias (`DEEPSEEK_TEXT_ENABLED`, renamed from `DEEPSEEK_TEXT_FALLBACK_ENABLED`) is the only routing/compose/verify model; `/health` reports `publicModel: deepseek-text` and repeats it in `publicModelFallback` for App v0.9.26 and earlier. Answer modes are now `curated_sources_model` / `multi_source_model`; the App still reads the old `_qwen` values from saved conversations. Production keeps running the Qwen version until this source is deployed.
+
 ### v0.9.24: compact Search and Exa/Ask integration
 
 - Search introduces the Exa/AI experimental assistant copy and equal-height

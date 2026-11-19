@@ -24,10 +24,11 @@ the recorded production version below.
    six web excerpts. These join bounded local evidence for composition and
    support verification. Contradictions, wrong versions and invented facts
    retain their existing guards. Citations keep original source URLs.
-6. Qwen is the default text model for terms, composition and verification.
-   A request-local text fallback can use the existing DeepSeek Gateway/BYOK
-   identity after model failure, without search tools or continuations.
-   `modelProviders` records successful text-model participation.
+6. DeepSeek V4 Flash text is the only text model for routing, terms,
+   composition and verification. It uses the existing AI Gateway/BYOK
+   identity without search tools or continuations. After one failed call,
+   the rest of that request skips the model. `modelProviders` records
+   successful participation. The Worker has no Workers AI binding.
 7. Tavily and DeepSeek native web search are disabled by default. They require
    explicit opt-in. The key-free fixed-source path remains available when Exa
    is not configured; an active Exa failure preserves deterministic fallback.
@@ -146,7 +147,7 @@ original deterministic `no_match` response. Live answers never write to R2.
 The normal source configuration uses `EXA_WEB_ENABLED=true`,
 `WEB_SEARCH_PRIMARY=exa`, `TAVILY_WEB_ENABLED=false`,
 `DEEPSEEK_NATIVE_SEARCH_ENABLED=false` and
-`DEEPSEEK_TEXT_FALLBACK_ENABLED=true`.
+`DEEPSEEK_TEXT_ENABLED=true`.
 
 - `EXA_API_KEY` and optional `TAVILY_API_KEY` stay in Worker secrets. Provider
   flags and `CURATED_WEB_ENABLED=true` also gate retrieval. Health checks key
@@ -162,9 +163,12 @@ The normal source configuration uses `EXA_WEB_ENABLED=true`,
   network, rate-limit and quota failures skip subsequent calls to that provider
   during the same question. An already-started language request can finish.
   The next question starts with fresh provider availability.
-- DeepSeek text fallback reuses `CF_ACCOUNT_ID`, `CF_AIG_TOKEN` and the existing
-  explicit BYOK alias. It sends no web tools, has a six-second timeout and
-  bounded output. It is reported separately from web search in health/trace.
+- DeepSeek text reuses `CF_ACCOUNT_ID`, `CF_AIG_TOKEN` and the existing
+  explicit BYOK alias. It sends no web tools, has a six-second timeout for
+  curated-web phases (ten seconds otherwise) and bounded output. It is
+  reported separately from web search in health/trace. With
+  `DEEPSEEK_TEXT_ENABLED=false` the Worker answers only from deterministic
+  routes.
 - Logs contain provider, phase, status and count, never keys, query text,
   excerpts or upstream error bodies. Evidence is not stored or indexed.
   A duplicate URL counts once; provider names do not establish independence.
@@ -222,7 +226,9 @@ version, source and claim checks remain required.
 ## Client-visible status and execution trace
 
 `GET /health` returns only sanitized capability flags: Worker reachability,
-Workers AI Qwen configuration, Dex-bundle/AI Search/curated-source switches, the three
+text-model configuration (`publicModel: deepseek-text`, repeated in
+`publicModelFallback` for App v0.9.26 and earlier), Dex-bundle/AI
+Search/curated-source switches, the three
 fixed source provider names, generic `webSearch` plus
 `webSearchProviders` containing `exa` and/or `tavily` in configured order
 only when their flags and secrets are present, and `deepseek-native` only after its server flag is enabled following
@@ -239,8 +245,10 @@ only the sources actually used.
 Every `/v1/ask` response also carries a privacy-safe trace:
 
 - `answerMode`: local audited, online audited, AI Search audited, curated
-  sources + Qwen, DeepSeek native search, Qwen × DeepSeek corroborated, or no
-  match;
+  sources + text model (`curated_sources_model`), DeepSeek native search,
+  curated × DeepSeek native corroborated (`multi_source_model`), or no match.
+  The App still reads the older `curated_sources_qwen` and
+  `multi_source_qwen` values from saved conversations;
 - `modelUsed` and `aiSearchUsed`: what this request actually used, not merely
   what the deployment has configured;
 - `sourceKinds`: `pokeapi`, `strategywiki`, `wikidata`, `exa`, `tavily`, or
@@ -335,12 +343,11 @@ Native search is disabled in the current source candidate. The text fallback
 uses the same Gateway identity with no tools. The following instructions cover
 explicitly enabling the legacy native-search path.
 
-DeepSeek is not AI Search's generation model and is never an unlimited public
-fallback. Qwen remains the public classifier/composer/verifier. After the
-local/audited/Dex-bundle route misses, the optional native-search request runs
-concurrently with fixed-source/Tavily + Qwen research so one slow provider does
-not consume the App's whole timeout; the verified Qwen route wins when both
-succeed.
+DeepSeek is not AI Search's generation model. The DeepSeek text model remains
+the classifier/composer/verifier. After the local/audited/Dex-bundle route
+misses, the optional native-search request runs concurrently with curated
+web research so one slow provider does not consume the App's whole timeout;
+the verified curated route wins when both succeed.
 
 Native V4 Flash setup:
 
@@ -373,30 +380,21 @@ search use, the same server-owned Pokémon domain allowlist, up to four bounded
 pause-turn continuations, an 18-second per-request timeout and a 26-second
 whole-chain deadline, no cache or prompt logging, and a 128 KiB response cap. TitoDex rejects model
 text containing its own URL/domain, exposes only revalidated source URLs, and
-asks Workers AI to support-check the draft against bounded citation snippets.
+asks the text model to support-check the draft against bounded citation snippets.
 Failure falls back without changing the deterministic result.
 
 The provider has executed the requested search in a live smoke, but its current
-response shape does not always include bounded `cited_text` for the Qwen
-support verifier. TitoDex therefore revalidates every returned source URL
-against its server-owned allowlist. When citation text exists, Qwen verifies
+response shape does not always include bounded `cited_text` for the support
+verifier. TitoDex therefore revalidates every returned source URL
+against its server-owned allowlist. When citation text exists, the text model verifies
 the draft; when it does not, the explicit
 `EXPERIMENTAL_BROAD_ANSWERS=true` trial may return the sourced result at low
 confidence with an in-App warning. Disabling that flag restores the strict
 evidence gate without changing deterministic fallback.
 
-The older provider-native JSON generation path remains separately gated by
-`AI_EXTERNAL_PROVIDER_ENABLED=true` and `AI_PROVIDER=deepseek`; its example
-model is now `deepseek-v4-flash`. It does not provide native web search and is
-not required for the native-search route above.
-
-For a self-hosted OpenAI-compatible model, first create an authenticated custom
-provider in AI Gateway. Then set `AI_PROVIDER` to `custom-<slug>` and use either
-`chat/completions` or `v1/chat/completions`. The code does not accept arbitrary
-origin URLs, so a model credential cannot be redirected to another host.
-
-Provider calls use a ten-second timeout, one attempt, no response cache, no AI
-Gateway prompt logging, strict JSON parsing, and a 16 KiB response cap. AI
+Text-model calls use one attempt, no response cache, no AI Gateway prompt
+logging and strict JSON parsing. The Gateway URL is built only from server-owned
+segments, so a model credential cannot be redirected to another host. AI
 Search receives only the bounded question and derived context; neither API can
 accept raw save bytes under the request schema. Worker logs contain only coarse
 result metadata and never the question or exact location.
@@ -420,7 +418,7 @@ R2, Search, Gateway, or model resources fail closed; Journey answers continue
 to use the installed deterministic pack. The structured reader permits only the
 validated root manifest, numeric species details, and fixed `items.json`,
 `moves.json`, or `dex_catalog.json` objects under that manifest prefix. Flavor
-prose and held-item rows are not supplied to embeddings or Qwen. Held-item
+prose and held-item rows are not supplied to embeddings or the text model. Held-item
 answers are deterministic and retain the bundle's PokeAPI / 52Poké attribution.
 
 References:

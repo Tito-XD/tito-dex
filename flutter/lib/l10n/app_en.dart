@@ -185,7 +185,6 @@ const kAppEn = <String, String>{
   'askTitoDexWorkerDisabled': 'Online AI is off',
   'askTitoDexWorkerUnavailable': 'Local data only for now',
   'askTitoDexWorkerRefresh': 'Check connection again',
-  'askTitoDexQwenConfigured': 'Qwen is configured',
   'askTitoDexAiSearchEnabled': 'AI Search is on',
   'askTitoDexCuratedSourcesEnabled': 'Web research is on',
   'askTitoDexBraveNotConnected': 'Brave Search is not connected',
@@ -196,17 +195,13 @@ const kAppEn = <String, String>{
   'askTitoDexStatusOnlineHint':
       'Encyclopedia and guide sources are shown together. The full allowlist and license notes are in Settings under Data sources & licenses. Connection status only means they are configured; sources actually used for this answer still appear on the reply.',
   'askTitoDexRouteLocal': 'Reviewed data · local answer',
-  'askTitoDexRouteAuditedOnline': 'Reviewed data · Qwen online match',
-  'askTitoDexRouteAiSearch': 'R2 AI Search · Qwen match',
+  'askTitoDexRouteAuditedOnline': 'Reviewed data · online match',
+  'askTitoDexRouteAiSearch': 'R2 AI Search match',
   'askTitoDexRouteCuratedDeterministic': 'Web sources · deterministic extract',
-  'askTitoDexRouteCuratedQwen': 'Web sources · Qwen write-up',
-  'askTitoDexRouteCuratedFallback': 'Web sources · fallback model write-up',
-  'askTitoDexRouteAuditedFallback': 'Reviewed data · fallback model match',
-  'askTitoDexRouteAiSearchFallback': 'R2 AI Search · fallback model match',
-  'askTitoDexTraceQwenDeepseek': 'Qwen / DeepSeek took part',
-  'askTitoDexTraceDeepseekText': 'DeepSeek fallback model took part',
-  'askTitoDexTraceNoModel': 'Qwen was not called this time',
-  'askTitoDexTraceModel': 'Qwen took part',
+  'askTitoDexRouteCuratedModel': 'Web sources · model write-up',
+  'askTitoDexTraceDeepseekText': 'DeepSeek took part',
+  'askTitoDexTraceNoModel': 'No text model was called this time',
+  'askTitoDexTraceModel': 'A text model took part',
   'askTitoDexTraceAiSearch': 'AI Search hit',
   'askTitoDexTraceSearchRoutes': '{count} search routes',
   'askTitoDexOnlineFallback':
@@ -242,7 +237,7 @@ const kAppEn = <String, String>{
       'The online service is unavailable. The journey still works offline — please try again later.',
   'askTitoDexNoticeTitle': 'Turn on Ask TitoDex?',
   'askTitoDexNoticeBody':
-      'This assistant is off by default. After you confirm, TitoDex still prefers local data in the App. Only when that is not enough does it connect to the Journey Worker, which may use AI Search, Workers AI (Qwen), Exa web search to organize an answer, with DeepSeek as a fallback text model. A request includes only the game version you confirmed, reliable location/badge/milestone IDs, language, parser version, this question, and at most 6 recent Q&A pairs from the current conversation for follow-ups. Up to 20 conversations stay on this device. When full, choose a conversation to delete before starting another. Raw saves, trainer names, IDs, money, party, or individual stats are never uploaded. You can later turn off online answers on their own, or disable the whole assistant and hide every entry.',
+      'This assistant is off by default. After you confirm, TitoDex still prefers local data in the App. Only when that is not enough does it connect to the Journey Worker, which may use AI Search, Exa web search and the DeepSeek text model to organize an answer. A request includes only the game version you confirmed, reliable location/badge/milestone IDs, language, parser version, this question, and at most 6 recent Q&A pairs from the current conversation for follow-ups. Up to 20 conversations stay on this device. When full, choose a conversation to delete before starting another. Raw saves, trainer names, IDs, money, party, or individual stats are never uploaded. You can later turn off online answers on their own, or disable the whole assistant and hide every entry.',
   'askTitoDexNoticeAccept': 'Turn it on',
   'settingsAskTitoDex': 'Allow online AI and search',
   'settingsAskTitoDexHint':
@@ -425,7 +420,7 @@ const kAppEn = <String, String>{
   'settingsAttributionBody':
       'TitoDex is an unofficial, non-commercial tool for learning and personal playthrough help. It is not affiliated with, licensed, sponsored, or endorsed by Nintendo Co., Ltd., Creatures Inc., GAME FREAK inc., The Pokémon Company, or their affiliates. Pokémon, characters, game names, images, audio, and trademarks belong to their respective rights holders. This tool does not provide ROMs, keys, paid content, or save editing.\n\n'
       'Data and text: PokéAPI (species, forms, moves, abilities, items, versions, and base locations; data/code repository BSD-3-Clause); 52Poké Wiki (some Chinese descriptions, held items, locations, and body styles; original wiki content CC BY-NC-SA 3.0); Bulbapedia (item grouping and a few location language links; CC BY-NC-SA 2.5); PKHeX (modern encounter overlays exported from a pinned commit; GPL-3.0-or-later — the App does not embed or execute it); Project Pokémon (technical reference for HGSS save/PKM structure and map IDs).\n\n'
-      'Ask TitoDex web sources: Exa searches public pages using Chinese and English terms, followed by topic, work, game-version and supporting-excerpt checks. Each answer retains its actual source links. Qwen composes and verifies, with DeepSeek as a fallback text model. Online excerpts are used only for that answer and citation checks; they are not automatically written into R2, AI Search, the APK or the local dex pack. Each site’s own terms still apply. Tavily and DeepSeek native search are disabled by default and require explicit maintainer opt-in. Exa, Tavily and DeepSeek are services, not licensors of page content.\n\n'
+      'Ask TitoDex web sources: Exa searches public pages using Chinese and English terms, followed by topic, work, game-version and supporting-excerpt checks. Each answer retains its actual source links. The DeepSeek text model composes and verifies. Online excerpts are used only for that answer and citation checks; they are not automatically written into R2, AI Search, the APK or the local dex pack. Each site’s own terms still apply. Tavily and DeepSeek native search are disabled by default and require explicit maintainer opt-in. Exa, Tavily and DeepSeek are services, not licensors of page content.\n\n'
       'Media: PokéAPI/sprites, Pokémon Showdown / Smogon community creators, Pokémon Paraíso and ShinyHunters companion animation candidates, PokéSprite type icons (MIT), SteamGridDB community source pages, and official images/audio from Pokémon HOME and the games; the Nunito font ships under SIL OFL 1.1. Open wiki licenses do not automatically cover official game media; each asset is handled by recorded source and original rights status.\n\n'
       'External tools: sleep score, 19 ingredient values, recipe-level multipliers, and cooking energy formulas on the Pokémon Sleep secondary page are ported from Neroli’s Lab pinned commit cb533f2, used under Apache-2.0 with the license and NOTICE bundled in the App. Full team building and long-term simulation stay as an external link.\n\n'
       'Source entry points: pokemon.com · wiki.52poke.com · bulbapedia.bulbagarden.net · strategywiki.org · serebii.net · pokeapi.co · wikidata.org · pokemondb.net · smogon.com · marriland.com · gamefaqs.gamespot.com · game8.co · ign.com · nintendolife.com · eurogamer.net · github.com/PokeAPI/sprites · github.com/msikma/pokesprite · github.com/kwsch/PKHeX · projectpokemon.org · pokemonshowdown.com · steamgriddb.com · nerolislab.com. Pinned commits, per-file sources, and build-batch notes live in CREDITS.md and THIRD_PARTY_NOTICES.md at the project root, plus attribution files shipped with the data pack.',
@@ -1268,7 +1263,6 @@ const kAppEn = <String, String>{
       'Connection · {enabled}/{total}\nQ&A history · {history}/{limit}',
   'askTitoDexBroadTrialHint':
       'Broad-answer trial is on: Pokémon topics and public web pages and supporting excerpts still apply, but incomplete evidence becomes a low-confidence answer instead of being dropped.',
-  'askTitoDexCapQwen': 'Qwen · compose / verify',
   'askTitoDexCapAiSearch': 'AI Search · R2 index',
   'askTitoDexCapBundle': 'TitoDex bundle · structured checks',
   'askTitoDexCapEncyclopedia': 'Encyclopedias · curated sources',
@@ -1339,7 +1333,7 @@ const kAppEn = <String, String>{
   'askTitoDexEntityMove': 'Move',
   'askTitoDexEntityAbility': 'Ability',
   'askTitoDexRouteDeepseekNative': 'DeepSeek native web answer',
-  'askTitoDexRouteMultiSource': 'Qwen × DeepSeek cross-check',
+  'askTitoDexRouteMultiSource': 'Two-source cross-check',
   'askTitoDexSourceDeepseekWeb': 'DeepSeek web',
   'askTitoDexSourceDeepseekNativeShort': 'DeepSeek native',
   'askTitoDexLiveJoinComma': ', ',
@@ -1384,7 +1378,7 @@ const kAppEn = <String, String>{
   'askTitoDexStatusOnlineReady': 'Online available',
   'askTitoDexConnectionsTitle': 'Online connections',
   'askTitoDexCapOnlineService': 'Online service · Journey Worker',
-  'askTitoDexTextFallbackShort': 'DeepSeek text fallback',
+  'askTitoDexTextModelShort': 'DeepSeek',
   'askTitoDexCapSearchGeneric': 'Web search',
   'askTitoDexCapAnswerGeneric': 'Answer composition',
   'askTitoDexCapDexFacts': 'Dex data · TitoDex Bundle',

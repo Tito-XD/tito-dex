@@ -150,15 +150,15 @@ export type AssistantResponse = {
     | 'audited_online'
     | 'ai_search_audited'
     | 'curated_sources_deterministic'
-    | 'curated_sources_qwen'
+    | 'curated_sources_model'
     | 'deepseek_native_search'
-    | 'multi_source_qwen'
+    | 'multi_source_model'
     | 'no_match';
   /** Source-supported partial general overview; no selected-version ownership. */
   outlineMode?: 'basic_web_outline';
   modelUsed?: boolean;
   /** Successful text model providers; optional for existing clients. */
-  modelProviders?: ('workers-ai-qwen' | 'deepseek-text')[];
+  modelProviders?: 'deepseek-text'[];
   aiSearchUsed?: boolean;
   sourceKinds?: (
     | 'pokeapi'

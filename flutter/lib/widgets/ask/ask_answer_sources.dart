@@ -439,9 +439,7 @@ class _AnswerMetaLabel extends StatelessWidget {
 
 String _modelTraceLabel(AskTitoDexResult result) {
   if (result.modelProviders.contains('deepseek-text')) {
-    return result.modelProviders.contains('workers-ai-qwen')
-        ? AppZh.askTitoDexTraceQwenDeepseek
-        : AppZh.askTitoDexTraceDeepseekText;
+    return AppZh.askTitoDexTraceDeepseekText;
   }
   return result.modelUsed
       ? AppZh.askTitoDexTraceModel
@@ -452,28 +450,17 @@ String _answerModeLabel(AskTitoDexResult result) {
   if (result.outlineMode == 'basic_web_outline') {
     return AppZh.askTitoDexBasicOutline;
   }
-  if (result.modelProviders.contains('deepseek-text')) {
-    final fallback = switch (result.answerMode) {
-      AskTitoDexAnswerMode.curatedSourcesQwen =>
-        AppZh.askTitoDexRouteCuratedFallback,
-      AskTitoDexAnswerMode.auditedOnline =>
-        AppZh.askTitoDexRouteAuditedFallback,
-      AskTitoDexAnswerMode.aiSearchAudited =>
-        AppZh.askTitoDexRouteAiSearchFallback,
-      _ => null,
-    };
-    if (fallback != null) return fallback;
-  }
   return switch (result.answerMode) {
     AskTitoDexAnswerMode.localAudited => AppZh.askTitoDexRouteLocal,
     AskTitoDexAnswerMode.auditedOnline => AppZh.askTitoDexRouteAuditedOnline,
     AskTitoDexAnswerMode.aiSearchAudited => AppZh.askTitoDexRouteAiSearch,
     AskTitoDexAnswerMode.curatedSourcesDeterministic =>
       AppZh.askTitoDexRouteCuratedDeterministic,
-    AskTitoDexAnswerMode.curatedSourcesQwen => AppZh.askTitoDexRouteCuratedQwen,
+    AskTitoDexAnswerMode.curatedSourcesModel =>
+      AppZh.askTitoDexRouteCuratedModel,
     AskTitoDexAnswerMode.deepseekNativeSearch =>
       AppZh.askTitoDexRouteDeepseekNative,
-    AskTitoDexAnswerMode.multiSourceQwen => AppZh.askTitoDexRouteMultiSource,
+    AskTitoDexAnswerMode.multiSourceModel => AppZh.askTitoDexRouteMultiSource,
     AskTitoDexAnswerMode.noMatch => AppZh.askTitoDexOnlineSearchedNoMatch,
   };
 }

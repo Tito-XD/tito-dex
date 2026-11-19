@@ -14,8 +14,7 @@ import 'package:titodex/theme/tito_theme.dart';
 
 const connected = AskTitoDexWorkerStatus(
   availability: AskTitoDexAvailability.online,
-  qwenConfigured: true,
-  textFallbackConfigured: true,
+  textModelConfigured: true,
   aiSearchEnabled: true,
   dexBundleEnabled: true,
   curatedSourcesEnabled: false,
@@ -385,7 +384,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('联网连接'), findsOneWidget);
       expect(find.text('联网服务 · Journey Worker'), findsOneWidget);
-      expect(find.text('回答整理与核验 · Qwen · DeepSeek 文本备用'), findsOneWidget);
+      expect(find.text('回答整理与核验 · DeepSeek'), findsOneWidget);
       expect(find.text('网页检索 · Exa'), findsOneWidget);
       expect(find.text('图鉴资料 · TitoDex Bundle'), findsOneWidget);
       expect(find.text('审核提示 · AI Search'), findsOneWidget);
@@ -406,7 +405,6 @@ void main() {
         tester,
         status: const AskTitoDexWorkerStatus(
           availability: AskTitoDexAvailability.online,
-          qwenConfigured: true,
           webSearchEnabled: true,
           webSearchProviders: ['exa', 'tavily', 'exa'],
         ),
@@ -430,10 +428,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Online connections'), findsOneWidget);
     expect(find.text('Online service · Journey Worker'), findsOneWidget);
-    expect(
-      find.text('Answer composition · Qwen · DeepSeek text fallback'),
-      findsOneWidget,
-    );
+    expect(find.text('Answer composition · DeepSeek'), findsOneWidget);
     expect(find.text('Web search · Exa'), findsOneWidget);
     expect(find.text('Dex data · TitoDex Bundle'), findsOneWidget);
     expect(find.text('Reviewed hints · AI Search'), findsOneWidget);

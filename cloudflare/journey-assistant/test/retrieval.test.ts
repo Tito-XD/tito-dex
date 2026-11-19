@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { AssistantRequest } from '../src/contract';
-import { parseProviderJsonResponse } from '../src/index';
 import { progressionHints } from '../src/progression_hints';
 import {
   getJourneySearch,
@@ -150,26 +149,6 @@ describe('audited AI Search retrieval', () => {
         retrieval: expect.objectContaining({ match_threshold: 0.51 }),
       }),
     }));
-  });
-});
-
-describe('OpenAI-compatible provider response limits', () => {
-  it('parses only strict JSON content from a bounded successful response', async () => {
-    const response = Response.json({
-      choices: [{ message: { content: '{"hintId":"hgss-route36-sudowoodo"}' } }],
-    });
-    await expect(parseProviderJsonResponse(response)).resolves.toEqual({
-      hintId: 'hgss-route36-sudowoodo',
-    });
-  });
-
-  it('rejects markdown-wrapped and oversized provider output', async () => {
-    await expect(parseProviderJsonResponse(Response.json({
-      choices: [{ message: { content: '```json\n{"hintId":"x"}\n```' } }],
-    }))).rejects.toThrow();
-    await expect(parseProviderJsonResponse(new Response('x', {
-      headers: { 'content-length': '20000' },
-    }))).rejects.toThrow('provider_response_too_large');
   });
 });
 

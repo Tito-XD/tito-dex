@@ -86,12 +86,12 @@ void main() {
   });
 
   test(
-    'text fallback trace survives history serialization and local tracing',
+    'DeepSeek text trace survives history serialization and local tracing',
     () {
       final result = AskTitoDexResult.fromJson({
         'status': 'answered',
         'answer': '资料整理',
-        'answerMode': 'curated_sources_qwen',
+        'answerMode': 'curated_sources_model',
         'modelUsed': true,
         'modelProviders': [
           'workers-ai-qwen',
@@ -105,71 +105,64 @@ void main() {
       final restored = AskTitoDexResult.fromJson(
         result.toJson(),
       ).withRuntimeTrace(onlineAttempted: true);
-      expect(restored.modelProviders, ['workers-ai-qwen', 'deepseek-text']);
+      expect(restored.modelProviders, ['deepseek-text']);
       expect(restored.sourceKinds, ['exa']);
       expect(restored.outlineMode, 'basic_web_outline');
-      expect(restored.answerMode, AskTitoDexAnswerMode.curatedSourcesQwen);
+      expect(restored.answerMode, AskTitoDexAnswerMode.curatedSourcesModel);
       expect(
         AskTitoDexResult.fromJson({'status': 'answered'}).modelProviders,
         isEmpty,
       );
     },
   );
-  for (final mode in [
-    AskTitoDexAnswerMode.curatedSourcesQwen,
-    AskTitoDexAnswerMode.auditedOnline,
-    AskTitoDexAnswerMode.aiSearchAudited,
+  for (final (mode, routeLabel) in [
+    (
+      AskTitoDexAnswerMode.curatedSourcesModel,
+      AppZh.askTitoDexRouteCuratedModel,
+    ),
+    (AskTitoDexAnswerMode.auditedOnline, AppZh.askTitoDexRouteAuditedOnline),
+    (AskTitoDexAnswerMode.aiSearchAudited, AppZh.askTitoDexRouteAiSearch),
   ]) {
-    for (final mixed in [false, true]) {
-      testWidgets(
-        'fallback model is shown accurately for ${mode.name} / $mixed',
-        (tester) async {
-          final result = AskTitoDexResult(
-            status: AskTitoDexStatus.answered,
-            answer: '本条回答来自提供的资料。',
-            answerMode: mode,
-            modelUsed: true,
-            modelProviders: [if (mixed) 'workers-ai-qwen', 'deepseek-text'],
-          );
-          await tester.pumpWidget(
-            MaterialApp(
-              theme: buildTitoTheme(),
-              home: Scaffold(
-                body: ListView(
-                  children: [
-                    AskAnswerCard(
-                      question: '资料说明',
-                      result: result,
-                      entityResolver: DexAskTitoDexEntityResolver(
-                        catalogLoader: () async => const [],
-                      ),
-                      sourceOpener: (_) async => true,
-                      animateEvidence: false,
-                      onRetry: () {},
-                      onClarificationSelected: (_) {},
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-          await tester.pumpAndSettle();
-          expect(find.text(AppZh.askTitoDexTraceDeepseekText), findsNothing);
-          await tester.tap(find.byKey(const Key('ask-titodex-source-summary')));
-          await tester.pumpAndSettle();
-          expect(
-            find.text(
-              mixed
-                  ? AppZh.askTitoDexTraceQwenDeepseek
-                  : AppZh.askTitoDexTraceDeepseekText,
-            ),
-            findsOneWidget,
-          );
-          expect(find.text(AppZh.askTitoDexTraceModel), findsNothing);
-          expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsNothing);
-          expect(tester.takeException(), isNull);
-        },
+    testWidgets('DeepSeek text model is shown for ${mode.name}', (
+      tester,
+    ) async {
+      final result = AskTitoDexResult(
+        status: AskTitoDexStatus.answered,
+        answer: '本条回答来自提供的资料。',
+        answerMode: mode,
+        modelUsed: true,
+        modelProviders: const ['deepseek-text'],
       );
-    }
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildTitoTheme(),
+          home: Scaffold(
+            body: ListView(
+              children: [
+                AskAnswerCard(
+                  question: '资料说明',
+                  result: result,
+                  entityResolver: DexAskTitoDexEntityResolver(
+                    catalogLoader: () async => const [],
+                  ),
+                  sourceOpener: (_) async => true,
+                  animateEvidence: false,
+                  onRetry: () {},
+                  onClarificationSelected: (_) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(AppZh.askTitoDexTraceDeepseekText), findsNothing);
+      await tester.tap(find.byKey(const Key('ask-titodex-source-summary')));
+      await tester.pumpAndSettle();
+      expect(find.text(AppZh.askTitoDexTraceDeepseekText), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexTraceModel), findsNothing);
+      expect(find.text(routeLabel), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   }
 }

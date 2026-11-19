@@ -13,7 +13,7 @@
 | Save import | HGSS fixture-verified rich party/trainer/map/dex sync; Gen I–VII metadata experimental; DeSmuME `.dsv` recognized |
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree, Journey counterpart completion grids and Team evolution details |
-| “Ask TitoDex” blocker Q&A | Built into the host; reviewed local hints and deterministic existing-resource queries, move/ability reverse filters, bounded retrieval and Qwen with final fact protection |
+| “Ask TitoDex” blocker Q&A | Built into the host; reviewed local hints and deterministic existing-resource queries, move/ability reverse filters, bounded retrieval and the DeepSeek text model with final fact protection |
 | Offline data | Live bundle v20; v0.9.26 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |

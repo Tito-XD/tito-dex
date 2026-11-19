@@ -3,7 +3,7 @@
 | 目录 | 用途 | 自动部署分支 |
 | --- | --- | --- |
 | [`dex-cdn/`](dex-cdn/) | 离线图鉴 CDN Worker（R2 代理） | **`deploy/dex-cdn`** |
-| [`journey-assistant/`](journey-assistant/) | 内建可选 Journey 问答的独立 Worker：BGE-M3 AI Search + Dex bundle + Workers AI Qwen + Tavily／DeepSeek 限定搜索 | 独立部署；App 总开关默认关闭 |
+| [`journey-assistant/`](journey-assistant/) | 内建可选 Journey 问答的独立 Worker：BGE-M3 AI Search + Dex bundle + DeepSeek 文本模型 + Exa／Tavily／DeepSeek 限定搜索 | 独立部署；App 总开关默认关闭 |
 
 **Production:** `https://dex.tito.cafe` · Worker **`tito-dex`** · R2 **`titodex-dex`** · live bundle **v20** on `/v5/`; v0.9.18 Offline embeds the verified v20 archive
 

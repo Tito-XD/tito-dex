@@ -6,6 +6,7 @@ import { buildDexBundleSources } from '../src/dex_bundle_retrieval';
 import { questionEvidenceDomain } from '../src/question_evidence_scope';
 import { researchCuratedWeb, type CuratedSource, type CuratedWebModelRunner } from '../src/curated_web';
 import worker from '../src/index';
+import { stubTextModel, TEXT_MODEL_ENV, type StubModelMessage, type TextModelHandler } from './text_model_stub';
 
 const request: AssistantRequest = { question: '伊布怎么进化？',
   context: { game: 'general', generation: 0, badgeIds: [], milestoneIds: [], locale: 'zh-Hans', parserRevision: 2,
@@ -271,13 +272,14 @@ describe('honest cached general facts with real upstream links', () => {
   });
 });
 
-function basicEnv(run: ReturnType<typeof vi.fn>): Env {
-  return { ...env, AI: { run }, AI_MODEL: '@cf/qwen/qwen3-30b-a3b-fp8', AI_GATEWAY_ID: 'titodex-journey-assistant',
+function basicEnv(run: TextModelHandler): Env {
+  stubTextModel(run);
+  return { ...env, ...TEXT_MODEL_ENV,
     AI_SEARCH_ENABLED: 'false', CURATED_WEB_ENABLED: 'true', TAVILY_WEB_ENABLED: 'false', EXA_WEB_ENABLED: 'true',
-    EXA_API_KEY: key, DEEPSEEK_NATIVE_SEARCH_ENABLED: 'false', DEEPSEEK_TEXT_FALLBACK_ENABLED: 'false',
+    EXA_API_KEY: key, DEEPSEEK_NATIVE_SEARCH_ENABLED: 'false',
   } as unknown as Env;
 }
-async function ask(run: ReturnType<typeof vi.fn>): Promise<AssistantResponse> {
+async function ask(run: TextModelHandler): Promise<AssistantResponse> {
   const response = await worker.fetch(new Request('https://assistant.test/v1/ask', { method: 'POST',
     headers: { 'content-type': 'application/json', 'x-titodex-device-key': 'basic-test-12345678', 'cf-connecting-ip': '203.0.113.2' },
     body: JSON.stringify(request) }), basicEnv(run));
@@ -291,25 +293,20 @@ describe('final basic outline ownership', () => {
     ] } });
     const answer = '伊布可使用水之石进化为水伊布。';
     vi.stubGlobal('fetch', fetchSources(quote));
-    const run = vi.fn(async (_model, input, options) => {
-      const phase = options.gateway.metadata.phase;
-      return { response: await sourceRunner(answer)(phase, input.messages, {}, 0, 0) };
-    });
+    const run = vi.fn((phase: string, messages: StubModelMessage[]) => sourceRunner(answer)(phase, messages, {}, 0, 0));
     const result = await ask(run);
     expect(result.answer).toBe(answer);
     expect(result.sources?.[0].url).toBe('https://pokemon-reference.org/general');
     expect(result.outlineMode).toBe('basic_web_outline');
-    expect(result.modelProviders).toEqual(['workers-ai-qwen']);
+    expect(result.modelProviders).toEqual(['deepseek-text']);
   });
   it('keeps a contradiction blocked through local fallback and final structured fact ownership', async () => {
     await seed(133, { evolutionChain: { id: 133, nameZh: '伊布', children: [
       { id: 134, nameZh: '水伊布', triggers: [{ trigger: 'use-item', item: 'water-stone' }], children: [] },
     ] } });
     vi.stubGlobal('fetch', fetchSources(quote));
-    const run = vi.fn(async (_model, input, options) => {
-      const phase = options.gateway.metadata.phase;
-      return { response: await sourceRunner('伊布可进化为水伊布。', 'contradicted')(phase, input.messages, {}, 0, 0) };
-    });
+    const run = vi.fn((phase: string, messages: StubModelMessage[]) =>
+      sourceRunner('伊布可进化为水伊布。', 'contradicted')(phase, messages, {}, 0, 0));
     const result = await ask(run);
     expect(result).toMatchObject({ status: 'no_match', answer: null, errorCode: 'basic_outline_conflict' });
     expect(result.sources?.length).toBeGreaterThan(0);

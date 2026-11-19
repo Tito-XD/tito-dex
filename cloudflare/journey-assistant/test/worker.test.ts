@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AssistantRequest, AssistantResponse } from '../src/contract';
 import { buildDexBundleSources } from '../src/dex_bundle_retrieval';
 import worker, { reconcileParallelAnswers } from '../src/index';
+import { stubTextModel, TEXT_MODEL_ENV, type TextModelHandler } from './text_model_stub';
 import { progressionHints } from '../src/progression_hints';
 
 function body(overrides: Record<string, unknown> = {}): string {
@@ -235,32 +236,23 @@ describe('journey assistant Worker contract', () => {
     });
   });
 
-  it('accepts a real DeepSeek server-search result only after Qwen support verification', async () => {
-    const aiRun = vi.fn(async (
-      _model: string,
-      _input: Record<string, unknown>,
-      options?: AiOptions,
-    ) => {
-      const phase = options?.gateway?.metadata?.phase;
+  it('accepts a real DeepSeek server-search result only after text-model support verification', async () => {
+    const aiRun = vi.fn(async (phase: string) => {
       if (phase === 'curated-web-route') {
         return {
-          response: {
             hintId: '',
             webAllowed: true,
             queryZh: '宝可梦 紫 悖谬宝可梦',
             queryEn: 'Pokémon Violet Paradox Pokémon',
             pokeApiKind: '',
             pokeApiSlug: '',
-          },
-        };
+          };
       }
       if (phase === 'deepseek-native-verify') {
         return {
-          response: {
             supported: true,
             answer: '悖谬宝可梦是《宝可梦 紫》中与未来意象有关的一组宝可梦。',
-          },
-        };
+          };
       }
       throw new Error(`unexpected_phase_${String(phase)}`);
     });
@@ -342,10 +334,8 @@ describe('journey assistant Worker contract', () => {
     ['wrong gameplay source', 'https://www.serebii.net/pokedex-sv/pikachu/', false],
     ['no source', '', false],
   ] as const)('bounds relaxed franchise answers with %s', async (_label, url, accepted) => {
-    const aiRun = vi.fn(async (_model: string, _input: Record<string, unknown>, options?: AiOptions) => ({
-      response: options?.gateway?.metadata?.phase === 'deepseek-native-topic-check'
-        ? { onTopic: true } : { supported: false, webAllowed: false, hintId: '' },
-    }));
+    const aiRun = vi.fn(async (phase: string) => (phase === 'deepseek-native-topic-check'
+        ? { onTopic: true } : { supported: false, webAllowed: false, hintId: '' }));
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
       type: 'message', stop_reason: 'end_turn', content: [
         { type: 'server_tool_use', id: 'search-cards', name: 'web_search', input: { query: 'Pokemon TCG energy rules' } },
@@ -376,13 +366,12 @@ describe('journey assistant Worker contract', () => {
     ['皮卡丘为什么进化成雷丘？', 'Pikachu (Pokémon)', 'https://bulbapedia.bulbagarden.net/wiki/Pikachu_(Pok%C3%A9mon)'],
   ])('never revives a contradicted scoped native answer: %s', async (question, title, url) => {
     const phases: unknown[] = [];
-    const aiRun = vi.fn(async (_model: string, _input: Record<string, unknown>, options?: AiOptions) => {
-      const phase = options?.gateway?.metadata?.phase;
+    const aiRun = vi.fn(async (phase: string) => {
       phases.push(phase);
-      if (phase === 'curated-web-verify') return { response: { claims: [
+      if (phase === 'curated-web-verify') return { claims: [
         { index: 0, verdict: 'contradicted', sourceId: 'deepseek-citation-1', quote: 'This source contradicts the proposed claim.' },
-      ] } };
-      return { response: { supported: false, webAllowed: false, onTopic: true, hintId: '' } };
+      ] };
+      return { supported: false, webAllowed: false, onTopic: true, hintId: '' };
     });
     const citation = { type: 'web_search_result_location', title, url, cited_text: 'This source contradicts the proposed claim.' };
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
@@ -409,16 +398,15 @@ describe('journey assistant Worker contract', () => {
         ? '基本能量没有同名张数限制。特殊能量同名卡最多四张。'
         : '基本能量没有同名张数限制。特殊能量没有任何张数限制。';
       const quote = 'Basic Energy cards are not restricted by the four-copy rule.';
-      const aiRun = vi.fn(async (_model: string, _input: Record<string, unknown>, options?: AiOptions) => {
-        const phase = options?.gateway?.metadata?.phase;
-        if (phase === 'curated-web-verify') return { response: { claims: [
+      const aiRun = vi.fn(async (phase: string) => {
+        if (phase === 'curated-web-verify') return { claims: [
           { index: 0, verdict: mode === 'unsupported' ? 'unsupported' : 'supported',
             sourceId: 'deepseek-citation-1', quote: mode === 'invented-quote' ? 'A fabricated quote that is absent from the source.' : quote },
           { index: 1, verdict: mode === 'contradicted' ? 'contradicted' : mode === 'supported' ? 'supported' : 'unsupported',
             sourceId: 'deepseek-citation-2', quote: 'Special Energy cards are subject to the four-copy rule.' },
-        ] } };
-        if (phase === 'deepseek-native-topic-check') return { response: { onTopic: true } };
-        return { response: { supported: false, webAllowed: false, hintId: '' } };
+        ] };
+        if (phase === 'deepseek-native-topic-check') return { onTopic: true };
+        return { supported: false, webAllowed: false, hintId: '' };
       });
       const citations = [
         { type: 'web_search_result_location', title: 'Pokemon TCG rulebook', url: 'https://assets.pokemon.com/rulebook.pdf', cited_text: quote },
@@ -452,22 +440,16 @@ describe('journey assistant Worker contract', () => {
   );
 
   it('accepts cited DeepSeek trial output at low confidence when snippets are absent', async () => {
-    const aiRun = vi.fn(async (
-      _model: string,
-      _input: Record<string, unknown>,
-      options?: AiOptions,
-    ) => options?.gateway?.metadata?.phase === 'deepseek-native-topic-check'
-      ? { response: { onTopic: true } }
+    const aiRun = vi.fn(async (phase: string) => phase === 'deepseek-native-topic-check'
+      ? { onTopic: true }
       : {
-          response: {
             hintId: '',
             webAllowed: true,
             queryZh: '宝可梦 紫 利欧路 培养',
             queryEn: 'Pokémon Violet Riolu training guide',
             pokeApiKind: 'pokemon-species',
             pokeApiSlug: 'riolu',
-          },
-        });
+          });
     const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
       type: 'message',
       stop_reason: 'end_turn',
@@ -521,31 +503,22 @@ describe('journey assistant Worker contract', () => {
   it('guards DeepSeek final bodies while allowing explicit edition questions', async () => {
     await seedDeepSeekMoveAdviceFixture();
     let currentAnswer = '';
-    const aiRun = vi.fn(async (
-      _model: string,
-      _input: Record<string, unknown>,
-      options?: AiOptions,
-    ) => {
-      const phase = options?.gateway?.metadata?.phase;
+    const aiRun = vi.fn(async (phase: string) => {
       if (phase === 'curated-web-route') {
         return {
-          response: {
             hintId: '',
             webAllowed: true,
             queryZh: '宝可梦 朱紫 版本资料',
             queryEn: 'Pokémon Scarlet Violet version guide',
             pokeApiKind: '',
             pokeApiSlug: '',
-          },
-        };
+          };
       }
       if (phase === 'deepseek-native-verify') {
         return {
-          response: {
             supported: true,
             answer: currentAnswer,
-          },
-        };
+          };
       }
       throw new Error(`unexpected_phase_${String(phase)}`);
     });
@@ -650,22 +623,16 @@ describe('journey assistant Worker contract', () => {
   });
 
   it('rejects an off-topic Paradox answer even in the relaxed trial mode', async () => {
-    const aiRun = vi.fn(async (
-      _model: string,
-      _input: Record<string, unknown>,
-      options?: AiOptions,
-    ) => options?.gateway?.metadata?.phase === 'deepseek-native-topic-check'
-      ? { response: { onTopic: false } }
+    const aiRun = vi.fn(async (phase: string) => phase === 'deepseek-native-topic-check'
+      ? { onTopic: false }
       : {
-          response: {
             hintId: 'sv-violet-paradox-overview',
             webAllowed: true,
             queryZh: '宝可梦 紫 属性克制',
             queryEn: 'Pokémon Violet type matchups',
             pokeApiKind: '',
             pokeApiSlug: '',
-          },
-        });
+          });
     const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
       type: 'message',
       stop_reason: 'end_turn',
@@ -709,20 +676,15 @@ describe('journey assistant Worker contract', () => {
     expect(value).toMatchObject({ status: 'no_match', answer: null });
     expect(value.answer ?? '').not.toContain('悖谬');
     expect(aiRun.mock.calls.some((call) =>
-      (call[2] as AiOptions | undefined)?.gateway?.metadata?.phase ===
-        'deepseek-native-topic-check')).toBe(true);
+      call[0] === 'deepseek-native-topic-check')).toBe(true);
   });
 
-  it('marks Qwen and DeepSeek as dual-source only after an explicit cross-check', async () => {
-    const aiRun = vi.fn(async (
-      _model: string,
-      _input: Record<string, unknown>,
-      options?: AiOptions,
-    ) => {
-      expect(options?.gateway?.metadata?.phase).toBe(
+  it('marks curated and DeepSeek native answers as dual-source only after an explicit cross-check', async () => {
+    const aiRun = vi.fn(async (phase: string) => {
+      expect(phase).toBe(
         'parallel-answer-cross-check',
       );
-      return { response: { corroborated: true, conflict: false } };
+      return { corroborated: true, conflict: false };
     });
     const request = JSON.parse(violetBody('利欧路值得培养吗？')) as AssistantRequest;
     const curated: AssistantResponse = {
@@ -731,7 +693,7 @@ describe('journey assistant Worker contract', () => {
       confidence: 'medium',
       followUp: null,
       onlineComposed: true,
-      answerMode: 'curated_sources_qwen',
+      answerMode: 'curated_sources_model',
       sourceKinds: ['tavily'],
       sources: [{
         title: 'Riolu guide',
@@ -765,7 +727,7 @@ describe('journey assistant Worker contract', () => {
     );
 
     expect(result).toMatchObject({
-      answerMode: 'multi_source_qwen',
+      answerMode: 'multi_source_model',
       sourceKinds: ['tavily', 'deepseek-native'],
       sources: [{ title: 'Riolu guide' }, { title: 'Riolu - Bulbapedia' }],
     });
@@ -774,7 +736,7 @@ describe('journey assistant Worker contract', () => {
     expect(aiRun).toHaveBeenCalledTimes(1);
   });
 
-  it('serves local HGSS answers without an AI binding', async () => {
+  it('serves local HGSS answers without a text model', async () => {
     const response = await post(body(), 'local-answer-key-123');
     expect(response.status).toBe(200);
     const value = await response.json() as {
@@ -1189,7 +1151,7 @@ describe('journey assistant Worker contract', () => {
     expect(JSON.stringify(species)).not.toContain('must-not-leak');
   });
 
-  it('answers item and species profile facts from bundle catalogs without Qwen', async () => {
+  it('answers item and species profile facts from bundle catalogs without a text model', async () => {
     await seedDexBundle({}, {
       summary: { id: 447, nameZh: '利欧路', types: ['fighting'] },
       weaknesses: ['妖精', '超能力', '飞行'],
@@ -1364,36 +1326,31 @@ describe('journey assistant Worker contract', () => {
         effectZh: '能让某些特定宝可梦进化。',
       }),
     ));
-    const aiRun = vi.fn(async (
-      _model: string,
-      input: Record<string, unknown>,
-      options?: AiOptions,
-    ) => {
-      const phase = options?.gateway?.metadata?.phase;
+    const aiRun = vi.fn(async (phase: string, input: unknown[]) => {
       if (phase === 'curated-web-compose') {
         expect(JSON.stringify(input)).toContain('TitoDex Dex bundle v20');
         expect(JSON.stringify(input)).toContain('pokeapi-item-107');
-        return { response: {
+        return {
           supported: true,
           answer: '经本地资料与 PokéAPI 核对，光之石是进化道具，可让特定宝可梦进化。',
           usedSourceIds: ['dex-bundle-v20', 'pokeapi-item-107'],
-        } };
+        };
       }
       if (phase === 'curated-web-verify') {
-        return { response: {
+        return {
           supported: true,
           answer: '经本地资料与 PokéAPI 核对，光之石是进化道具，可让特定宝可梦进化。',
-        } };
+        };
       }
       if (phase === 'curated-web-route') {
-        return { response: {
+        return {
           hintId: '',
           webAllowed: true,
           queryZh: '宝可梦 紫 光之石 作用',
           queryEn: 'Pokemon Violet Shiny Stone effect',
           pokeApiKind: 'item',
           pokeApiSlug: 'shiny-stone',
-        } };
+        };
       }
       throw new Error(`unexpected model phase ${String(phase)}`);
     });
@@ -1450,27 +1407,22 @@ describe('journey assistant Worker contract', () => {
         descriptionZh: '本地结构化说明。',
       }),
     ));
-    const aiRun = vi.fn(async (
-      _model: string,
-      _input: Record<string, unknown>,
-      options?: AiOptions,
-    ) => {
-      const phase = options?.gateway?.metadata?.phase;
-      if (phase === 'curated-web-compose') return { response: {
+    const aiRun = vi.fn(async (phase: string) => {
+      if (phase === 'curated-web-compose') return {
         supported: true,
         answer: '只根据本地资料改写的回答不算联网核验。',
         usedSourceIds: ['dex-bundle-v20'],
-      } };
-      if (phase === 'curated-web-verify') return { response: {
+      };
+      if (phase === 'curated-web-verify') return {
         supported: true,
         answer: '只根据本地资料改写的回答不算联网核验。',
-      } };
-      if (phase === 'curated-web-route') return { response: {
+      };
+      if (phase === 'curated-web-route') return {
         hintId: '', webAllowed: true,
         queryZh: '宝可梦 紫 光之石 作用',
         queryEn: 'Pokemon Violet Shiny Stone effect',
         pokeApiKind: 'item', pokeApiSlug: 'shiny-stone',
-      } };
+      };
       throw new Error(`unexpected model phase ${String(phase)}`);
     });
     vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () =>
@@ -2211,10 +2163,12 @@ function deepSeekEnv({
   aiRun,
   experimental = false,
 }: {
-  aiRun: ReturnType<typeof vi.fn>;
+  aiRun: TextModelHandler;
   experimental?: boolean;
 }): Env {
+  stubTextModel(aiRun);
   return {
+    ...TEXT_MODEL_ENV,
     JOURNEY_CONTENT: env.JOURNEY_CONTENT,
     DEX_CONTENT: env.DEX_CONTENT,
     QUESTION_BUDGET: env.QUESTION_BUDGET,
@@ -2222,24 +2176,11 @@ function deepSeekEnv({
       limit: async () => ({ success: true }),
     },
     JOURNEY_SEARCH_NAMESPACE: undefined,
-    AI: {
-      run: aiRun,
-    },
-    CF_ACCOUNT_ID: 'a'.repeat(32),
-    CF_AIG_TOKEN: 'test-gateway-run-token-123456',
-    AI_MODEL: '@cf/qwen/qwen3-30b-a3b-fp8',
-    AI_GATEWAY_ID: 'titodex-journey-assistant',
     AI_SEARCH_ENABLED: 'false',
     CURATED_WEB_ENABLED: 'false',
     TAVILY_WEB_ENABLED: 'false',
     EXPERIMENTAL_BROAD_ANSWERS: experimental ? 'true' : 'false',
     DEEPSEEK_NATIVE_SEARCH_ENABLED: 'true',
-    DEEPSEEK_NATIVE_PROVIDER: 'custom-deepseek-anthropic',
-    DEEPSEEK_NATIVE_KEY_ALIAS: 'TitoDex',
-    AI_EXTERNAL_PROVIDER_ENABLED: 'false',
-    AI_PROVIDER: 'workers-ai',
-    AI_PROVIDER_MODEL: 'deepseek-v4-flash',
-    AI_PROVIDER_ENDPOINT: 'chat/completions',
     TAVILY_API_KEY: '',
   } as unknown as Env;
 }
@@ -2272,8 +2213,10 @@ async function seedDeepSeekMoveAdviceFixture(): Promise<void> {
   }));
 }
 
-function curatedDexEnv(aiRun: ReturnType<typeof vi.fn>): Env {
+function curatedDexEnv(aiRun: TextModelHandler): Env {
+  stubTextModel(aiRun);
   return {
+    ...TEXT_MODEL_ENV,
     JOURNEY_CONTENT: env.JOURNEY_CONTENT,
     DEX_CONTENT: env.DEX_CONTENT,
     QUESTION_BUDGET: env.QUESTION_BUDGET,
@@ -2281,20 +2224,11 @@ function curatedDexEnv(aiRun: ReturnType<typeof vi.fn>): Env {
       limit: async () => ({ success: true }),
     },
     JOURNEY_SEARCH_NAMESPACE: undefined,
-    AI: { run: aiRun },
-    AI_MODEL: '@cf/qwen/qwen3-30b-a3b-fp8',
-    AI_GATEWAY_ID: 'titodex-journey-assistant',
     AI_SEARCH_ENABLED: 'false',
     CURATED_WEB_ENABLED: 'true',
     TAVILY_WEB_ENABLED: 'false',
     EXPERIMENTAL_BROAD_ANSWERS: 'false',
     DEEPSEEK_NATIVE_SEARCH_ENABLED: 'false',
-    DEEPSEEK_NATIVE_PROVIDER: 'custom-deepseek-anthropic',
-    DEEPSEEK_NATIVE_KEY_ALIAS: 'TitoDex',
-    AI_EXTERNAL_PROVIDER_ENABLED: 'false',
-    AI_PROVIDER: 'workers-ai',
-    AI_PROVIDER_MODEL: 'deepseek-v4-flash',
-    AI_PROVIDER_ENDPOINT: 'chat/completions',
     TAVILY_API_KEY: '',
   } as unknown as Env;
 }

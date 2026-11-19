@@ -231,7 +231,7 @@ void main() {
                 'answer': '白天、高亲密度升级。',
                 'confidence': 'medium',
                 'followUp': null,
-                'answerMode': 'curated_sources_qwen',
+                'answerMode': 'curated_sources_model',
                 'modelUsed': true,
                 'answerBlocks': [
                   {'id': 'summary', 'kind': 'summary', 'text': '白天、高亲密度升级。'},
@@ -336,7 +336,7 @@ void main() {
           'schemaVersion': 2,
           'capabilities': {
             'worker': true,
-            'publicModel': 'workers-ai-qwen',
+            'publicModel': 'deepseek-text',
             'aiSearch': true,
             'curatedSources': true,
             'sourceProviders': [
@@ -367,7 +367,7 @@ void main() {
     final status = await online.checkStatus();
 
     expect(status.availability, AskTitoDexAvailability.online);
-    expect(status.qwenConfigured, isTrue);
+    expect(status.textModelConfigured, isTrue);
     expect(status.aiSearchEnabled, isTrue);
     expect(status.curatedSourcesEnabled, isTrue);
     expect(status.braveSearchEnabled, isFalse);
@@ -399,13 +399,57 @@ void main() {
       'confidence': 'medium',
       'followUp': null,
       'onlineComposed': true,
-      'answerMode': 'multi_source_qwen',
+      'answerMode': 'multi_source_model',
       'modelUsed': true,
       'sourceKinds': ['tavily', 'deepseek-native'],
     });
-    expect(dual.answerMode, AskTitoDexAnswerMode.multiSourceQwen);
+    expect(dual.answerMode, AskTitoDexAnswerMode.multiSourceModel);
     expect(dual.sourceKinds, ['tavily', 'deepseek-native']);
   });
+
+  test('client still reads answer modes and health from older Workers', () {
+    for (final (wire, mode) in [
+      ('curated_sources_qwen', AskTitoDexAnswerMode.curatedSourcesModel),
+      ('multi_source_qwen', AskTitoDexAnswerMode.multiSourceModel),
+    ]) {
+      final result = AskTitoDexResult.fromJson({
+        'status': 'answered',
+        'answer': '旧版回答',
+        'onlineComposed': true,
+        'answerMode': wire,
+        'modelProviders': ['workers-ai-qwen'],
+      });
+      expect(result.answerMode, mode);
+      expect(result.modelProviders, isEmpty);
+    }
+  });
+
+  for (final (capabilities, configured) in [
+    (<String, Object>{'publicModel': 'workers-ai-qwen'}, false),
+    (
+      <String, Object>{
+        'publicModel': 'workers-ai-qwen',
+        'publicModelFallback': 'deepseek-text',
+      },
+      true,
+    ),
+  ]) {
+    test('health text model status from older Worker: $capabilities', () async {
+      final online = HttpAskTitoDexOnlineClient(
+        client: MockClient(
+          (_) async => http.Response(
+            jsonEncode({
+              'ok': true,
+              'capabilities': {'worker': true, ...capabilities},
+            }),
+            200,
+          ),
+        ),
+        endpoint: 'https://example.test/v1/ask',
+      );
+      expect((await online.checkStatus()).textModelConfigured, configured);
+    });
+  }
 
   group('HGSS deterministic progression hints', () {
     final repository = ProgressionHintRepository(
@@ -594,7 +638,9 @@ void main() {
       );
       expect(find.text(AppZh.askTitoDexCapOnlineService), findsOneWidget);
       expect(
-        find.text(AppZh.askTitoDexCapAnswerComposition('Qwen')),
+        find.text(
+          AppZh.askTitoDexCapAnswerComposition(AppZh.askTitoDexTextModelShort),
+        ),
         findsOneWidget,
       );
       expect(find.text(AppZh.askTitoDexCapReviewedHints), findsOneWidget);
@@ -645,7 +691,7 @@ void main() {
 来源：
 [1] PokeAPI · 路卡利欧：https://pokeapi.co/api/v2/pokemon-species/448/''',
           onlineComposed: true,
-          answerMode: AskTitoDexAnswerMode.curatedSourcesQwen,
+          answerMode: AskTitoDexAnswerMode.curatedSourcesModel,
           modelUsed: true,
           confidence: 'medium',
           sourceKinds: ['pokeapi', 'exa', 'tavily', 'pokeapi'],
@@ -677,7 +723,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsNothing);
+      expect(find.text(AppZh.askTitoDexRouteCuratedModel), findsNothing);
       expect(find.text(AppZh.askTitoDexTraceModel), findsNothing);
       expect(find.text('检索 3 路'), findsNothing);
       expect(find.text('参考 3 个来源 · 未逐项核验'), findsOneWidget);
@@ -727,7 +773,7 @@ void main() {
 
       expect(find.byKey(const Key('ask-titodex-source-sheet')), findsOneWidget);
       expect(find.text('回答引用 · 3'), findsOneWidget);
-      expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexRouteCuratedModel), findsOneWidget);
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
       expect(find.text('检索 3 路'), findsOneWidget);
       expect(find.text('PokeAPI'), findsOneWidget);
@@ -1293,7 +1339,7 @@ class _CompleterService extends AskTitoDexService {
   Future<AskTitoDexWorkerStatus> checkConnection() async =>
       AskTitoDexWorkerStatus(
         availability: AskTitoDexAvailability.online,
-        qwenConfigured: true,
+        textModelConfigured: true,
         aiSearchEnabled: true,
         curatedSourcesEnabled: true,
         sourceProviders: const ['pokeapi', 'strategywiki', 'wikidata'],

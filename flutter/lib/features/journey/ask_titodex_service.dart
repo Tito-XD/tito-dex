@@ -84,8 +84,7 @@ enum AskTitoDexAvailability { checking, online, disabled, unavailable }
 class AskTitoDexWorkerStatus {
   const AskTitoDexWorkerStatus({
     required this.availability,
-    this.qwenConfigured = false,
-    this.textFallbackConfigured = false,
+    this.textModelConfigured = false,
     this.aiSearchEnabled = false,
     this.dexBundleEnabled = false,
     this.curatedSourcesEnabled = false,
@@ -111,8 +110,7 @@ class AskTitoDexWorkerStatus {
       );
 
   final AskTitoDexAvailability availability;
-  final bool qwenConfigured;
-  final bool textFallbackConfigured;
+  final bool textModelConfigured;
   final bool aiSearchEnabled;
   final bool dexBundleEnabled;
   final bool curatedSourcesEnabled;
@@ -298,8 +296,9 @@ class HttpAskTitoDexOnlineClient
     final legacyBraveSearch = capabilities['braveSearch'] == true;
     return AskTitoDexWorkerStatus(
       availability: AskTitoDexAvailability.online,
-      qwenConfigured: capabilities['publicModel'] == 'workers-ai-qwen',
-      textFallbackConfigured:
+      // Older Workers report DeepSeek only as publicModelFallback.
+      textModelConfigured:
+          capabilities['publicModel'] == 'deepseek-text' ||
           capabilities['publicModelFallback'] == 'deepseek-text',
       aiSearchEnabled: capabilities['aiSearch'] == true,
       dexBundleEnabled: capabilities['dexBundle'] == true,

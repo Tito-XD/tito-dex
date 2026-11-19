@@ -14,7 +14,7 @@ TitoDex 会在构建阶段整理公开 API、社区资料与技术文档，并�
 
 ### 问 TitoDex 的限定联网来源
 
-当前开发中的问答流程使用 Exa 并行检索中文和英文关键词，搜索公共网页，并按问题主题、作品、游戏版本和原文依据筛选。实际采用的网页在每条回答中保留来源链接。Qwen 负责整理与核验；文本模型不可用时可使用 DeepSeek 备用模型。Tavily 与 DeepSeek 原生联网默认关闭，需要维护者显式开启。Exa、Tavily 与 DeepSeek 是检索／生成服务，各网页的内容权利仍属于原权利人。
+当前开发中的问答流程使用 Exa 并行检索中文和英文关键词，搜索公共网页，并按问题主题、作品、游戏版本和原文依据筛选。实际采用的网页在每条回答中保留来源链接。DeepSeek 文本模型负责整理与核验。Tavily 与 DeepSeek 原生联网默认关闭，需要维护者显式开启。Exa、Tavily 与 DeepSeek 是检索／生成服务，各网页的内容权利仍属于原权利人。
 
 这些网页的即时摘要只用于当次回答、交叉核验和显示逐条引用，不会自动写入 R2、AI Search、APK、本地图鉴包或训练资料。被回答引用不表示 TitoDex 复制或重新许可整站内容；每个站点的文字、媒体和商标仍适用其自身条款及原权利状态。52Poké 的百科原创内容按其 CC BY-NC-SA 3.0 标注处理，其他来源只在实际命中时按回答中的链接与适用说明署名。
 
@@ -54,7 +54,7 @@ TitoDex compiles public APIs, community references, and technical documentation 
 - **Bulbapedia** — item grouping inspiration, selected location links, and fact-checking for the initial HGSS blocker-hint dataset (Sudowoodo/flower shop, Ilex Forest, Goldenrod Radio Tower/Card Key). TitoDex stores newly written summaries/steps with per-record provenance; original wiki content is licensed under CC BY-NC-SA 2.5.
 - **PKHeX** — normalized modern-game encounter overlays from a pinned commit; GPL-3.0-or-later. TitoDex neither embeds nor executes PKHeX.
 - **Project Pokémon** — HGSS save structure, Gen IV Pokémon structure, and HGSS map-index technical references.
-- **Ask TitoDex web sources** — the development candidate runs parallel Chinese/English Exa searches over public pages, then checks topic, work, game version and supporting excerpts. Each answer retains the actual source links. Qwen composes and verifies, with DeepSeek as an optional text-model fallback. Tavily and DeepSeek native search are disabled by default and require explicit opt-in. These providers are services rather than content licensors. Excerpts are used only for the current answer, verification and citations; they are not automatically persisted to R2, AI Search, the APK, local bundles or training data.
+- **Ask TitoDex web sources** — the development candidate runs parallel Chinese/English Exa searches over public pages, then checks topic, work, game version and supporting excerpts. Each answer retains the actual source links. The DeepSeek text model composes and verifies. Tavily and DeepSeek native search are disabled by default and require explicit opt-in. These providers are services rather than content licensors. Excerpts are used only for the current answer, verification and citations; they are not automatically persisted to R2, AI Search, the APK, local bundles or training data.
 - **PokéAPI/sprites and Pokémon Showdown / Smogon contributors** — upstream sprite, animation, cry, artwork, and item-icon sources. Rights and upstream contributor credits remain with their respective owners.
 - **Pokémon Paraíso and ShinyHunters** — additional companion animation candidates. The APK adds source URLs and exact identity mappings; original files download to a local cache only after confirmation. Source contributor credits and underlying Pokémon-media rights remain unchanged.
 - **PokéSprite** — the vendored Gen 8 type-icon set, pinned at `c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e`; MIT project license, with underlying Pokémon-media rights unchanged.

@@ -24,7 +24,7 @@ describe('admission security regressions', () => {
 
   it('rotating device keys and forwarded headers cannot rotate the edge bucket', async () => {
     const keys: string[] = [];
-    const aiRun = vi.spyOn(env.AI ?? { run: async () => null }, 'run');
+    const modelFetch = vi.spyOn(globalThis, 'fetch');
     const limitedEnv = { ...env, QUESTION_RATE_LIMITER: {
       limit: vi.fn(async ({ key }: { key: string }) => { keys.push(key); return { success: false }; }),
     } } as Env;
@@ -32,7 +32,8 @@ describe('admission security regressions', () => {
       expect((await worker.fetch(request(`rotated-device-${i}`, '192.0.2.1'), limitedEnv)).status).toBe(429);
     }
     expect(new Set(keys)).toEqual(new Set(['edge:192.0.2.1']));
-    expect(aiRun).not.toHaveBeenCalled();
+    expect(modelFetch).not.toHaveBeenCalled();
+    modelFetch.mockRestore();
   });
   it('missing edge identity shares a bucket and limiter failures fail closed', async () => {
     const limit = vi.fn(async () => ({ success: false }));

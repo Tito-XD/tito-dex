@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:test';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import worker, { runQwenWithTextFallback } from '../src/index';
+import worker, { runTextModel } from '../src/index';
 import { runDeepSeekText } from '../src/deepseek_text';
 import type { DeepSeekNativeSearchConfig } from '../src/deepseek_native_search';
 import type { AssistantResponse } from '../src/contract';
@@ -15,20 +15,19 @@ const schema = { type: 'object', properties: { allowed: { type: 'boolean' } } };
 function payload(value: unknown) {
   return new Response(JSON.stringify({ stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify(value) }] }));
 }
-function fakeEnv(aiRun = vi.fn(async () => ({ response: { allowed: true } }))) {
+function fakeEnv() {
   return Object.assign({}, env, {
-    AI: { run: aiRun }, AI_MODEL: '@cf/qwen/qwen3-30b-a3b-fp8', AI_GATEWAY_ID: config.gatewayId,
+    AI_GATEWAY_ID: config.gatewayId,
     CF_ACCOUNT_ID: config.accountId, CF_AIG_TOKEN: config.authToken,
     CURATED_WEB_ENABLED: 'true', EXA_WEB_ENABLED: 'true', EXA_API_KEY: 'exa-test-key-only-123456789',
     TAVILY_WEB_ENABLED: 'false', TAVILY_API_KEY: '', WEB_SEARCH_PRIMARY: 'exa',
-    DEEPSEEK_NATIVE_SEARCH_ENABLED: 'false', DEEPSEEK_TEXT_FALLBACK_ENABLED: 'true',
+    DEEPSEEK_NATIVE_SEARCH_ENABLED: 'false', DEEPSEEK_TEXT_ENABLED: 'true',
     DEEPSEEK_NATIVE_PROVIDER: config.provider, DEEPSEEK_NATIVE_KEY_ALIAS: config.keyAlias,
-    AI_EXTERNAL_PROVIDER_ENABLED: 'false',
   }) as Env;
 }
 afterEach(() => vi.restoreAllMocks());
 
-describe('DeepSeek text-only model fallback', () => {
+describe('DeepSeek text model', () => {
   it('uses the fixed Gateway and explicit BYOK alias with no search tools', async () => {
     const fetcher = vi.fn<typeof fetch>(async (input, init) => {
       expect(input.toString()).toBe(`https://gateway.ai.cloudflare.com/v1/${config.accountId}/titodex-journey-assistant/custom-deepseek-anthropic/anthropic/v1/messages`);
@@ -44,36 +43,40 @@ describe('DeepSeek text-only model fallback', () => {
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
-  it('does not start text fallback when Qwen succeeds and reports only Qwen', async () => {
-    const fetcher = vi.spyOn(globalThis, 'fetch');
-    const trace: { modelUsed: boolean; aiSearchUsed: boolean; modelProviders?: AssistantResponse['modelProviders'] } = { modelUsed: true, aiSearchUsed: false };
-    expect(await runQwenWithTextFallback(fakeEnv(), 'curated-web-queries', messages, schema, 250, 0, trace)).toEqual({ allowed: true });
-    expect(fetcher).not.toHaveBeenCalled();
-    expect(trace.modelProviders).toEqual(['workers-ai-qwen']);
-  });
 
-  it('uses text fallback only after a Qwen failure and reports its successful provider', async () => {
+  it('reports DeepSeek text as the provider after a successful call', async () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(payload({ allowed: true }));
-    const aiRun = vi.fn(async () => { throw new Error('model failed'); });
     const trace: { modelUsed: boolean; aiSearchUsed: boolean; modelProviders?: AssistantResponse['modelProviders'] } = { modelUsed: true, aiSearchUsed: false };
-    expect(await runQwenWithTextFallback(fakeEnv(aiRun), 'curated-web-compose', messages, schema, 250, 0, trace)).toEqual({ allowed: true });
-    expect(aiRun).toHaveBeenCalledTimes(1);
+    expect(await runTextModel(fakeEnv(), 'curated-web-compose', messages, schema, 250, 0, trace)).toEqual({ allowed: true });
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(trace.modelProviders).toEqual(['deepseek-text']);
     expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).not.toHaveProperty('tools');
   });
 
-  it('skips repeated Qwen failures within one request and retries it in a new request', async () => {
+  it('keeps the shorter Gateway timeout for curated-web phases', async () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => payload({ allowed: true }));
-    const aiRun = vi.fn(async () => { throw new Error('model failed'); });
+    await runTextModel(fakeEnv(), 'curated-web-compose', messages, schema, 250, 0);
+    await runTextModel(fakeEnv(), 'local-hint-compose', messages, schema, 250, 0);
+    const timeouts = fetcher.mock.calls.map((call) => new Headers(call[1]?.headers).get('cf-aig-request-timeout'));
+    expect(timeouts).toEqual(['6000', '10000']);
+  });
+
+  it('fails fast after one failure within a request and retries in a new request', async () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response('busy', { status: 503 }));
     const trace = { modelUsed: true, aiSearchUsed: false };
-    const configured = fakeEnv(aiRun);
-    await runQwenWithTextFallback(configured, 'curated-web-queries', messages, schema, 250, 0, trace);
-    await runQwenWithTextFallback(configured, 'curated-web-compose', messages, schema, 250, 0, trace);
-    expect(aiRun).toHaveBeenCalledTimes(1);
+    const configured = fakeEnv();
+    await expect(runTextModel(configured, 'curated-web-queries', messages, schema, 250, 0, trace)).rejects.toThrow('deepseek_text_unavailable');
+    await expect(runTextModel(configured, 'curated-web-compose', messages, schema, 250, 0, trace)).rejects.toThrow('text_model_unavailable_this_request');
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    await expect(runTextModel(configured, 'curated-web-queries', messages, schema, 250, 0, { modelUsed: true, aiSearchUsed: false })).rejects.toThrow('deepseek_text_unavailable');
     expect(fetcher).toHaveBeenCalledTimes(2);
-    await runQwenWithTextFallback(configured, 'curated-web-queries', messages, schema, 250, 0, { modelUsed: true, aiSearchUsed: false });
-    expect(aiRun).toHaveBeenCalledTimes(2);
+  });
+
+  it('refuses to call a model when DeepSeek text is disabled', async () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch');
+    const disabled = Object.assign(fakeEnv(), { DEEPSEEK_TEXT_ENABLED: 'false' }) as Env;
+    await expect(runTextModel(disabled, 'curated-web-queries', messages, schema, 250, 0)).rejects.toThrow('text_model_unconfigured');
+    expect(fetcher).not.toHaveBeenCalled();
   });
 
   it('rejects a response that attempts a tool call instead of JSON text', async () => {
@@ -83,14 +86,20 @@ describe('DeepSeek text-only model fallback', () => {
     await expect(runDeepSeekText(config, 'curated-web-queries', messages, schema, 250, 0, fetcher)).rejects.toThrow('invalid_deepseek_text');
   });
 
-  it('health reports a text fallback without advertising a native search route', async () => {
+  it('health reports DeepSeek text as the model without advertising a native search route', async () => {
     const response = await worker.fetch(new Request('https://worker.test/health'), fakeEnv());
     const value = await response.json();
     expect(value).toMatchObject({ capabilities: {
-      publicModel: 'workers-ai-qwen', publicModelFallback: 'deepseek-text',
+      publicModel: 'deepseek-text', publicModelFallback: 'deepseek-text',
       sourceProviders: [], webSearchProviders: ['exa'],
     } });
     expect(JSON.stringify(value)).not.toContain('deepseek-native');
     expect(JSON.stringify(value)).not.toContain(config.authToken);
+  });
+
+  it('health reports no model when DeepSeek text is disabled', async () => {
+    const disabled = Object.assign(fakeEnv(), { DEEPSEEK_TEXT_ENABLED: 'false' }) as Env;
+    const value = await (await worker.fetch(new Request('https://worker.test/health'), disabled)).json();
+    expect(value).toMatchObject({ capabilities: { publicModel: 'unavailable', publicModelFallback: 'unavailable' } });
   });
 });

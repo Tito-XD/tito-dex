@@ -54,14 +54,20 @@ enum AskTitoDexAnswerMode {
   auditedOnline('audited_online'),
   aiSearchAudited('ai_search_audited'),
   curatedSourcesDeterministic('curated_sources_deterministic'),
-  curatedSourcesQwen('curated_sources_qwen'),
+  curatedSourcesModel('curated_sources_model'),
   deepseekNativeSearch('deepseek_native_search'),
-  multiSourceQwen('multi_source_qwen'),
+  multiSourceModel('multi_source_model'),
   noMatch('no_match');
 
   const AskTitoDexAnswerMode(this.wireValue);
 
   final String wireValue;
+
+  /// Values written by older Workers; saved conversations still contain them.
+  static const _legacyWireValues = {
+    'curated_sources_qwen': AskTitoDexAnswerMode.curatedSourcesModel,
+    'multi_source_qwen': AskTitoDexAnswerMode.multiSourceModel,
+  };
 
   static AskTitoDexAnswerMode fromWire(
     Object? value, {
@@ -71,9 +77,11 @@ enum AskTitoDexAnswerMode {
     for (final mode in values) {
       if (mode.wireValue == value) return mode;
     }
+    final legacy = _legacyWireValues[value];
+    if (legacy != null) return legacy;
     if (!onlineComposed) return AskTitoDexAnswerMode.localAudited;
     return matchedHintIds.isEmpty
-        ? AskTitoDexAnswerMode.curatedSourcesQwen
+        ? AskTitoDexAnswerMode.curatedSourcesModel
         : AskTitoDexAnswerMode.auditedOnline;
   }
 }
@@ -470,10 +478,7 @@ class AskTitoDexResult {
       ),
       modelUsed: json['modelUsed'] as bool? ?? onlineComposed,
       modelProviders: _strings(json['modelProviders'])
-          .where(
-            (value) =>
-                const {'workers-ai-qwen', 'deepseek-text'}.contains(value),
-          )
+          .where((value) => value == 'deepseek-text')
           .toSet()
           .toList(growable: false),
       aiSearchUsed: json['aiSearchUsed'] as bool? ?? false,

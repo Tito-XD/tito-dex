@@ -601,8 +601,7 @@ class _PendingService extends AskTitoDexService {
   Future<AskTitoDexWorkerStatus> checkConnection() async =>
       const AskTitoDexWorkerStatus(
         availability: AskTitoDexAvailability.online,
-        qwenConfigured: true,
-        textFallbackConfigured: true,
+        textModelConfigured: true,
         dexBundleEnabled: true,
         aiSearchEnabled: true,
         curatedSourcesEnabled: true,
@@ -632,7 +631,7 @@ AskTitoDexResult _reply(String answer) => AskTitoDexResult(
   answer: answer,
   onlineComposed: true,
   modelUsed: true,
-  answerMode: AskTitoDexAnswerMode.curatedSourcesQwen,
+  answerMode: AskTitoDexAnswerMode.curatedSourcesModel,
   sourceKinds: const ['exa'],
   sources: const [
     ProgressionSource(

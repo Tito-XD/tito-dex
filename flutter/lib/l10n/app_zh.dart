@@ -311,8 +311,6 @@ abstract final class AppZh {
       t('askTitoDexWorkerUnavailable', '当前仅可使用本地资料');
   static String get askTitoDexWorkerRefresh =>
       t('askTitoDexWorkerRefresh', '重新检查连接');
-  static String get askTitoDexQwenConfigured =>
-      t('askTitoDexQwenConfigured', 'Qwen 已配置');
   static String get askTitoDexAiSearchEnabled =>
       t('askTitoDexAiSearchEnabled', 'AI Search 已开启');
   static String get askTitoDexCuratedSourcesEnabled =>
@@ -330,27 +328,19 @@ abstract final class AppZh {
   static String get askTitoDexRouteLocal =>
       t('askTitoDexRouteLocal', '审核资料 · 本地回答');
   static String get askTitoDexRouteAuditedOnline =>
-      t('askTitoDexRouteAuditedOnline', '审核资料 · Qwen 在线匹配');
+      t('askTitoDexRouteAuditedOnline', '审核资料 · 在线匹配');
   static String get askTitoDexRouteAiSearch =>
-      t('askTitoDexRouteAiSearch', 'R2 AI Search · Qwen 匹配');
+      t('askTitoDexRouteAiSearch', 'R2 AI Search 匹配');
   static String get askTitoDexRouteCuratedDeterministic =>
       t('askTitoDexRouteCuratedDeterministic', '网页来源 · 确定性提取');
-  static String get askTitoDexRouteCuratedQwen =>
-      t('askTitoDexRouteCuratedQwen', '网页来源 · Qwen 整理');
-  static String get askTitoDexRouteCuratedFallback =>
-      t('askTitoDexRouteCuratedFallback', '网页来源 · 文本模型备用整理');
-  static String get askTitoDexRouteAuditedFallback =>
-      t('askTitoDexRouteAuditedFallback', '审核资料 · 备用模型匹配');
-  static String get askTitoDexRouteAiSearchFallback =>
-      t('askTitoDexRouteAiSearchFallback', 'R2 AI Search · 备用模型匹配');
-  static String get askTitoDexTraceQwenDeepseek =>
-      t('askTitoDexTraceQwenDeepseek', 'Qwen / DeepSeek 已参与');
+  static String get askTitoDexRouteCuratedModel =>
+      t('askTitoDexRouteCuratedModel', '网页来源 · 模型整理');
   static String get askTitoDexTraceDeepseekText =>
-      t('askTitoDexTraceDeepseekText', 'DeepSeek 备用模型已参与');
+      t('askTitoDexTraceDeepseekText', 'DeepSeek 已参与');
   static String get askTitoDexTraceNoModel =>
-      t('askTitoDexTraceNoModel', '本次未调用 Qwen');
+      t('askTitoDexTraceNoModel', '本次未调用文本模型');
   static String get askTitoDexTraceModel =>
-      t('askTitoDexTraceModel', 'Qwen 已参与');
+      t('askTitoDexTraceModel', '文本模型已参与');
   static String get askTitoDexTraceAiSearch =>
       t('askTitoDexTraceAiSearch', 'AI Search 已命中');
   static String askTitoDexTraceSearchRoutes(int count) =>
@@ -406,7 +396,7 @@ abstract final class AppZh {
       t('askTitoDexNoticeTitle', '开启问 TitoDex？');
   static String get askTitoDexNoticeBody => t(
     'askTitoDexNoticeBody',
-    '这个助手默认关闭。确认开启后，TitoDex 仍会优先使用 App 内的本地资料；本地不足时才会连接 Journey Worker，并可能使用 AI Search、Workers AI（Qwen）、Exa 网页检索来整理答案，文本模型不可用时可能使用 DeepSeek 备用模型。请求只包含你确认后的游戏版本、可靠的地点/徽章/里程碑 ID、语言、解析器版本、本次问题，以及当前会话最近最多 6 组问答用于理解追问。本机最多保存 20 个会话；达到上限后，新建会话需要先选择删除旧会话。不会上传原始存档、训练家姓名、ID、金钱、队伍或个体数据。你之后可单独关闭在线回答，或关闭整个助手并隐藏所有入口。',
+    '这个助手默认关闭。确认开启后，TitoDex 仍会优先使用 App 内的本地资料；本地不足时才会连接 Journey Worker，并可能使用 AI Search、Exa 网页检索和 DeepSeek 文本模型来整理答案。请求只包含你确认后的游戏版本、可靠的地点/徽章/里程碑 ID、语言、解析器版本、本次问题，以及当前会话最近最多 6 组问答用于理解追问。本机最多保存 20 个会话；达到上限后，新建会话需要先选择删除旧会话。不会上传原始存档、训练家姓名、ID、金钱、队伍或个体数据。你之后可单独关闭在线回答，或关闭整个助手并隐藏所有入口。',
   );
   static String get askTitoDexNoticeAccept =>
       t('askTitoDexNoticeAccept', '确认开启');
@@ -704,7 +694,7 @@ abstract final class AppZh {
     'settingsAttributionBody',
     'TitoDex 是非官方、非商业、仅面向学习与个人游玩辅助的工具，与 Nintendo Co., Ltd.、Creatures Inc.、GAME FREAK inc.、The Pokémon Company 及其关联公司不存在隶属、授权、赞助或认可关系。Pokémon、宝可梦、角色、游戏名称、图像、音频与商标归各自权利人所有；本工具不提供 ROM、密钥、付费内容或存档修改。\n\n'
         '资料与文字：PokéAPI（物种、形态、招式、特性、道具、版本与基础地点；数据／代码仓库 BSD-3-Clause）、52Poké Wiki／神奇宝贝百科（部分中文说明、携带道具、地点与体形；百科原创内容 CC BY-NC-SA 3.0）、Bulbapedia（道具分组与少量地点语言链接；CC BY-NC-SA 2.5）、PKHeX（固定提交导出的现代遭遇覆盖；GPL-3.0-or-later，App 不嵌入或执行）、Project Pokémon（HGSS 存档／PKM 结构与地图编号技术参考）。\n\n'
-        '问 TitoDex 的网页来源：Exa 使用中英文关键词检索公共网页，按问题主题、作品、游戏版本和原文依据筛选；每条回答保留实际采用的来源链接。Qwen 负责整理与核验，文本模型不可用时可能使用 DeepSeek 备用模型。联网摘要只用于当次回答与引用核验，不会自动写入 R2、AI Search、APK 或本地图鉴包；各站内容仍适用其自身条款与权利说明。Tavily 与 DeepSeek 原生联网默认关闭，需要维护者显式开启。Exa、Tavily 与 DeepSeek 是检索／生成服务，各网页内容权利仍属于原权利人。\n\n'
+        '问 TitoDex 的网页来源：Exa 使用中英文关键词检索公共网页，按问题主题、作品、游戏版本和原文依据筛选；每条回答保留实际采用的来源链接。DeepSeek 文本模型负责整理与核验。联网摘要只用于当次回答与引用核验，不会自动写入 R2、AI Search、APK 或本地图鉴包；各站内容仍适用其自身条款与权利说明。Tavily 与 DeepSeek 原生联网默认关闭，需要维护者显式开启。Exa、Tavily 与 DeepSeek 是检索／生成服务，各网页内容权利仍属于原权利人。\n\n'
         '媒体：PokéAPI/sprites、Pokémon Showdown／Smogon 社区创作者、Pokémon Paraíso 与 ShinyHunters 同行动画候选、PokéSprite 类型图标（MIT）、SteamGridDB 社区来源页、Pokémon HOME 与各代游戏的官方图像／音频；Nunito 字体依 SIL OFL 1.1 随包分发。百科开放许可不自动覆盖其中的官方游戏媒体，各素材仍按记录级来源与原权利状态处理。\n\n'
         '外部工具：Pokémon Sleep 二级页的睡眠分数、19 种食材数值、食谱等级倍率与料理能量公式移植自 Neroli’s Lab 固定提交 cb533f2，依 Apache-2.0 使用并随 App 提供许可证与 NOTICE；完整配队和长期模拟仍保留为外部入口。\n\n'
         '来源入口：pokemon.com · wiki.52poke.com · bulbapedia.bulbagarden.net · strategywiki.org · serebii.net · pokeapi.co · wikidata.org · pokemondb.net · smogon.com · marriland.com · gamefaqs.gamespot.com · game8.co · ign.com · nintendolife.com · eurogamer.net · github.com/PokeAPI/sprites · github.com/msikma/pokesprite · github.com/kwsch/PKHeX · projectpokemon.org · pokemonshowdown.com · steamgriddb.com · nerolislab.com。固定提交、逐文件来源和构建批次说明见项目根目录 CREDITS.md、THIRD_PARTY_NOTICES.md 及数据包随附 attribution 文件。',
@@ -2090,8 +2080,8 @@ abstract final class AppZh {
       t('askTitoDexConnectionsTitle', '联网连接');
   static String get askTitoDexCapOnlineService =>
       t('askTitoDexCapOnlineService', '联网服务 · Journey Worker');
-  static String get askTitoDexTextFallbackShort =>
-      t('askTitoDexTextFallbackShort', 'DeepSeek 文本备用');
+  static String get askTitoDexTextModelShort =>
+      t('askTitoDexTextModelShort', 'DeepSeek');
   static String get askTitoDexCapSearchGeneric =>
       t('askTitoDexCapSearchGeneric', '网页检索');
   static String get askTitoDexCapAnswerGeneric =>
@@ -2213,8 +2203,6 @@ abstract final class AppZh {
     'askTitoDexBroadTrialHint',
     '当前为宽范围试用：仍只接受宝可梦主题和公开网页与原文依据，但证据不足时会降为低置信度回答，不再直接丢弃。',
   );
-  static String get askTitoDexCapQwen =>
-      t('askTitoDexCapQwen', 'Qwen · 回答整理/核对');
   static String get askTitoDexCapAiSearch =>
       t('askTitoDexCapAiSearch', 'AI Search · R2 索引');
   static String get askTitoDexCapBundle =>
@@ -2321,7 +2309,7 @@ abstract final class AppZh {
   static String get askTitoDexRouteDeepseekNative =>
       t('askTitoDexRouteDeepseekNative', 'DeepSeek 原生联网回答');
   static String get askTitoDexRouteMultiSource =>
-      t('askTitoDexRouteMultiSource', 'Qwen × DeepSeek 交叉核对');
+      t('askTitoDexRouteMultiSource', '两路来源交叉核对');
   static String get askTitoDexSourceDeepseekWeb =>
       t('askTitoDexSourceDeepseekWeb', 'DeepSeek 联网');
   static String get askTitoDexSourceDeepseekNativeShort =>

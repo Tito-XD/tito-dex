@@ -90,7 +90,7 @@ export async function answerQuestion(
   const deterministic = deterministicAnswer(hint, request);
   // A unique local rule is already final. Model calls are reserved for hints
   // selected from an unresolved miss/tie, preserving offline-first behavior
-  // and the public Workers AI quota.
+  // and the paid text-model budget.
   if (!selectedByAi) return deterministic;
   // A retrieval/model-selected hint is already an online result. When the
   // optional composer is omitted, return the exact audited answer directly;

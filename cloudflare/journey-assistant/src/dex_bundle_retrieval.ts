@@ -541,7 +541,7 @@ function fuzzyShapeSlugs(question: string): string[] {
 }
 
 /**
- * Build a small, internally generated evidence object for open-ended Qwen
+ * Build a small, internally generated evidence object for open-ended model
  * composition. It deliberately excludes flavor prose and held-item rows (the
  * latter include a separately licensed 52Poké batch); those remain available
  * only through deterministic, attributed answers above.
